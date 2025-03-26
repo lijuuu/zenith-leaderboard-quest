@@ -13,7 +13,12 @@ import {
   UserCheck,
   Zap,
   Check,
-  X
+  X,
+  Lock,
+  Share2,
+  Users,
+  User,
+  Copy
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -32,13 +37,27 @@ import {
   TabsList,
   TabsTrigger
 } from '@/components/ui/tabs';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { cn } from '@/lib/utils';
+import { Challenge } from '@/api/types';
 
 interface ChallengeInterfaceProps {
-  challenge?: any;
+  challenge?: Challenge;
+  isPrivate?: boolean;
+  accessCode?: string;
 }
 
-const ChallengeInterface: React.FC<ChallengeInterfaceProps> = ({ challenge }) => {
+const ChallengeInterface: React.FC<ChallengeInterfaceProps> = ({ challenge, isPrivate = false, accessCode }) => {
   const { toast } = useToast();
   const [timeRemaining, setTimeRemaining] = useState('30:00');
   const [opponentProgress, setOpponentProgress] = useState(0);
@@ -90,10 +109,54 @@ const ChallengeInterface: React.FC<ChallengeInterfaceProps> = ({ challenge }) =>
     };
   }, [toast, timeRemaining]);
   
+  const copyAccessCode = () => {
+    if (accessCode) {
+      navigator.clipboard.writeText(accessCode);
+      toast({
+        title: "Copied!",
+        description: "Access code copied to clipboard",
+      });
+    }
+  };
+  
   return (
     <div className="h-full flex flex-col lg:flex-row">
       {/* Left side - Code Editor */}
       <div className="flex-1 min-h-[400px] lg:min-h-full flex flex-col">
+        {isPrivate && (
+          <div className="bg-amber-100 dark:bg-amber-900/30 p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Lock className="text-amber-500 h-4 w-4" />
+              <span className="font-medium text-amber-700 dark:text-amber-400">Private Challenge</span>
+              {accessCode && (
+                <Badge variant="outline" className="ml-2 border-amber-300 dark:border-amber-700">
+                  Code: {accessCode}
+                </Badge>
+              )}
+            </div>
+            
+            {accessCode && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8"
+                      onClick={copyAccessCode}
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Copy access code</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+        )}
+        
         <div className="bg-zinc-100 dark:bg-zinc-900 p-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Zap className="text-amber-500 h-4 w-4" />
@@ -194,6 +257,42 @@ const ChallengeInterface: React.FC<ChallengeInterfaceProps> = ({ challenge }) =>
           </TabsContent>
           
           <TabsContent value="progress" className="flex-1 overflow-auto p-4 space-y-6">
+            {isPrivate && (
+              <Card className="shadow-none bg-amber-50/50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Lock className="h-4 w-4 text-amber-500" />
+                    Private Challenge
+                  </CardTitle>
+                  <CardDescription>
+                    <span className="text-amber-700 dark:text-amber-400">
+                      Only invited participants can join this challenge
+                    </span>
+                  </CardDescription>
+                </CardHeader>
+                {accessCode && (
+                  <CardContent>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-amber-100 dark:bg-amber-900/50 p-2 rounded border border-amber-200 dark:border-amber-800/50 font-mono text-center">
+                        {accessCode}
+                      </div>
+                      <Button 
+                        size="icon" 
+                        variant="outline"
+                        className="h-9 w-9 border-amber-200 dark:border-amber-800/50"
+                        onClick={copyAccessCode}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                      Share this code with others to invite them to your challenge
+                    </p>
+                  </CardContent>
+                )}
+              </Card>
+            )}
+            
             <Card className="shadow-none">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -201,14 +300,14 @@ const ChallengeInterface: React.FC<ChallengeInterfaceProps> = ({ challenge }) =>
                   Challenge Progress
                 </CardTitle>
                 <CardDescription>
-                  Track progress against your opponent
+                  Track progress against your opponents
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-green-500 text-white flex-center">
+                      <div className="h-8 w-8 rounded-full bg-green-500 text-white flex items-center justify-center">
                         Y
                       </div>
                       <span className="font-medium">You</span>
@@ -226,7 +325,7 @@ const ChallengeInterface: React.FC<ChallengeInterfaceProps> = ({ challenge }) =>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex-center">
+                      <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
                         O
                       </div>
                       <span className="font-medium">Opponent</span>
@@ -302,6 +401,56 @@ const ChallengeInterface: React.FC<ChallengeInterfaceProps> = ({ challenge }) =>
                   <div className="flex items-center justify-between text-sm p-2 bg-zinc-100 dark:bg-zinc-800 rounded">
                     <span>Test Case #4</span>
                     <Clock className="h-4 w-4 text-zinc-500" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-none">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Users className="h-4 w-4 text-blue-500" />
+                  Participants
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex -space-x-2 overflow-hidden mb-3">
+                  {[1, 2, 3, 4, 5].map((idx) => (
+                    <Avatar key={idx} className="border-2 border-background w-8 h-8">
+                      <AvatarImage src={`https://i.pravatar.cc/300?img=${idx}`} alt="Participant" />
+                      <AvatarFallback>
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                  ))}
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 text-xs border-2 border-background">
+                    +3
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="flex items-center gap-1">
+                      <User className="h-3 w-3" />
+                      Total Participants
+                    </span>
+                    <span>8</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="flex items-center gap-1">
+                      <Check className="h-3 w-3 text-green-600 dark:text-green-500" />
+                      Completed
+                    </span>
+                    <span>2</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3 w-3 text-amber-600 dark:text-amber-500" />
+                      In Progress
+                    </span>
+                    <span>6</span>
                   </div>
                 </div>
               </CardContent>

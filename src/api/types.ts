@@ -20,6 +20,8 @@ export interface User {
   followers?: number;
   is2FAEnabled?: boolean;
   isOnline?: boolean;
+  country?: string;
+  countryCode?: string;
 }
 
 export interface UserProfile extends User {
@@ -135,9 +137,11 @@ export interface Challenge {
   isActive: boolean;
   problems?: string[];
   description?: string;
-  participantCount?: number;
   date?: string;
   type?: string;
+  isPrivate?: boolean;
+  accessCode?: string;
+  timeLimit?: number;
 }
 
 // Chat related types
@@ -148,6 +152,9 @@ export interface ChatChannel {
   type: 'public' | 'private' | 'direct';
   participants?: User[];
   unreadCount?: number;
+  isOnline?: boolean;
+  lastMessage?: string;
+  lastMessageTime?: string;
 }
 
 export interface ChatMessage {
@@ -163,8 +170,12 @@ export interface ChatMessage {
   timestamp: string;
   isCurrentUser?: boolean;
   attachments?: {
-    type: 'image' | 'code' | 'link';
+    type: 'image' | 'code' | 'link' | 'challenge-invite';
     content: string;
+    challengeId?: string;
+    challengeTitle?: string;
+    isPrivate?: boolean;
+    accessCode?: string;
   }[];
   liked?: boolean;
   likeCount?: number;

@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { 
   PlusCircle, 
   Users, 
@@ -11,7 +12,11 @@ import {
   Calendar, 
   Clock, 
   User, 
-  Cpu 
+  Cpu,
+  Shuffle,
+  Lock,
+  Unlock,
+  Search
 } from "lucide-react";
 import MainNavbar from "@/components/MainNavbar";
 import { Button } from "@/components/ui/button";
@@ -36,64 +41,58 @@ import ActivityHeatmapRounded from "@/components/ActivityHeatmapRounded";
 import ReferralBanner from "@/components/ReferralBanner";
 import SubmissionHistory from "@/components/SubmissionHistory";
 import ChallengeInterface from "@/components/ChallengeInterface";
-
-// Sample challenge data
-const activeChallenge = {
-  id: "c1",
-  title: "Two Sum Challenge",
-  difficulty: "Easy",
-  opponent: {
-    name: "Alex J.",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    rating: 1850
-  },
-  timeRemaining: "28:45",
-  progress: 65
-};
-
-const upcomingChallenges = [
-  {
-    id: "c2",
-    title: "Weekly Contest #145",
-    time: "Tomorrow, 10:00 AM",
-    participants: 128,
-    type: "Contest"
-  },
-  {
-    id: "c3",
-    title: "1v1 with Robin M.",
-    time: "Today, 4:30 PM",
-    participants: 2,
-    type: "1v1"
-  }
-];
-
-const pastChallenges = [
-  {
-    id: "p1",
-    title: "Daily Challenge: Merge Sort",
-    date: "Yesterday",
-    result: "Won",
-    score: 95
-  },
-  {
-    id: "p2",
-    title: "Weekly Contest #144",
-    date: "Last week",
-    result: "7th place",
-    score: 1250
-  },
-  {
-    id: "p3",
-    title: "1v1 with Taylor S.",
-    date: "3 days ago",
-    result: "Lost",
-    score: 75
-  }
-];
+import CreateChallengeForm from "@/components/CreateChallengeForm";
+import JoinPrivateChallenge from "@/components/JoinPrivateChallenge";
+import UserSearch from "@/components/UserSearch";
+import { getChallenges, getChallenge, getChallengeInvites } from "@/api/challengeApi";
+import { Challenge } from "@/api/types";
 
 const Challenges = () => {
-  const [activeChallengeId, setActiveChallengeId] = useState<string | null>("c1");
+  const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
+  const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  
+  const { data: challenges, isLoading: challengesLoading, refetch: refetchChallenges } = useQuery({
+    queryKey: ["challenges"],
+    queryFn: () => getChallenges(),
+  });
+  
+  const { data: publicChallenges, isLoading: publicChallengesLoading } = useQuery({
+    queryKey: ["public-challenges"],
+    queryFn: () => getChallenges({ private: false }),
+  });
+  
+  const { data: privateChallenges, isLoading: privateChallengesLoading } = useQuery({
+    queryKey: ["private-challenges"],
+    queryFn: () => getChallenges({ private: true }),
+  });
+  
+  const { data: invites, isLoading: invitesLoading } = useQuery({
+    queryKey: ["challenge-invites"],
+    queryFn: getChallengeInvites,
+  });
+  
+  const loadChallenge = async (id: string) => {
+    try {
+      const challenge = await getChallenge(id);
+      if (challenge) {
+        setActiveChallenge(challenge);
+        setActiveChallengeId(id);
+      }
+    } catch (error) {
+      console.error("Failed to load challenge:", error);
+    }
+  };
+  
+  const handleChallengeCreated = (newChallenge: Challenge) => {
+    refetchChallenges();
+  };
+  
+  const handleJoinSuccess = (challenge: Challenge) => {
+    setActiveChallenge(challenge);
+    setActiveChallengeId(challenge.id);
+  };
   
   return (
     <div className="min-h-screen bg-background text-foreground pt-16 pb-8">
@@ -102,10 +101,15 @@ const Challenges = () => {
       {activeChallengeId ? (
         <main className="page-container py-8">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold">Active Challenge</h1>
+            <h1 className="text-2xl font-bold">
+              {activeChallenge?.title || "Active Challenge"}
+            </h1>
             <Button 
               variant="outline" 
-              onClick={() => setActiveChallengeId(null)}
+              onClick={() => {
+                setActiveChallengeId(null);
+                setActiveChallenge(null);
+              }}
               className="text-sm"
             >
               Exit Challenge
@@ -113,7 +117,11 @@ const Challenges = () => {
           </div>
           
           <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg rounded-xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden shadow-sm h-[calc(100vh-180px)] min-h-[600px]">
-            <ChallengeInterface />
+            <ChallengeInterface 
+              challenge={activeChallenge} 
+              isPrivate={activeChallenge?.isPrivate} 
+              accessCode={activeChallenge?.accessCode}
+            />
           </div>
         </main>
       ) : (
@@ -122,10 +130,22 @@ const Challenges = () => {
             <div className="lg:col-span-2 space-y-8">
               <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Challenges</h1>
-                <Button className="bg-green-500 hover:bg-green-600">
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Create Challenge
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsJoinModalOpen(true)}
+                  >
+                    <Lock className="h-4 w-4 mr-2" />
+                    Join Private
+                  </Button>
+                  <Button 
+                    className="bg-green-500 hover:bg-green-600"
+                    onClick={() => setIsCreateModalOpen(true)}
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Create Challenge
+                  </Button>
+                </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -214,142 +234,273 @@ const Challenges = () => {
                 </Card>
               </div>
               
+              <UserSearch className="w-full" />
+              
               <ReferralBanner />
               
               <Tabs defaultValue="active" className="w-full">
-                <TabsList className="grid grid-cols-3 mb-4">
+                <TabsList className="grid grid-cols-4 mb-4">
                   <TabsTrigger value="active">Active</TabsTrigger>
-                  <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-                  <TabsTrigger value="past">Past</TabsTrigger>
+                  <TabsTrigger value="public">Public</TabsTrigger>
+                  <TabsTrigger value="private">Private</TabsTrigger>
+                  <TabsTrigger value="invites">Invites</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="active" className="space-y-4">
-                  {activeChallenge && (
-                    <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveChallengeId(activeChallenge.id)}>
+                  {!challengesLoading && challenges?.filter(c => c.isActive).map((challenge) => (
+                    <Card 
+                      key={challenge.id} 
+                      className="cursor-pointer hover:shadow-md transition-shadow" 
+                      onClick={() => loadChallenge(challenge.id)}
+                    >
                       <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
-                          <CardTitle>{activeChallenge.title}</CardTitle>
+                          <CardTitle className="flex items-center gap-2">
+                            {challenge.title}
+                            {challenge.isPrivate && (
+                              <Lock className="h-4 w-4 text-amber-500" />
+                            )}
+                          </CardTitle>
                           <div className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded dark:bg-green-900/30 dark:text-green-300">
-                            {activeChallenge.difficulty}
+                            {challenge.difficulty}
                           </div>
                         </div>
                         <CardDescription className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" /> Time Remaining: {activeChallenge.timeRemaining}
+                          <Clock className="h-3 w-3" /> Created: {new Date(challenge.createdAt).toLocaleDateString()}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <img src={activeChallenge.opponent.avatar} alt={activeChallenge.opponent.name} className="w-8 h-8 rounded-full" />
+                            <img src={challenge.createdBy.profileImage} alt={challenge.createdBy.username} className="w-8 h-8 rounded-full" />
                             <div>
-                              <p className="text-sm font-medium">{activeChallenge.opponent.name}</p>
-                              <p className="text-xs text-zinc-500 dark:text-zinc-400">Rating: {activeChallenge.opponent.rating}</p>
+                              <p className="text-sm font-medium">{challenge.createdBy.username}</p>
+                              <p className="text-xs text-zinc-500 dark:text-zinc-400">Created by</p>
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm font-medium">Your Progress</p>
-                            <Progress value={activeChallenge.progress} className="h-2 w-32" />
+                            <p className="text-sm font-medium">Problems: {challenge.problemCount}</p>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">Participants: {challenge.participants}</p>
                           </div>
                         </div>
                       </CardContent>
                       <CardFooter className="flex justify-end">
                         <Button size="sm" className="bg-green-500 hover:bg-green-600">
-                          Continue Challenge
+                          Join Challenge
                           <ChevronRight className="ml-1 h-4 w-4" />
                         </Button>
                       </CardFooter>
                     </Card>
-                  )}
+                  ))}
                   
-                  {!activeChallenge && (
+                  {(challengesLoading || !challenges?.filter(c => c.isActive).length) && (
                     <div className="text-center py-10">
                       <p className="text-zinc-500 dark:text-zinc-400">No active challenges</p>
-                      <Button className="mt-4 bg-green-500 hover:bg-green-600">
+                      <Button
+                        className="mt-4 bg-green-500 hover:bg-green-600"
+                        onClick={() => setIsCreateModalOpen(true)}
+                      >
                         <PlusCircle className="h-4 w-4 mr-2" />
-                        Find Challenge
+                        Create Challenge
                       </Button>
                     </div>
                   )}
                 </TabsContent>
                 
-                <TabsContent value="upcoming" className="space-y-4">
-                  {upcomingChallenges.map(challenge => (
-                    <Card key={challenge.id} className="hover:shadow-md transition-shadow">
+                <TabsContent value="public" className="space-y-4">
+                  {!publicChallengesLoading && publicChallenges?.filter(c => c.isActive).map((challenge) => (
+                    <Card 
+                      key={challenge.id} 
+                      className="cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => loadChallenge(challenge.id)}
+                    >
                       <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
                           <CardTitle>{challenge.title}</CardTitle>
-                          <div className={cn(
-                            "px-2 py-1 text-xs font-medium rounded",
-                            challenge.type === "Contest" 
-                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                              : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                          )}>
-                            {challenge.type}
+                          <div className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded dark:bg-green-900/30 dark:text-green-300">
+                            {challenge.difficulty}
                           </div>
                         </div>
                         <CardDescription className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" /> {challenge.time}
+                          <Unlock className="h-3 w-3 text-green-500" /> Public Challenge
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
-                          <span className="text-sm">{challenge.participants} participants</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <img src={challenge.createdBy.profileImage} alt={challenge.createdBy.username} className="w-8 h-8 rounded-full" />
+                            <div>
+                              <p className="text-sm font-medium">{challenge.createdBy.username}</p>
+                              <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
+                                <Calendar className="h-3 w-3" />
+                                <span>{new Date(challenge.createdAt).toLocaleDateString()}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">{challenge.participants} participants</span>
+                              <Users className="h-4 w-4 text-zinc-500" />
+                            </div>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">{challenge.problemCount} problems</p>
+                          </div>
                         </div>
                       </CardContent>
                       <CardFooter className="flex justify-end">
-                        <Button size="sm" variant="outline">
-                          View Details
+                        <Button size="sm" className="bg-green-500 hover:bg-green-600">
+                          Join Challenge
+                          <ChevronRight className="ml-1 h-4 w-4" />
                         </Button>
                       </CardFooter>
                     </Card>
                   ))}
                   
-                  {upcomingChallenges.length === 0 && (
+                  {(publicChallengesLoading || !publicChallenges?.filter(c => c.isActive).length) && (
                     <div className="text-center py-10">
-                      <p className="text-zinc-500 dark:text-zinc-400">No upcoming challenges</p>
+                      <p className="text-zinc-500 dark:text-zinc-400">No public challenges found</p>
+                      <Button
+                        className="mt-4 bg-green-500 hover:bg-green-600"
+                        onClick={() => setIsCreateModalOpen(true)}
+                      >
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Create Public Challenge
+                      </Button>
                     </div>
                   )}
                 </TabsContent>
                 
-                <TabsContent value="past" className="space-y-4">
-                  {pastChallenges.map(challenge => (
-                    <Card key={challenge.id} className="hover:shadow-md transition-shadow">
+                <TabsContent value="private" className="space-y-4">
+                  {!privateChallengesLoading && privateChallenges?.filter(c => c.isActive).map((challenge) => (
+                    <Card 
+                      key={challenge.id} 
+                      className="cursor-pointer hover:shadow-md transition-shadow border-amber-200/30 dark:border-amber-800/30"
+                      onClick={() => loadChallenge(challenge.id)}
+                    >
                       <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
-                          <CardTitle>{challenge.title}</CardTitle>
-                          <div className={cn(
-                            "px-2 py-1 text-xs font-medium rounded",
-                            challenge.result === "Won" 
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                              : challenge.result.includes("place") 
-                                ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                                : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-                          )}>
-                            {challenge.result}
+                          <CardTitle className="flex items-center gap-2">
+                            {challenge.title}
+                            <Lock className="h-4 w-4 text-amber-500" />
+                          </CardTitle>
+                          <div className="px-2 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded dark:bg-amber-900/30 dark:text-amber-300">
+                            {challenge.difficulty}
                           </div>
                         </div>
                         <CardDescription className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" /> {challenge.date}
+                          <Lock className="h-3 w-3 text-amber-500" /> Private Challenge
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="flex items-center gap-2">
-                          <Trophy className="h-4 w-4 text-amber-500" />
-                          <span className="text-sm">Score: {challenge.score}</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <img src={challenge.createdBy.profileImage} alt={challenge.createdBy.username} className="w-8 h-8 rounded-full" />
+                            <div>
+                              <p className="text-sm font-medium">{challenge.createdBy.username}</p>
+                              <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
+                                <Calendar className="h-3 w-3" />
+                                <span>{new Date(challenge.createdAt).toLocaleDateString()}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">{challenge.participants} participants</span>
+                              <Users className="h-4 w-4 text-zinc-500" />
+                            </div>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400">{challenge.problemCount} problems</p>
+                          </div>
                         </div>
                       </CardContent>
                       <CardFooter className="flex justify-end">
-                        <Button size="sm" variant="outline">
-                          View Results
+                        <Button size="sm" className="bg-amber-500 hover:bg-amber-600">
+                          Continue Challenge
+                          <ChevronRight className="ml-1 h-4 w-4" />
                         </Button>
                       </CardFooter>
                     </Card>
                   ))}
                   
-                  {pastChallenges.length === 0 && (
+                  {(privateChallengesLoading || !privateChallenges?.filter(c => c.isActive).length) && (
                     <div className="text-center py-10">
-                      <p className="text-zinc-500 dark:text-zinc-400">No past challenges</p>
+                      <p className="text-zinc-500 dark:text-zinc-400">No private challenges found</p>
+                      <div className="flex items-center justify-center gap-3 mt-4">
+                        <Button 
+                          variant="outline"
+                          onClick={() => setIsJoinModalOpen(true)}
+                        >
+                          <Lock className="h-4 w-4 mr-2" />
+                          Join with Code
+                        </Button>
+                        <Button
+                          className="bg-green-500 hover:bg-green-600"
+                          onClick={() => setIsCreateModalOpen(true)}
+                        >
+                          <PlusCircle className="h-4 w-4 mr-2" />
+                          Create Private Challenge
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="invites" className="space-y-4">
+                  {!invitesLoading && invites?.map((invite) => (
+                    <Card 
+                      key={invite.challengeId} 
+                      className="hover:shadow-md transition-shadow"
+                    >
+                      <CardHeader className="pb-2">
+                        <CardTitle className="flex items-center gap-2">
+                          {invite.challengeTitle}
+                          {invite.isPrivate && (
+                            <Lock className="h-4 w-4 text-amber-500" />
+                          )}
+                        </CardTitle>
+                        <CardDescription>
+                          Invited by {invite.invitedBy}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm">
+                          {invite.isPrivate 
+                            ? "You've been invited to join a private challenge." 
+                            : "You've been invited to participate in this challenge."
+                          }
+                        </p>
+                        {invite.isPrivate && invite.accessCode && (
+                          <div className="mt-2 p-2 bg-amber-100/50 dark:bg-amber-900/20 rounded flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Lock className="h-4 w-4 text-amber-500" />
+                              <span className="font-mono text-sm">Code: {invite.accessCode}</span>
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                      <CardFooter className="flex justify-end gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                        >
+                          Decline
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          className={invite.isPrivate ? "bg-amber-500 hover:bg-amber-600" : "bg-green-500 hover:bg-green-600"}
+                          onClick={() => loadChallenge(invite.challengeId)}
+                        >
+                          Accept Invite
+                          <ChevronRight className="ml-1 h-4 w-4" />
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                  
+                  {(invitesLoading || !invites?.length) && (
+                    <div className="text-center py-10">
+                      <p className="text-zinc-500 dark:text-zinc-400">No challenge invites</p>
+                      <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-2">
+                        When someone invites you to a challenge, it will appear here
+                      </p>
                     </div>
                   )}
                 </TabsContent>
@@ -473,6 +624,18 @@ const Challenges = () => {
           </div>
         </main>
       )}
+      
+      <CreateChallengeForm 
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={handleChallengeCreated}
+      />
+      
+      <JoinPrivateChallenge
+        isOpen={isJoinModalOpen}
+        onClose={() => setIsJoinModalOpen(false)}
+        onSuccess={handleJoinSuccess}
+      />
     </div>
   );
 };
