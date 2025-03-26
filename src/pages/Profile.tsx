@@ -359,7 +359,7 @@ const Profile = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ActivityHeatmapRounded data={profile?.activityHeatmap} />
+                  <ActivityHeatmapRounded data={profile?.activityHeatmap?.data} />
                 </CardContent>
               </Card>
               
