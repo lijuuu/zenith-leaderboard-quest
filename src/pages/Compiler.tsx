@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { compileAndRun } from "@/api/problemApi";
 import { useToast } from "@/hooks/use-toast";
-import MainNavbar from "@/components/MainNavbar";
 
 const Compiler = () => {
   const { toast } = useToast();
@@ -66,10 +65,8 @@ const Compiler = () => {
   };
   
   return (
-    <div className="min-h-screen bg-zinc-900 text-white pt-14">
-      <MainNavbar />
-      
-      <main className="page-container py-8">
+    <div className="pt-4 pb-16">
+      <div className="container px-4 mx-auto max-w-6xl">
         <h1 className="text-3xl font-bold mb-6">Online Compiler</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
@@ -252,7 +249,7 @@ const Compiler = () => {
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

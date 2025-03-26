@@ -8,7 +8,6 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AccentColorProvider } from "@/contexts/AccentColorContext";
 import { Provider } from "react-redux";
 import { store } from "@/store";
-import AppNavigation from "@/components/ui/AppNavigation";
 import Index from "./pages/Index";
 import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
@@ -22,6 +21,7 @@ import Compiler from "./pages/Compiler";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
+import MainNavbar from "@/components/MainNavbar";
 
 // Create the query client instance
 const queryClient = new QueryClient({
@@ -42,8 +42,8 @@ const App = () => {
           <AccentColorProvider defaultColor="green" storageKey="zenx-accent-color">
             <TooltipProvider>
               <div className="min-h-screen bg-zinc-900 text-white">
-                <AppNavigation />
-                <div className="pt-16">
+                <MainNavbar />
+                <div className="pt-14">
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/leaderboard" element={<Leaderboard />} />
