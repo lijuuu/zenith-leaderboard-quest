@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser } from "@/api/userApi";
-import MainNavbar from "@/components/MainNavbar";
+import Navbar from "@/components/Navbar";
 import SettingsTabs from "@/components/settings/SettingsTabs";
 import LoadingFallback from "@/components/settings/LoadingFallback";
 
@@ -15,7 +15,7 @@ const Settings = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground pt-16">
-        <MainNavbar />
+        <Navbar />
         <main className="page-container py-8">
           <LoadingFallback />
         </main>
@@ -25,7 +25,7 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground pt-16">
-      <MainNavbar />
+      <Navbar />
       
       <main className="page-container py-8">
         <h1 className="text-3xl font-bold mb-6">Settings</h1>

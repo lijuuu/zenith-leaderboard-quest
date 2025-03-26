@@ -1,15 +1,32 @@
 
 import React from "react";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Palette } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAccentColor } from "@/contexts/AccentColorContext";
+
+type AccentColorType = {
+  name: string;
+  value: "green" | "blue" | "purple" | "orange" | "red" | "teal";
+  class: string;
+};
 
 const AppearanceSettingsTab: React.FC = () => {
   const { theme, setTheme } = useTheme();
+  const { accentColor, setAccentColor } = useAccentColor();
+  
+  const accentColors: AccentColorType[] = [
+    { name: "Green", value: "green", class: "bg-[hsl(var(--accent-green))]" },
+    { name: "Blue", value: "blue", class: "bg-[hsl(var(--accent-blue))]" },
+    { name: "Purple", value: "purple", class: "bg-[hsl(var(--accent-purple))]" },
+    { name: "Orange", value: "orange", class: "bg-[hsl(var(--accent-orange))]" },
+    { name: "Red", value: "red", class: "bg-[hsl(var(--accent-red))]" },
+    { name: "Teal", value: "teal", class: "bg-[hsl(var(--accent-teal))]" },
+  ];
 
   return (
     <Card>
@@ -28,7 +45,7 @@ const AppearanceSettingsTab: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className={`border rounded-md p-4 cursor-pointer ${
                 theme === "light" 
-                  ? "border-green-500 dark:border-green-500" 
+                  ? "border-[hsl(var(--accent-" + accentColor + "))]" 
                   : "border-zinc-200 dark:border-zinc-700"
               }`}
                 onClick={() => setTheme("light")}
@@ -39,7 +56,7 @@ const AppearanceSettingsTab: React.FC = () => {
                     <span className="font-medium">Light</span>
                   </div>
                   {theme === "light" && (
-                    <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                    <div className={`w-4 h-4 rounded-full accent-color`}></div>
                   )}
                 </div>
                 <div className="h-20 bg-white border border-zinc-200 rounded-md"></div>
@@ -47,7 +64,7 @@ const AppearanceSettingsTab: React.FC = () => {
               
               <div className={`border rounded-md p-4 cursor-pointer ${
                 theme === "dark" 
-                  ? "border-green-500 dark:border-green-500" 
+                  ? "border-[hsl(var(--accent-" + accentColor + "))]" 
                   : "border-zinc-200 dark:border-zinc-700"
               }`}
                 onClick={() => setTheme("dark")}
@@ -58,7 +75,7 @@ const AppearanceSettingsTab: React.FC = () => {
                     <span className="font-medium">Dark</span>
                   </div>
                   {theme === "dark" && (
-                    <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                    <div className={`w-4 h-4 rounded-full accent-color`}></div>
                   )}
                 </div>
                 <div className="h-20 bg-zinc-900 border border-zinc-700 rounded-md"></div>
@@ -66,7 +83,7 @@ const AppearanceSettingsTab: React.FC = () => {
               
               <div className={`border rounded-md p-4 cursor-pointer ${
                 theme === "system" 
-                  ? "border-green-500 dark:border-green-500" 
+                  ? "border-[hsl(var(--accent-" + accentColor + "))]" 
                   : "border-zinc-200 dark:border-zinc-700"
               }`}
                 onClick={() => setTheme("system")}
@@ -80,11 +97,41 @@ const AppearanceSettingsTab: React.FC = () => {
                     <span className="font-medium">System</span>
                   </div>
                   {theme === "system" && (
-                    <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                    <div className={`w-4 h-4 rounded-full accent-color`}></div>
                   )}
                 </div>
                 <div className="h-20 bg-gradient-to-r from-white to-zinc-900 border border-zinc-200 rounded-md"></div>
               </div>
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="font-medium mb-3">Accent Color</h3>
+            <Separator className="mb-4" />
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+              {accentColors.map(color => (
+                <div 
+                  key={color.value}
+                  className={`border rounded-md p-4 cursor-pointer ${
+                    accentColor === color.value 
+                      ? `border-[hsl(var(--accent-${color.value}))]` 
+                      : "border-zinc-200 dark:border-zinc-700"
+                  }`}
+                  onClick={() => setAccentColor(color.value)}
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <div className={`w-10 h-10 rounded-full ${color.class}`}>
+                      {accentColor === color.value && (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Palette className="h-5 w-5 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <span className="font-medium text-sm">{color.name}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
           

@@ -73,6 +73,14 @@
     
     --green-glow: 135 100% 38%;
     --red-glow: 0 100% 50%;
+
+    /* Accent Color Variables */
+    --accent-green: 142 76% 36%;
+    --accent-blue: 221 83% 53%; 
+    --accent-purple: 262 83% 58%;
+    --accent-orange: 24 94% 50%;
+    --accent-red: 0 84% 60%;
+    --accent-teal: 174 86% 45%;
   }
 
   .dark {
@@ -115,6 +123,14 @@
     
     --green-glow: 135 100% 38%;
     --red-glow: 0 100% 50%;
+
+    /* Accent Color Variables */
+    --accent-green: 142 70% 45%;
+    --accent-blue: 214 100% 60%;
+    --accent-purple: 262 80% 65%;
+    --accent-orange: 24 90% 55%;
+    --accent-red: 0 90% 65%;
+    --accent-teal: 174 80% 50%;
   }
 
   * {
@@ -128,6 +144,31 @@
   body {
     @apply bg-background text-foreground antialiased selection:bg-zenblue/10 selection:text-zenblue;
     font-feature-settings: "ss01", "ss03", "cv01", "cv02", "cv03";
+  }
+
+  /* Accent Color Classes */
+  .accent-green .accent-color {
+    @apply bg-[hsl(var(--accent-green))] text-white;
+  }
+  
+  .accent-blue .accent-color {
+    @apply bg-[hsl(var(--accent-blue))] text-white;
+  }
+  
+  .accent-purple .accent-color {
+    @apply bg-[hsl(var(--accent-purple))] text-white;
+  }
+  
+  .accent-orange .accent-color {
+    @apply bg-[hsl(var(--accent-orange))] text-white;
+  }
+  
+  .accent-red .accent-color {
+    @apply bg-[hsl(var(--accent-red))] text-white;
+  }
+  
+  .accent-teal .accent-color {
+    @apply bg-[hsl(var(--accent-teal))] text-white;
   }
 
   /* Custom Classes */

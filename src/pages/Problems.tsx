@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import ProblemCard from "@/components/ProblemCard";
 import { getProblems } from "@/api/problemApi";
 import { Problem } from "@/api/types";
-import MainNavbar from "@/components/MainNavbar";
+import Navbar from "@/components/Navbar";
 
 const Problems = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,7 +59,7 @@ const Problems = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground pt-16">
-      <MainNavbar />
+      <Navbar />
       
       <main className="page-container py-8">
         <div className="flex flex-col md:flex-row gap-6">
@@ -172,7 +172,7 @@ const Problems = () => {
                   <Zap className="w-4 h-4" />
                   Challenge Mode
                 </Button>
-                <Button className="flex items-center gap-2 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700">
+                <Button className="flex items-center gap-2 accent-color">
                   <Code className="w-4 h-4" />
                   New Problem
                 </Button>
