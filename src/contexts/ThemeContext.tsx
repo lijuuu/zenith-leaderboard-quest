@@ -15,7 +15,7 @@ interface ThemeContextType {
 }
 
 const initialState: ThemeContextType = {
-  theme: 'system',
+  theme: 'dark',
   setTheme: () => null,
 };
 
@@ -23,7 +23,7 @@ const ThemeContext = createContext<ThemeContextType>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = 'system',
+  defaultTheme = 'dark',
   storageKey = 'zenx-theme',
   ...props
 }: ThemeProviderProps) {

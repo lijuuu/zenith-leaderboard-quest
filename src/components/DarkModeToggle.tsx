@@ -12,7 +12,7 @@ const DarkModeToggle = () => {
       size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label="Toggle theme"
-      className="rounded-full w-9 h-9"
+      className="rounded-full w-9 h-9 text-zinc-400 hover:text-white"
     >
       {theme === "dark" ? (
         <Sun className="h-4 w-4" />

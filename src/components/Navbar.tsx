@@ -68,7 +68,7 @@ const Navbar = ({ isAuthenticated = true }) => {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
         isScrolled || mobileMenuOpen
-          ? "bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg border-b border-zinc-200/70 dark:border-zinc-800/70"
+          ? "bg-zinc-900/90 backdrop-blur-lg border-b border-zinc-800"
           : "bg-transparent"
       )}
     >
@@ -76,10 +76,10 @@ const Navbar = ({ isAuthenticated = true }) => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full accent-color flex items-center justify-center text-white font-bold text-lg">
+              <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-white font-bold text-lg">
                 z
               </div>
-              <span className="text-2xl lowercase font-bold font-display tracking-tight">
+              <span className="text-2xl lowercase font-bold font-display tracking-tight text-white">
                 zenx
               </span>
             </Link>
@@ -94,8 +94,10 @@ const Navbar = ({ isAuthenticated = true }) => {
                 className={cn(
                   "relative px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2",
                   isActive(item.path)
-                    ? "text-white accent-color"
-                    : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    ? item.name === "Challenges" 
+                      ? "bg-green-500 text-white" 
+                      : "bg-zinc-800 text-white"
+                    : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
                 )}
               >
                 {item.icon}
@@ -110,7 +112,7 @@ const Navbar = ({ isAuthenticated = true }) => {
             {isAuthenticated ? (
               <Link
                 to="/logout"
-                className="px-3 py-2 rounded-md text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2"
+                className="px-3 py-2 rounded-md text-sm font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors flex items-center gap-2"
               >
                 <LogOut className="w-4 h-4" />
                 Logout
@@ -118,7 +120,7 @@ const Navbar = ({ isAuthenticated = true }) => {
             ) : (
               <Link
                 to="/login"
-                className="px-4 py-2 accent-color rounded-md text-sm font-medium transition-colors"
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-md text-sm font-medium transition-colors text-white"
               >
                 Login
               </Link>
@@ -129,7 +131,7 @@ const Navbar = ({ isAuthenticated = true }) => {
           <div className="flex items-center gap-2 md:hidden">
             <DarkModeToggle />
             <button
-              className="p-2 rounded-md text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="p-2 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -150,7 +152,7 @@ const Navbar = ({ isAuthenticated = true }) => {
           mobileMenuOpen ? "transform translate-y-0" : "transform -translate-y-full"
         )}
       >
-        <nav className="border-t border-zinc-200 dark:border-zinc-800 py-4 px-6 space-y-1 backdrop-blur-lg">
+        <nav className="border-t border-zinc-800 py-4 px-6 space-y-1 backdrop-blur-lg bg-zinc-900/90">
           {allNavItems.map((item) => (
             <Link
               key={item.name}
@@ -158,8 +160,10 @@ const Navbar = ({ isAuthenticated = true }) => {
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium transition-colors",
                 isActive(item.path)
-                  ? "text-white accent-color"
-                  : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  ? item.name === "Challenges"
+                    ? "bg-green-500 text-white"
+                    : "bg-zinc-800 text-white"
+                  : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
               )}
             >
               {item.icon}
@@ -170,7 +174,7 @@ const Navbar = ({ isAuthenticated = true }) => {
           {isAuthenticated ? (
             <Link
               to="/logout"
-              className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
             >
               <LogOut className="w-4 h-4" />
               Logout
@@ -178,7 +182,7 @@ const Navbar = ({ isAuthenticated = true }) => {
           ) : (
             <Link
               to="/login"
-              className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium accent-color transition-colors"
+              className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium bg-green-500 hover:bg-green-600 text-white transition-colors"
             >
               Login
             </Link>

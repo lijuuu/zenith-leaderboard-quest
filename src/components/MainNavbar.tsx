@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -12,46 +12,81 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User, Settings, Search } from "lucide-react";
+import { 
+  LogOut, 
+  User, 
+  Settings, 
+  Search, 
+  Home, 
+  Code, 
+  Terminal,
+  Zap,
+  Award,
+  MessageSquare,
+} from "lucide-react";
 import { useAccentColor } from "@/contexts/AccentColorContext";
+import { cn } from "@/lib/utils";
 
 const MainNavbar = () => {
   const { accentColor } = useAccentColor();
+  const location = useLocation();
+  
+  const navigationItems = [
+    { name: "Home", path: "/", icon: <Home className="h-4 w-4" /> },
+    { name: "Profile", path: "/profile", icon: <User className="h-4 w-4" /> },
+    { name: "Problems", path: "/problems", icon: <Code className="h-4 w-4" /> },
+    { name: "Compiler", path: "/compiler", icon: <Terminal className="h-4 w-4" /> },
+    { name: "Challenges", path: "/challenges", icon: <Zap className="h-4 w-4" /> },
+    { name: "Leaderboard", path: "/leaderboard", icon: <Award className="h-4 w-4" /> },
+    { name: "Chat", path: "/chat", icon: <MessageSquare className="h-4 w-4" /> },
+    { name: "Settings", path: "/settings", icon: <Settings className="h-4 w-4" /> },
+  ];
+  
+  const isActive = (path: string) => {
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(path);
+  };
   
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 border-b border-border bg-background/80 backdrop-blur-sm z-50">
+    <header className="fixed top-0 left-0 right-0 h-16 bg-zinc-900 border-b border-zinc-800 z-50">
       <div className="page-container h-full flex items-center justify-between">
         <div className="flex items-center">
-          <Link to="/" className="flex items-center mr-8">
-            <span className={`text-xl font-bold text-accent-color`}>
+          <Link to="/" className="flex items-center gap-2 mr-8">
+            <div className="bg-zinc-800 w-8 h-8 flex items-center justify-center rounded-full">
+              <span className="font-bold text-lg text-white">z</span>
+            </div>
+            <span className="text-xl font-bold text-white">
               zenx
             </span>
           </Link>
 
           <nav className="hidden md:flex items-center space-x-1">
-            <Link to="/">
-              <Button variant="ghost">Home</Button>
-            </Link>
-            <Link to="/problems">
-              <Button variant="ghost">Problems</Button>
-            </Link>
-            <Link to="/challenges">
-              <Button variant="ghost">Challenges</Button>
-            </Link>
-            <Link to="/compiler">
-              <Button variant="ghost">Compiler</Button>
-            </Link>
-            <Link to="/leaderboard">
-              <Button variant="ghost">Leaderboard</Button>
-            </Link>
-            <Link to="/chat">
-              <Button variant="ghost">Chat</Button>
-            </Link>
+            {navigationItems.map((item) => (
+              <Link 
+                key={item.name}
+                to={item.path}
+              >
+                <Button 
+                  variant="ghost" 
+                  className={cn(
+                    "gap-2 font-medium text-zinc-400 hover:text-white hover:bg-zinc-800/50",
+                    isActive(item.path) && (item.name === "Challenges" 
+                      ? "bg-green-500 text-white hover:bg-green-600 hover:text-white" 
+                      : "bg-zinc-800 text-white hover:bg-zinc-800 hover:text-white")
+                  )}
+                >
+                  {item.icon}
+                  {item.name}
+                </Button>
+              </Link>
+            ))}
           </nav>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" aria-label="Search">
+          <Button variant="ghost" size="icon" aria-label="Search" className="text-zinc-400 hover:text-white">
             <Search className="h-5 w-5" />
           </Button>
           
@@ -94,7 +129,7 @@ const MainNavbar = () => {
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <span>Logout</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

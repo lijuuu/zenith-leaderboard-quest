@@ -40,26 +40,28 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
-              <Route path="/problems" element={<Problems />} />
-              <Route path="/problems/:id" element={<ProblemDetail />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/profile/:userId" element={<Profile />} />
-              <Route path="/challenges" element={<Challenges />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/compiler" element={<Compiler />} />
-              
-              {/* Auth Routes */}
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/verify-email" element={<VerifyEmail />} />
-              
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/problems" element={<Problems />} />
+                <Route path="/problems/:id" element={<ProblemDetail />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile/:userId" element={<Profile />} />
+                <Route path="/challenges" element={<Challenges />} />
+                <Route path="/chat" element={<Chat />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/compiler" element={<Compiler />} />
+                
+                {/* Auth Routes */}
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/verify-email" element={<VerifyEmail />} />
+                
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
           </TooltipProvider>
         </AccentColorProvider>
       </ThemeProvider>
