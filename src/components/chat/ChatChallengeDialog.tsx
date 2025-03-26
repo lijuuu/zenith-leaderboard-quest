@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Challenge } from '@/api/types';
 import { X, Info, Plus, Users, Check, Sword, Trophy, Clock, FileCode } from 'lucide-react';

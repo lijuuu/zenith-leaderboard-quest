@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { 
@@ -509,9 +508,15 @@ const Chat = () => {
               {challengeDialogOpen && (
                 <ChatChallengeDialog
                   isOpen={challengeDialogOpen}
-                  setIsOpen={setChallengeDialogOpen}
-                  recipientId={selectedChat.participants && selectedChat.participants[0] ? selectedChat.participants[0].id : ''}
-                  recipientName={selectedChat.participants && selectedChat.participants[0] ? selectedChat.participants[0].username : ''}
+                  onClose={() => setChallengeDialogOpen(false)}
+                  onCreateChallenge={(challenge) => {
+                    // Handle the created challenge, for example:
+                    toast({
+                      title: "Challenge Created",
+                      description: `Your challenge "${challenge.title}" has been created successfully.`,
+                    });
+                    refetchMessages();
+                  }}
                 />
               )}
             </div>
