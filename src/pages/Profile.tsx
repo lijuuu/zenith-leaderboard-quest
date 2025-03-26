@@ -11,12 +11,14 @@ import { useToast } from "@/hooks/use-toast";
 import { getAllChallenges, getUserChallenges } from "@/api/challengeApi";
 import { getUserProfile } from "@/api/userApi";
 import { UserProfile, Challenge } from "@/api/types";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Import our components
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileStats from "@/components/profile/ProfileStats";
 import ChallengesList from "@/components/profile/ChallengesList";
 import ContributionActivity from "@/components/ContributionActivity";
+import MonthlyActivityHeatmap from "@/components/MonthlyActivityHeatmap";
 import ProblemsSolvedChart from "@/components/profile/ProblemsSolvedChart";
 import RecentSubmissions from "@/components/profile/RecentSubmissions";
 import ProfileAchievements from "@/components/profile/ProfileAchievements";
@@ -25,6 +27,7 @@ const Profile = () => {
   const { userId } = useParams<{ userId: string }>();
   const { toast } = useToast();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const isMobile = useIsMobile();
   
   const { 
     data: profile, 
@@ -202,8 +205,17 @@ const Profile = () => {
             
             {/* Activity Section */}
             <Card className="mb-6 bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
+              <CardHeader className="pb-0">
+                <CardTitle className="text-lg font-medium flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-green-500" /> Activity
+                </CardTitle>
+              </CardHeader>
               <CardContent className="p-4">
-                <ContributionActivity />
+                {isMobile ? (
+                  <MonthlyActivityHeatmap showTitle={false} />
+                ) : (
+                  <ContributionActivity showTitle={false} />
+                )}
               </CardContent>
             </Card>
             

@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { format, parseISO, subDays, eachDayOfInterval, getDay, startOfYear, endOfYear, getYear } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type ActivityLevel = 0 | 1 | 2 | 3 | 4;
 
@@ -18,12 +19,14 @@ interface ActivityDay {
 
 interface ContributionProps {
   className?: string;
+  showTitle?: boolean;
 }
 
-const ContributionActivity = ({ className }: ContributionProps) => {
+const ContributionActivity = ({ className, showTitle = true }: ContributionProps) => {
   const [activityData, setActivityData] = useState<ActivityDay[]>([]);
   const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
   const [hoveredDay, setHoveredDay] = useState<ActivityDay | null>(null);
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     // Generate mock activity data for the selected year
@@ -74,12 +77,12 @@ const ContributionActivity = ({ className }: ContributionProps) => {
   // Function to get color based on activity level
   const getColor = (level: ActivityLevel) => {
     switch (level) {
-      case 0: return 'bg-zinc-800/70 hover:bg-zinc-800';
-      case 1: return 'bg-green-900/80 hover:bg-green-900';
-      case 2: return 'bg-green-700/80 hover:bg-green-700';
-      case 3: return 'bg-green-600/80 hover:bg-green-600';
-      case 4: return 'bg-green-500/90 hover:bg-green-500';
-      default: return 'bg-zinc-800/70 hover:bg-zinc-800';
+      case 0: return 'bg-zinc-800 hover:bg-zinc-700';
+      case 1: return 'bg-green-900 hover:bg-green-800';
+      case 2: return 'bg-green-700 hover:bg-green-600';
+      case 3: return 'bg-green-600 hover:bg-green-500';
+      case 4: return 'bg-green-500 hover:bg-green-400';
+      default: return 'bg-zinc-800 hover:bg-zinc-700';
     }
   };
 
@@ -171,34 +174,36 @@ const ContributionActivity = ({ className }: ContributionProps) => {
   
   return (
     <Card className={cn("bg-zinc-900/60 border-zinc-800/50", className)}>
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Activity className="h-5 w-5 text-green-400" />
-            Activity Heatmap
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-7 w-7 border-zinc-700"
-              onClick={handlePrevYear}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm font-medium">{currentYear}</span>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-7 w-7 border-zinc-700"
-              onClick={handleNextYear}
-              disabled={currentYear >= new Date().getFullYear()}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+      {showTitle && (
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Activity className="h-5 w-5 text-green-400" />
+              Activity Heatmap
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-7 w-7 border-zinc-700"
+                onClick={handlePrevYear}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-medium">{currentYear}</span>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-7 w-7 border-zinc-700"
+                onClick={handleNextYear}
+                disabled={currentYear >= new Date().getFullYear()}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        </div>
-      </CardHeader>
+        </CardHeader>
+      )}
       <CardContent>
         <Tabs defaultValue="yearly" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-zinc-800 border-zinc-700">
@@ -207,8 +212,8 @@ const ContributionActivity = ({ className }: ContributionProps) => {
           </TabsList>
           
           <TabsContent value="monthly" className="mt-3">
-            <div className="flex flex-col space-y-1">
-              <div className="grid grid-cols-7 gap-1 mb-1">
+            <div className="flex flex-col">
+              <div className="grid grid-cols-7 gap-1 mb-2 justify-items-center">
                 {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
                   <div key={day} className="text-xs text-zinc-500 text-center">
                     {day}
@@ -217,14 +222,14 @@ const ContributionActivity = ({ className }: ContributionProps) => {
               </div>
               
               <TooltipProvider>
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {groupedMonthlyData.map((week, weekIndex) => (
-                    <div key={weekIndex} className="grid grid-cols-7 gap-1">
+                    <div key={weekIndex} className="grid grid-cols-7 gap-1 justify-items-center">
                       {week.map((day) => (
                         <Tooltip key={day.date}>
                           <TooltipTrigger asChild>
                             <div 
-                              className={`aspect-square w-4 h-4 rounded-sm transition-all cursor-pointer ${getColor(day.level)}`}
+                              className={`w-8 h-8 rounded-md transition-colors cursor-pointer ${getColor(day.level)}`}
                               onMouseEnter={() => setHoveredDay(day)}
                               onMouseLeave={() => setHoveredDay(null)}
                             />
@@ -273,14 +278,14 @@ const ContributionActivity = ({ className }: ContributionProps) => {
                             });
                             
                             if (!day) {
-                              return <div key={dayIndex} className="w-4 h-4"></div>;
+                              return <div key={dayIndex} className="w-3 h-3"></div>;
                             }
                             
                             return (
                               <Tooltip key={dayIndex}>
                                 <TooltipTrigger asChild>
                                   <div 
-                                    className={`w-4 h-4 rounded-sm transition-all cursor-pointer ${getColor(day.level)}`}
+                                    className={`w-3 h-3 rounded-sm transition-colors cursor-pointer ${getColor(day.level)}`}
                                     onMouseEnter={() => setHoveredDay(day)}
                                     onMouseLeave={() => setHoveredDay(null)}
                                   />
