@@ -113,17 +113,23 @@ const ChallengeInterface: React.FC<ChallengeInterfaceProps> = ({ challenge }) =>
             <span className="text-zinc-500">JavaScript</span>
           </div>
           <div className="text-zinc-800 dark:text-zinc-200">
-            function twoSum(nums, target) {<br />
+            function twoSum(nums, target) {'{'}
+              <br />
             &nbsp;&nbsp;// Your code here<br />
-            &nbsp;&nbsp;const map = {};<br />
-            &nbsp;&nbsp;for (let i = 0; i &lt; nums.length; i++) {<br />
+            &nbsp;&nbsp;const map = {'{'}{'}'};
+              <br />
+            &nbsp;&nbsp;for (let i = 0; i &lt; nums.length; i++) {'{'}
+              <br />
             &nbsp;&nbsp;&nbsp;&nbsp;const complement = target - nums[i];<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;if (map[complement] !== undefined) {<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;if (map[complement] !== undefined) {'{'}
+              <br />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return [map[complement], i];<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;}<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;{'}'}
+              <br />
             &nbsp;&nbsp;&nbsp;&nbsp;map[nums[i]] = i;<br />
-            &nbsp;&nbsp;}<br />
-            }
+            &nbsp;&nbsp;{'}'}
+              <br />
+            {'}'}
           </div>
         </div>
         
@@ -259,16 +265,16 @@ const ChallengeInterface: React.FC<ChallengeInterfaceProps> = ({ challenge }) =>
                 <CardContent>
                   <pre className="text-xs bg-zinc-100 dark:bg-zinc-800 p-3 rounded overflow-x-auto">
                     <code>
-                      function twoSum(nums, target) {<br />
-                      &nbsp;&nbsp;for (let i = 0; i &lt; nums.length; i++) {<br />
-                      &nbsp;&nbsp;&nbsp;&nbsp;for (let j = i + 1; j &lt; nums.length; j++) {<br />
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (nums[i] + nums[j] === target) {<br />
+                      function twoSum(nums, target) {'{'}<br />
+                      &nbsp;&nbsp;for (let i = 0; i &lt; nums.length; i++) {'{'}<br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;for (let j = i + 1; j &lt; nums.length; j++) {'{'}<br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (nums[i] + nums[j] === target) {'{'}<br />
                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return [i, j];<br />
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
-                      &nbsp;&nbsp;&nbsp;&nbsp;}<br />
-                      &nbsp;&nbsp;}<br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{'}'}<br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;{'}'}<br />
+                      &nbsp;&nbsp;{'}'}<br />
                       &nbsp;&nbsp;return [];<br />
-                      }
+                      {'}'}
                     </code>
                   </pre>
                 </CardContent>
