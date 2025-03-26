@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 // Sample submission data
 const sampleSubmissions = [
@@ -138,6 +139,7 @@ interface SubmissionHistoryProps {
 const SubmissionHistory: React.FC<SubmissionHistoryProps> = ({ userData }) => {
   const [expandedSubmission, setExpandedSubmission] = useState<number | null>(null);
   const [submissions, setSubmissions] = useState(sampleSubmissions);
+  const { toast } = useToast();
 
   const toggleExpand = (id: number) => {
     if (expandedSubmission === id) {
