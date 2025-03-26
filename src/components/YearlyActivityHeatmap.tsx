@@ -18,9 +18,10 @@ type HeatmapDataPoint = {
 interface YearlyActivityHeatmapProps {
   data?: HeatmapDataPoint[];
   className?: string;
+  showTitle?: boolean;
 }
 
-const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, className }) => {
+const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, className, showTitle = true }) => {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [activityData, setActivityData] = useState<HeatmapDataPoint[]>([]);
   const [monthlyView, setMonthlyView] = useState<HeatmapDataPoint[]>([]);
@@ -202,34 +203,36 @@ const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, cla
   
   return (
     <Card className={`bg-zinc-900/60 border-zinc-800/50 ${className}`}>
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Activity className="h-5 w-5 text-green-400" />
-            Activity Heatmap
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-7 w-7 border-zinc-700"
-              onClick={handlePrevYear}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm font-medium">{currentYear}</span>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-7 w-7 border-zinc-700"
-              onClick={handleNextYear}
-              disabled={currentYear >= new Date().getFullYear()}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+      {showTitle && (
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Activity className="h-5 w-5 text-green-400" />
+              Activity Heatmap
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-7 w-7 border-zinc-700"
+                onClick={handlePrevYear}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-medium">{currentYear}</span>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-7 w-7 border-zinc-700"
+                onClick={handleNextYear}
+                disabled={currentYear >= new Date().getFullYear()}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        </div>
-      </CardHeader>
+        </CardHeader>
+      )}
       <CardContent>
         <Tabs defaultValue="monthly" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-zinc-800 border-zinc-700">
