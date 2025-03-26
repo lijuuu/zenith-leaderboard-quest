@@ -16,8 +16,6 @@ import Challenges from "./pages/Challenges";
 import Chat from "./pages/Chat";
 import Settings from "./pages/Settings";
 import Compiler from "./pages/Compiler";
-import Login from "./pages/Auth/Login";
-import Signup from "./pages/Auth/Signup";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
@@ -53,8 +51,6 @@ const App = () => (
               <Route path="/compiler" element={<Compiler />} />
               
               {/* Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
