@@ -5,7 +5,6 @@ import { Activity } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
 type ActivityDay = {
   date: string;
@@ -81,11 +80,11 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
   return (
-    <Card className={`bg-zinc-900/60 border-zinc-800/50 ${className}`}>
+    <Card className={`bg-zinc-950 border-zinc-800/50 ${className}`}>
       {showTitle && (
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center gap-2">
-            <Activity className="h-5 w-5 text-green-400" />
+            <Activity className="h-5 w-5 text-green-500" />
             Monthly Activity
           </CardTitle>
         </CardHeader>
@@ -103,7 +102,7 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({
               </div>
               
               <TooltipProvider>
-                <div className="grid grid-cols-7 gap-2.5 justify-items-center">
+                <div className="grid grid-cols-7 gap-2 justify-items-center">
                   {grid.map((row, rowIndex) => (
                     // For each day of the week (row)
                     row.map((day, colIndex) => {
@@ -113,7 +112,7 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({
                         <Tooltip key={`${rowIndex}-${colIndex}`}>
                           <TooltipTrigger asChild>
                             <div 
-                              className={`w-8 h-8 rounded-md cursor-pointer transition-all duration-200 transform hover:scale-110 ${
+                              className={`w-8 h-8 rounded-full cursor-pointer transition-all duration-200 transform hover:scale-125 ${
                                 day.isActive 
                                   ? 'bg-green-500 hover:bg-green-400' 
                                   : 'bg-red-500 hover:bg-red-400'
@@ -143,11 +142,11 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({
               
               <div className="mt-4 flex items-center justify-between pt-1 text-xs text-zinc-500">
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-md bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
                   <span>Inactive</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-md bg-green-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
                   <span>Active</span>
                 </div>
               </div>
