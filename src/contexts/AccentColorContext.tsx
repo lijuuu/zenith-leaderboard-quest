@@ -28,7 +28,14 @@ export function AccentColorProvider({
   ...props
 }: AccentColorProviderProps) {
   const [accentColor, setAccentColorState] = useState<AccentColor>(
-    () => (localStorage.getItem(storageKey) as AccentColor) || defaultColor
+    () => {
+      try {
+        return (localStorage.getItem(storageKey) as AccentColor) || defaultColor;
+      } catch (e) {
+        console.warn('LocalStorage not available for accent color, using default', e);
+        return defaultColor;
+      }
+    }
   );
 
   useEffect(() => {
@@ -44,7 +51,11 @@ export function AccentColorProvider({
   const value = {
     accentColor,
     setAccentColor: (color: AccentColor) => {
-      localStorage.setItem(storageKey, color);
+      try {
+        localStorage.setItem(storageKey, color);
+      } catch (e) {
+        console.warn('Failed to save accent color to localStorage', e);
+      }
       setAccentColorState(color);
     },
   };
