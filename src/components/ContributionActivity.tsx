@@ -4,7 +4,7 @@ import { Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { format, parseISO, subDays, eachDayOfInterval, subMonths } from 'date-fns';
+import { format, parseISO, subDays, eachDayOfInterval } from 'date-fns';
 
 interface ContributionProps {
   className?: string;
@@ -24,9 +24,9 @@ const ContributionActivity = ({ className }: ContributionProps) => {
   const [hoveredDay, setHoveredDay] = useState<ActivityDay | null>(null);
   
   useEffect(() => {
-    // Generate mock activity data for the past month only
+    // Generate mock activity data for the past year
     const today = new Date();
-    const startDate = subMonths(today, 1); // Show only one month instead of a year
+    const startDate = subDays(today, 365);
     
     const days = eachDayOfInterval({ 
       start: startDate, 
@@ -52,8 +52,7 @@ const ContributionActivity = ({ className }: ContributionProps) => {
       if (isWeekend) randomWeight *= 1.5;
       
       // Higher chance of activity in recent days
-      const daysAgo = Math.floor((today.getTime() - day.getTime()) / (1000 * 60 * 60 * 24));
-      const recencyBoost = Math.min(1, (30 - daysAgo) / 15);
+      const recencyBoost = Math.min(1, (365 - days.indexOf(day)) / 100);
       randomWeight *= recencyBoost;
       
       // Random activity count between 0 and 10
@@ -116,7 +115,7 @@ const ContributionActivity = ({ className }: ContributionProps) => {
           <Activity className="h-5 w-5 text-green-400" />
           Contribution Activity
         </CardTitle>
-        <p className="text-sm text-zinc-400">Your coding activity in the past month</p>
+        <p className="text-sm text-zinc-400">Your coding activity in the past year</p>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto pb-2">
