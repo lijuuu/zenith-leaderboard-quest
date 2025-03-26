@@ -60,6 +60,54 @@
     --ring: 240 5.9% 10%;
 
     --radius: 0.5rem;
+    
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 98%;
+    
+    --info: 221 83% 53%;
+    --info-foreground: 0 0% 98%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 98%;
+    
+    --info: 221 83% 53%;
+    --info-foreground: 0 0% 98%;
   }
 
   * {
@@ -77,7 +125,7 @@
 
   /* Custom Classes */
   .glass {
-    @apply backdrop-blur-lg bg-white/50 border border-white/20;
+    @apply backdrop-blur-lg bg-white/50 border border-white/20 dark:bg-zinc-900/50 dark:border-zinc-700/30;
   }
 
   .dark-glass {
@@ -140,5 +188,55 @@
   
   .delay-1000 {
     animation-delay: 1000ms;
+  }
+  
+  /* Theme specific color classes */
+  .theme-green {
+    @apply text-green-500 dark:text-green-400;
+  }
+  
+  .theme-red {
+    @apply text-red-500 dark:text-red-400;
+  }
+  
+  .theme-success {
+    @apply bg-green-500 text-white dark:bg-green-600;
+  }
+  
+  .theme-warning {
+    @apply bg-amber-500 text-white dark:bg-amber-600;
+  }
+  
+  .theme-error {
+    @apply bg-red-500 text-white dark:bg-red-600;
+  }
+  
+  .theme-info {
+    @apply bg-blue-500 text-white dark:bg-blue-600;
+  }
+  
+  /* Coding platform specific classes */
+  .difficulty-easy {
+    @apply bg-green-500 text-white dark:bg-green-600;
+  }
+  
+  .difficulty-medium {
+    @apply bg-amber-500 text-white dark:bg-amber-600;
+  }
+  
+  .difficulty-hard {
+    @apply bg-red-500 text-white dark:bg-red-600;
+  }
+  
+  .tag-pill {
+    @apply px-3 py-1 rounded-full text-xs font-medium bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200;
+  }
+  
+  .problem-card {
+    @apply bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 transition-all hover:shadow-md;
+  }
+  
+  .code-editor {
+    @apply font-mono text-sm bg-zinc-100 dark:bg-zinc-900 rounded-lg p-4;
   }
 }
