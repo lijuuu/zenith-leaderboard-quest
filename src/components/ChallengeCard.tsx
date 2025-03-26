@@ -3,30 +3,23 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Users, FileCode, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Challenge } from "@/api/types";
 
 interface ChallengeCardProps {
-  id: string;
-  title: string;
-  difficulty: "Easy" | "Medium" | "Hard";
-  createdBy: {
-    id: string;
-    username: string;
-    profileImage?: string;
-  };
-  participants: number;
-  problemCount: number;
-  createdAt: string;
+  challenge: Challenge;
 }
 
-const ChallengeCard = ({
-  id,
-  title,
-  difficulty,
-  createdBy,
-  participants,
-  problemCount,
-  createdAt
-}: ChallengeCardProps) => {
+const ChallengeCard = ({ challenge }: ChallengeCardProps) => {
+  const { 
+    id, 
+    title, 
+    difficulty, 
+    createdBy, 
+    participants, 
+    problemCount, 
+    createdAt 
+  } = challenge;
+  
   // Define difficulty class mappings
   const difficultyClasses = {
     Easy: "bg-green-500 text-white dark:bg-green-600",

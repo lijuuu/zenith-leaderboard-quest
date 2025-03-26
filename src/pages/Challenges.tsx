@@ -23,6 +23,7 @@ import {
   User
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Challenge } from '@/api/types';
 
 const Challenges = () => {
   const { toast } = useToast();
@@ -38,7 +39,7 @@ const Challenges = () => {
   });
 
   const filteredChallenges = challenges?.filter(challenge => {
-    if (activeTab === "my" && !challenge.isParticipant) return false;
+    if (activeTab === "my" && !challenge.isActive) return false; // Changed isParticipant to isActive
     if (activeTab === "public" && challenge.isPrivate) return false;
     if (activeTab === "private" && !challenge.isPrivate) return false;
     
@@ -51,20 +52,20 @@ const Challenges = () => {
     return true;
   });
 
-  const handleCreateChallenge = (data: any) => {
+  const handleCreateChallenge = () => {
     setShowCreateForm(false);
     refetch();
     toast({
       title: "Challenge Created",
-      description: `Your challenge "${data.title}" has been created successfully.`,
+      description: "Your challenge has been created successfully.",
     });
   };
 
-  const handleJoinPrivate = (accessCode: string) => {
+  const handleJoinPrivate = () => {
     setShowPrivateJoin(false);
     toast({
       title: "Joined Challenge",
-      description: `You have successfully joined the private challenge.`,
+      description: "You have successfully joined the private challenge.",
     });
     refetch();
   };
@@ -336,7 +337,6 @@ const Challenges = () => {
         <JoinPrivateChallenge 
           isOpen={showPrivateJoin} 
           onClose={() => setShowPrivateJoin(false)}
-          onJoin={handleJoinPrivate}
         />
       )}
       
@@ -345,7 +345,6 @@ const Challenges = () => {
         <CreateChallengeForm 
           isOpen={showCreateForm} 
           onClose={() => setShowCreateForm(false)}
-          onCreateChallenge={handleCreateChallenge}
         />
       )}
     </div>
