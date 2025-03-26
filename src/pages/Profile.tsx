@@ -3,13 +3,10 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Calendar, Puzzle, Trophy, UserPlus, Github, Globe, MapPin, Clock, BarChart3 } from "lucide-react";
-import MainNavbar from "@/components/MainNavbar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { getAllChallenges, getUserChallenges } from "@/api/challengeApi";
 import { getUserProfile } from "@/api/userApi";
@@ -19,7 +16,8 @@ import { UserProfile, Challenge } from "@/api/types";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileStats from "@/components/profile/ProfileStats";
 import ChallengesList from "@/components/profile/ChallengesList";
-import ActivityHeatmapRounded from "@/components/ActivityHeatmapRounded";
+import YearlyActivityHeatmap from "@/components/YearlyActivityHeatmap";
+import MonthlyActivityHeatmap from "@/components/MonthlyActivityHeatmap";
 import ProblemsSolvedChart from "@/components/profile/ProblemsSolvedChart";
 import RecentSubmissions from "@/components/profile/RecentSubmissions";
 import ProfileAchievements from "@/components/profile/ProfileAchievements";
@@ -59,11 +57,14 @@ const Profile = () => {
     loadChallenges();
   }, [profile, toast]);
   
-  // Transform the activity data to include the required 'level' property
+  // Transform the activity data to include the required properties
   const transformActivityData = () => {
     if (!profile?.activityHeatmap?.data) return [];
     
     return profile.activityHeatmap.data.map(item => {
+      // Determine if active based on count
+      const isActive = item.count > 0;
+      
       // Determine level based on count (similar logic to what's in ActivityHeatmapRounded)
       let level = 0;
       if (item.count > 0 && item.count <= 2) level = 1;
@@ -74,9 +75,27 @@ const Profile = () => {
       return {
         date: item.date,
         count: item.count,
+        isActive,
         level: level as 0 | 1 | 2 | 3 | 4
       };
     });
+  };
+  
+  // Transform for the monthly view
+  const transformMonthlyData = () => {
+    if (!profile?.activityHeatmap?.data) return [];
+    
+    // Get the last 30 days of data
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+    
+    return profile.activityHeatmap.data
+      .filter(item => new Date(item.date) >= thirtyDaysAgo)
+      .map(item => ({
+        date: item.date,
+        count: item.count,
+        isActive: item.count > 0
+      }));
   };
   
   // Count private and public challenges
@@ -85,65 +104,58 @@ const Profile = () => {
   
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-zinc-900 text-white">
-        <MainNavbar />
-        <main className="pt-20 pb-8">
-          <div className="page-container">
-            <Card className="w-full max-w-6xl mx-auto">
-              <CardHeader>
-                <div className="h-24 w-full animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded-md"></div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="h-20 animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded-md"></div>
-                  <div className="h-20 animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded-md"></div>
-                  <div className="h-20 animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded-md"></div>
-                </div>
-                <Separator />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="h-40 animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded-md"></div>
-                  <div className="h-40 animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded-md"></div>
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div className="h-64 animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded-md"></div>
-                  <div className="h-64 animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded-md"></div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
+      <div className="min-h-screen bg-zinc-950 text-white pt-20 pb-8">
+        <div className="page-container">
+          <Card className="w-full max-w-6xl mx-auto">
+            <CardHeader>
+              <div className="h-24 w-full animate-pulse bg-zinc-800 rounded-md"></div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="h-20 animate-pulse bg-zinc-800 rounded-md"></div>
+                <div className="h-20 animate-pulse bg-zinc-800 rounded-md"></div>
+                <div className="h-20 animate-pulse bg-zinc-800 rounded-md"></div>
+              </div>
+              <Separator />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="h-40 animate-pulse bg-zinc-800 rounded-md"></div>
+                <div className="h-40 animate-pulse bg-zinc-800 rounded-md"></div>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="h-64 animate-pulse bg-zinc-800 rounded-md"></div>
+                <div className="h-64 animate-pulse bg-zinc-800 rounded-md"></div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
   
   if (profileError) {
     return (
-      <div className="min-h-screen bg-zinc-900 text-white">
-        <MainNavbar />
-        <main className="pt-20 pb-8">
-          <div className="page-container">
-            <Card className="w-full max-w-6xl mx-auto">
-              <CardHeader>
-                <CardTitle className="text-lg font-medium">Error</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Failed to load profile</p>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
+      <div className="min-h-screen bg-zinc-950 text-white pt-20 pb-8">
+        <div className="page-container">
+          <Card className="w-full max-w-6xl mx-auto">
+            <CardHeader>
+              <CardTitle className="text-lg font-medium">Error</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Failed to load profile</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
   
   return (
-    <div className="min-h-screen bg-zinc-900 text-white">
-      <MainNavbar />
+    <div className="min-h-screen bg-zinc-950 text-white">
       <main className="pt-20 pb-8">
         <div className="page-container">
           <div className="w-full max-w-6xl mx-auto">
             {/* Profile Overview */}
-            <Card className="mb-6 bg-zinc-800/50 border-zinc-700/50">
+            <Card className="mb-6 bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
               <CardContent className="p-6">
                 {/* Profile Header Section */}
                 <ProfileHeader profile={profile!} userId={userId} />
@@ -151,7 +163,7 @@ const Profile = () => {
             </Card>
             
             {/* Stats Section */}
-            <Card className="mb-6 bg-zinc-800/50 border-zinc-700/50">
+            <Card className="mb-6 bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-medium flex items-center gap-2">
                   <BarChart3 className="h-5 w-5 text-green-500" /> Statistics Overview
@@ -230,21 +242,17 @@ const Profile = () => {
               </CardContent>
             </Card>
             
+            {/* Activity Section */}
+            <Card className="mb-6 bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
+              <CardContent className="p-6">
+                <YearlyActivityHeatmap data={transformActivityData()} />
+              </CardContent>
+            </Card>
+            
             {/* Activity & Challenges Section */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Left Column - Activity and Problems Solved */}
               <div className="lg:col-span-8 space-y-6">
-                <Card className="bg-zinc-800/50 border-zinc-700/50">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Calendar className="h-5 w-5 text-green-500" /> Activity Heatmap
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ActivityHeatmapRounded data={transformActivityData()} />
-                  </CardContent>
-                </Card>
-                
                 <Tabs defaultValue="problems" className="w-full">
                   <TabsList className="w-full justify-start bg-zinc-800 border-zinc-700">
                     <TabsTrigger value="problems" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">Problems Solved</TabsTrigger>
@@ -253,7 +261,7 @@ const Profile = () => {
                   </TabsList>
                   
                   <TabsContent value="problems" className="mt-4">
-                    <Card className="bg-zinc-800/50 border-zinc-700/50">
+                    <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
                       <CardContent className="p-4">
                         <ProblemsSolvedChart profile={profile!} />
                       </CardContent>
@@ -261,7 +269,7 @@ const Profile = () => {
                   </TabsContent>
                   
                   <TabsContent value="submissions" className="mt-4">
-                    <Card className="bg-zinc-800/50 border-zinc-700/50">
+                    <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
                       <CardContent className="p-4">
                         <RecentSubmissions userId={profile?.id} />
                       </CardContent>
@@ -269,18 +277,24 @@ const Profile = () => {
                   </TabsContent>
                   
                   <TabsContent value="achievements" className="mt-4">
-                    <Card className="bg-zinc-800/50 border-zinc-700/50">
+                    <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
                       <CardContent className="p-4">
                         <ProfileAchievements badges={profile?.badges || []} />
                       </CardContent>
                     </Card>
                   </TabsContent>
                 </Tabs>
+                
+                <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
+                  <CardContent className="p-4">
+                    <MonthlyActivityHeatmap data={transformMonthlyData()} />
+                  </CardContent>
+                </Card>
               </div>
               
               {/* Right Column - Challenges */}
               <div className="lg:col-span-4">
-                <Card className="bg-zinc-800/50 border-zinc-700/50">
+                <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <Trophy className="h-5 w-5 text-amber-500" /> Challenges
@@ -302,7 +316,7 @@ const Profile = () => {
                 </Card>
                 
                 {profile?.website || profile?.githubProfile || profile?.location ? (
-                  <Card className="mt-6 bg-zinc-800/50 border-zinc-700/50">
+                  <Card className="mt-6 bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg">Links & Info</CardTitle>
                     </CardHeader>
