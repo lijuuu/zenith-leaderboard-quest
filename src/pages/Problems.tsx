@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -171,7 +172,7 @@ const Problems = () => {
                 <SelectValue placeholder="Difficulty" />
               </SelectTrigger>
               <SelectContent className="bg-zinc-800 border-zinc-700">
-                <SelectItem value="">All Difficulties</SelectItem>
+                <SelectItem value="all">All Difficulties</SelectItem>
                 <SelectItem value="Easy">Easy</SelectItem>
                 <SelectItem value="Medium">Medium</SelectItem>
                 <SelectItem value="Hard">Hard</SelectItem>
