@@ -125,17 +125,17 @@ export interface Challenge {
     profileImage?: string;
   };
   participants: number;
+  participantUsers?: {
+    id?: string;
+    avatar?: string;
+    name?: string;
+  }[];
   problemCount: number;
   createdAt: string;
   isActive: boolean;
   problems?: string[];
   description?: string;
   participantCount?: number;
-  participants?: {
-    id?: string;
-    avatar?: string;
-    name?: string;
-  }[];
   date?: string;
   type?: string;
 }
@@ -215,10 +215,11 @@ export interface Submission {
   userId: string;
   language: string;
   code: string;
-  status: 'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Memory Limit Exceeded' | 'Runtime Error' | 'Compilation Error';
+  status: 'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Memory Limit Exceeded' | 'Runtime Error' | 'Compilation Error' | 'Processing';
   runtime?: string;
   memory?: string;
   timestamp: string;
+  submittedAt?: string;
   testCases?: {
     passed: number;
     total: number;
@@ -231,6 +232,11 @@ export interface Submission {
     }[];
   };
   difficulty?: string;
+  problem?: {
+    id: string;
+    title: string;
+    difficulty: string;
+  };
 }
 
 // Compiler related types

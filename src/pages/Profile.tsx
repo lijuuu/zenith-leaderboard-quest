@@ -236,14 +236,14 @@ const Profile = () => {
                             <div className="mt-3 flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div className="flex -space-x-2">
-                                  {challenge.participants?.map((participant, i) => (
+                                  {challenge.participantUsers && challenge.participantUsers.map((participant, i) => (
                                     <div key={i} className="w-6 h-6 rounded-full overflow-hidden border-2 border-zinc-800">
                                       <img src={participant.avatar} alt={participant.name} className="w-full h-full object-cover" />
                                     </div>
                                   ))}
                                 </div>
                                 <span className="text-xs text-zinc-400">
-                                  {challenge.participantCount || challenge.participants?.length || 2} participants
+                                  {challenge.participantCount || challenge.participants || (challenge.participantUsers ? challenge.participantUsers.length : 0)} participants
                                 </span>
                               </div>
                               <div className="text-xs text-zinc-400">
