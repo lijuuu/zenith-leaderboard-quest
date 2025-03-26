@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -19,6 +18,7 @@ import ProfileStats from "@/components/profile/ProfileStats";
 import ChallengesList from "@/components/profile/ChallengesList";
 import ContributionActivity from "@/components/ContributionActivity";
 import MonthlyActivityHeatmap from "@/components/MonthlyActivityHeatmap";
+import YearlyActivityHeatmap from "@/components/YearlyActivityHeatmap";
 import ProblemsSolvedChart from "@/components/profile/ProblemsSolvedChart";
 import RecentSubmissions from "@/components/profile/RecentSubmissions";
 import ProfileAchievements from "@/components/profile/ProfileAchievements";
@@ -214,7 +214,7 @@ const Profile = () => {
                 {isMobile ? (
                   <MonthlyActivityHeatmap showTitle={false} />
                 ) : (
-                  <ContributionActivity showTitle={false} />
+                  <YearlyActivityHeatmap showTitle={false} />
                 )}
               </CardContent>
             </Card>
