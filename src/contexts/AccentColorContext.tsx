@@ -27,25 +27,28 @@ export function AccentColorProvider({
   storageKey = 'zenx-accent-color',
   ...props
 }: AccentColorProviderProps) {
-  const [accentColor, setAccentColorState] = useState<AccentColor>(
-    () => {
-      try {
-        return (localStorage.getItem(storageKey) as AccentColor) || defaultColor;
-      } catch (e) {
-        console.warn('LocalStorage not available for accent color, using default', e);
-        return defaultColor;
-      }
+  const [accentColor, setAccentColorState] = useState<AccentColor>(() => {
+    try {
+      const storedColor = localStorage.getItem(storageKey);
+      return (storedColor as AccentColor) || defaultColor;
+    } catch (e) {
+      console.warn('LocalStorage not available for accent color, using default', e);
+      return defaultColor;
     }
-  );
+  });
 
   useEffect(() => {
-    const root = window.document.documentElement;
-    
-    // Remove all accent color classes
-    root.classList.remove('accent-green', 'accent-blue', 'accent-purple', 'accent-orange', 'accent-red', 'accent-teal');
-    
-    // Add the current accent color class
-    root.classList.add(`accent-${accentColor}`);
+    try {
+      const root = window.document.documentElement;
+      
+      // Remove all accent color classes
+      root.classList.remove('accent-green', 'accent-blue', 'accent-purple', 'accent-orange', 'accent-red', 'accent-teal');
+      
+      // Add the current accent color class
+      root.classList.add(`accent-${accentColor}`);
+    } catch (e) {
+      console.error('Error updating accent color class', e);
+    }
   }, [accentColor]);
 
   const value = {
