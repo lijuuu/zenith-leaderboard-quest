@@ -23,7 +23,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     setLiked(!liked);
   };
   
-  const isCurrentUser = message.sender?.id === "1"; // Assuming current user ID is 1
+  const isCurrentUser = message.isCurrentUser || message.sender?.id === "1"; // Assuming current user ID is 1
   
   return (
     <div 
