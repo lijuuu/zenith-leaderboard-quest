@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import Problems from "./pages/Problems";
 import ProblemDetail from "./pages/ProblemDetail";
 import Profile from "./pages/Profile";
+import PublicProfile from "./pages/PublicProfile"; // New component for public profiles
 import Challenges from "./pages/Challenges";
 import Chat from "./pages/Chat";
 import Settings from "./pages/Settings";
@@ -42,7 +43,6 @@ const App = () => {
           <AccentColorProvider defaultColor="green" storageKey="zenx-accent-color">
             <TooltipProvider>
               <div className="min-h-screen bg-zinc-900 text-white">
-                <MainNavbar />
                 <div className="pt-14">
                   <Routes>
                     <Route path="/" element={<Index />} />
@@ -50,7 +50,7 @@ const App = () => {
                     <Route path="/problems" element={<Problems />} />
                     <Route path="/problems/:id" element={<ProblemDetail />} />
                     <Route path="/profile" element={<Profile />} />
-                    <Route path="/profile/:userId" element={<Profile />} />
+                    <Route path="/profile/:userId" element={<PublicProfile />} />
                     <Route path="/challenges" element={<Challenges />} />
                     <Route path="/chat" element={<Chat />} />
                     <Route path="/settings" element={<Settings />} />

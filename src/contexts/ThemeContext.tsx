@@ -30,7 +30,22 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => {
       try {
-        return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
+        const storedTheme = localStorage.getItem(storageKey) as Theme;
+        // Try to get the theme from localStorage
+        if (storedTheme) {
+          return storedTheme;
+        }
+        
+        // If no theme in localStorage, check system preference
+        if (typeof window !== 'undefined') {
+          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+            .matches
+            ? 'dark'
+            : 'light';
+          return systemTheme;
+        }
+        
+        return defaultTheme;
       } catch (e) {
         // Handle case where localStorage is not available
         console.warn('LocalStorage not available, using default theme', e);
@@ -51,10 +66,22 @@ export function ThemeProvider({
         : 'light';
       
       root.classList.add(systemTheme);
-      return;
+      
+      // Setup listener for system theme changes
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => {
+        if (theme === 'system') {
+          const newTheme = mediaQuery.matches ? 'dark' : 'light';
+          root.classList.remove('light', 'dark');
+          root.classList.add(newTheme);
+        }
+      };
+      
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    } else {
+      root.classList.add(theme);
     }
-    
-    root.classList.add(theme);
   }, [theme]);
 
   const value = {
