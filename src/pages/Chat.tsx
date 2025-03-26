@@ -1,5 +1,5 @@
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
   Search, 
@@ -615,7 +615,7 @@ const Chat = () => {
 };
 
 // Helper icon component
-const MessageIcon = ({ className }: { className?: string }) => (
+const MessageIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
     viewBox="0 0 24 24" 

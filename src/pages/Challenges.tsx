@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -521,7 +520,7 @@ const Challenges = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ActivityHeatmapRounded />
+                  <ActivityHeatmapRounded data={[]} />
                 </CardContent>
               </Card>
               
