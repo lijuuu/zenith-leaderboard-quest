@@ -9,10 +9,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "dark" } = useTheme();
   const { accentColor } = useAccentColor();
   
-  // Create action button class dynamically
-  const getActionButtonClass = () => {
-    return `group-[.toast]:bg-${accentColor}-500 group-[.toast]:text-white`;
-  };
+  // Create class name for action button dynamically
+  const accentColorClass = `bg-${accentColor}-500`;
   
   return (
     <Sonner
@@ -23,7 +21,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           toast:
             "group toast group-[.toaster]:bg-zinc-800 group-[.toaster]:text-white group-[.toaster]:border-zinc-700 group-[.toaster]:shadow-lg",
           description: "group-[.toast]:text-zinc-400",
-          actionButton: getActionButtonClass(),
+          actionButton: `group-[.toast]:${accentColorClass} group-[.toast]:text-white`,
           cancelButton:
             "group-[.toast]:bg-zinc-700 group-[.toast]:text-zinc-200",
         },

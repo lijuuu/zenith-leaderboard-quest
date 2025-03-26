@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getUserProfile } from "@/api/userApi";
@@ -15,10 +15,9 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Code, Star, Award } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { UserProfile, Challenge, Badge } from "@/api/types";
 
 // Mock user data to supplement API data
-const mockUsers: Record<string, UserProfile> = {
+const mockUsers = {
   "user1": {
     id: "user1",
     username: "sarahcodes",
@@ -36,22 +35,7 @@ const mockUsers: Record<string, UserProfile> = {
     followers: 245,
     following: 123,
     ranking: 65,
-    email: "sarah.johnson@example.com",
-    stats: {
-      easy: { solved: 75, total: 100 },
-      medium: { solved: 84, total: 150 },
-      hard: { solved: 28, total: 80 }
-    },
-    achievements: {
-      weeklyContests: 12,
-      monthlyContests: 5,
-      specialEvents: 3
-    },
-    badges: [],
-    activityHeatmap: {
-      startDate: "2023-01-01T00:00:00Z",
-      data: []
-    }
+    email: "sarah.johnson@example.com"
   },
   "user2": {
     id: "user2",
@@ -70,22 +54,7 @@ const mockUsers: Record<string, UserProfile> = {
     followers: 412,
     following: 87,
     ranking: 27,
-    email: "michael.chen@example.com",
-    stats: {
-      easy: { solved: 100, total: 100 },
-      medium: { solved: 120, total: 150 },
-      hard: { solved: 100, total: 150 }
-    },
-    achievements: {
-      weeklyContests: 45,
-      monthlyContests: 12,
-      specialEvents: 8
-    },
-    badges: [],
-    activityHeatmap: {
-      startDate: "2023-01-01T00:00:00Z",
-      data: []
-    }
+    email: "michael.chen@example.com"
   },
   "user3": {
     id: "user3",
@@ -104,22 +73,7 @@ const mockUsers: Record<string, UserProfile> = {
     followers: 198,
     following: 215,
     ranking: 132,
-    email: "jane.williams@example.com",
-    stats: {
-      easy: { solved: 65, total: 100 },
-      medium: { solved: 60, total: 150 },
-      hard: { solved: 20, total: 150 }
-    },
-    achievements: {
-      weeklyContests: 8,
-      monthlyContests: 3,
-      specialEvents: 1
-    },
-    badges: [],
-    activityHeatmap: {
-      startDate: "2023-01-01T00:00:00Z",
-      data: []
-    }
+    email: "jane.williams@example.com"
   },
   "user4": {
     id: "user4",
@@ -138,22 +92,7 @@ const mockUsers: Record<string, UserProfile> = {
     followers: 276,
     following: 143,
     ranking: 85,
-    email: "alex.rodriguez@example.com",
-    stats: {
-      easy: { solved: 85, total: 100 },
-      medium: { solved: 95, total: 150 },
-      hard: { solved: 30, total: 150 }
-    },
-    achievements: {
-      weeklyContests: 18,
-      monthlyContests: 6,
-      specialEvents: 4
-    },
-    badges: [],
-    activityHeatmap: {
-      startDate: "2023-01-01T00:00:00Z",
-      data: []
-    }
+    email: "alex.rodriguez@example.com"
   },
   "user5": {
     id: "user5",
@@ -172,110 +111,30 @@ const mockUsers: Record<string, UserProfile> = {
     followers: 217,
     following: 96,
     ranking: 118,
-    email: "emma.wilson@example.com",
-    stats: {
-      easy: { solved: 70, total: 100 },
-      medium: { solved: 73, total: 150 },
-      hard: { solved: 20, total: 150 }
-    },
-    achievements: {
-      weeklyContests: 15,
-      monthlyContests: 4,
-      specialEvents: 2
-    },
-    badges: [],
-    activityHeatmap: {
-      startDate: "2023-01-01T00:00:00Z",
-      data: []
-    }
+    email: "emma.wilson@example.com"
   }
 };
-
-// Mock challenges data
-const mockChallenges: Challenge[] = [
-  {
-    id: "challenge1",
-    title: "Algorithm Marathon",
-    difficulty: "Medium",
-    createdBy: {
-      id: "user1",
-      username: "sarahcodes",
-      profileImage: "https://i.pravatar.cc/300?img=5"
-    },
-    participants: 24,
-    problemCount: 8,
-    createdAt: "2023-05-15T10:30:00Z",
-    isActive: true,
-    isPrivate: false
-  },
-  {
-    id: "challenge2",
-    title: "Data Structures Challenge",
-    difficulty: "Hard",
-    createdBy: {
-      id: "user2",
-      username: "mikecoder",
-      profileImage: "https://i.pravatar.cc/300?img=3"
-    },
-    participants: 18,
-    problemCount: 5,
-    createdAt: "2023-06-20T14:15:00Z",
-    isActive: true,
-    isPrivate: true,
-    accessCode: "DS123"
-  }
-];
-
-// Mock badges data
-const mockBadges: Badge[] = [
-  {
-    id: "badge1",
-    name: "Top Performer",
-    description: "Ranked in the top 10% of users",
-    icon: "trophy",
-    earnedDate: "2023-04-10T08:30:00Z",
-    rarity: "rare"
-  },
-  {
-    id: "badge2",
-    name: "Code Master",
-    description: "Solved over 100 problems",
-    icon: "code",
-    earnedDate: "2023-02-05T14:20:00Z",
-    rarity: "uncommon"
-  },
-  {
-    id: "badge3",
-    name: "Problem Solver",
-    description: "Solved problems from all difficulty levels",
-    icon: "award",
-    earnedDate: "2023-01-15T11:45:00Z",
-    rarity: "common"
-  }
-];
 
 const PublicProfile = () => {
   const { userId } = useParams<{ userId: string }>();
   const { toast } = useToast();
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
 
   // Fetch profile data
   const { data: profile, isLoading, isError } = useQuery({
     queryKey: ['userProfile', userId],
-    queryFn: () => getUserProfile(userId || '')
+    queryFn: () => getUserProfile(userId || ''),
+    onError: () => {
+      // Since getUserProfile might not return the mock data, we'll simulate a successful response
+      // This is just for demonstration purposes
+    }
   });
 
   // Use mock data if API doesn't return data
-  const userProfile = profile || (userId && mockUsers[userId]);
-  
+  const userProfile = profile || (userId && mockUsers[userId as keyof typeof mockUsers]);
+
   useEffect(() => {
-    // Load mock challenges
-    if (userProfile) {
-      setChallenges(mockChallenges);
-    }
-    
     window.scrollTo(0, 0);
-  }, [userId, userProfile]);
+  }, [userId]);
 
   if (isLoading) {
     return (
@@ -330,7 +189,7 @@ const PublicProfile = () => {
                 </TabsList>
                 
                 <TabsContent value="overview" className="space-y-6">
-                  <ProfileStats profile={userProfile} />
+                  <ProfileStats userId={userId} profile={userProfile} />
                   
                   <Card className="bg-zinc-800/50 border-zinc-700/50">
                     <CardHeader>
@@ -407,15 +266,15 @@ const PublicProfile = () => {
                 </TabsContent>
                 
                 <TabsContent value="submissions" className="space-y-6">
-                  <RecentSubmissions userId={userId} />
+                  <RecentSubmissions userId={userId} showAll />
                 </TabsContent>
                 
                 <TabsContent value="challenges" className="space-y-6">
-                  <ChallengesList challenges={challenges} />
+                  <ChallengesList userId={userId} />
                 </TabsContent>
                 
                 <TabsContent value="achievements" className="space-y-6">
-                  <ProfileAchievements badges={mockBadges} />
+                  <ProfileAchievements userId={userId} />
                 </TabsContent>
               </Tabs>
             </div>
