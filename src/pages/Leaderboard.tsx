@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -31,7 +30,7 @@ const Leaderboard = () => {
   const { period, currentPage, entries, totalEntries, status } = useAppSelector(
     (state) => state.leaderboard
   );
-  const [timeRange, setTimeRange] = useState(period);
+  const [timeRange, setTimeRange] = useState<'all' | 'monthly' | 'weekly'>(period);
   const [sortField, setSortField] = useState('rank');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [searchTerm, setSearchTerm] = useState('');
@@ -44,7 +43,7 @@ const Leaderboard = () => {
     queryFn: () => getLeaderboard({ 
       page: currentPage, 
       limit: ITEMS_PER_PAGE, 
-      period: timeRange as 'all' | 'monthly' | 'weekly' 
+      period: timeRange
     }),
   });
   
@@ -60,7 +59,7 @@ const Leaderboard = () => {
     
     // Sync Redux state with React Query
     if (leaderboardData) {
-      dispatch(fetchLeaderboard({ page: currentPage, limit: ITEMS_PER_PAGE, period: timeRange as 'all' | 'monthly' | 'weekly' }));
+      dispatch(fetchLeaderboard({ page: currentPage, limit: ITEMS_PER_PAGE, period: timeRange }));
     }
     
     if (friendsLeaderboard) {
@@ -71,13 +70,13 @@ const Leaderboard = () => {
   useEffect(() => {
     // When time range changes, reset to page 1
     if (timeRange !== period) {
-      dispatch(setPeriod(timeRange as 'all' | 'monthly' | 'weekly'));
+      dispatch(setPeriod(timeRange));
       dispatch(setCurrentPage(1));
     }
   }, [timeRange, period, dispatch]);
 
-  const handleTimeRangeChange = (value: string) => {
-    setTimeRange(value as 'all' | 'monthly' | 'weekly');
+  const handleTimeRangeChange = (value: 'all' | 'monthly' | 'weekly') => {
+    setTimeRange(value);
   };
 
   const handleSort = (field: string) => {
@@ -178,18 +177,6 @@ const Leaderboard = () => {
                     
                     <div className="inline-flex bg-zinc-900/50 border border-zinc-700 p-1 rounded-lg">
                       <button
-                        onClick={() => handleTimeRangeChange('daily')}
-                        className={cn(
-                          "px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 flex items-center",
-                          timeRange === 'daily' 
-                            ? "bg-zinc-800 text-white" 
-                            : "text-zinc-400 hover:text-white"
-                        )}
-                      >
-                        <Calendar className="w-3 h-3 mr-1" />
-                        Daily
-                      </button>
-                      <button
                         onClick={() => handleTimeRangeChange('weekly')}
                         className={cn(
                           "px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 flex items-center",
@@ -212,6 +199,18 @@ const Leaderboard = () => {
                       >
                         <Calendar className="w-3 h-3 mr-1" />
                         Monthly
+                      </button>
+                      <button
+                        onClick={() => handleTimeRangeChange('all')}
+                        className={cn(
+                          "px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 flex items-center",
+                          timeRange === 'all' 
+                            ? "bg-zinc-800 text-white" 
+                            : "text-zinc-400 hover:text-white"
+                        )}
+                      >
+                        <Calendar className="w-3 h-3 mr-1" />
+                        All Time
                       </button>
                     </div>
                   </div>

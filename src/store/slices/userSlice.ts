@@ -1,6 +1,7 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { getUserProfile, updateUserProfile } from '@/api/userApi';
+import { UserProfile } from '@/api/types';
 
 export interface UserState {
   profile: {
@@ -33,7 +34,22 @@ export const fetchUserProfile = createAsyncThunk(
   'user/fetchUserProfile',
   async (userId: string) => {
     const response = await getUserProfile(userId);
-    return response;
+    // Transform the UserProfile to match our Redux store shape
+    return {
+      id: response.id,
+      username: response.username,
+      fullName: response.fullName,
+      email: response.email,
+      profileImage: response.profileImage || '',
+      country: response.location,
+      bio: response.bio,
+      joinDate: response.joinedDate,
+      problemsSolved: response.problemsSolved,
+      currentStreak: response.dayStreak,
+      longestStreak: response.dayStreak, // Use dayStreak as a fallback
+      currentRating: response.ranking,
+      globalRank: response.ranking
+    };
   }
 );
 

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { fetchUserProfile } from '@/store/slices/userSlice';
-import { Trophy, Users, Code, Zap, Plus, Play, User, ChevronRight } from 'lucide-react';
+import { Trophy, Users, Code, Zap, Plus, Play, User, ChevronRight, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -13,7 +13,7 @@ import ReferralBanner from '@/components/ReferralBanner';
 import StatsCard from '@/components/StatsCard';
 import ContributionActivity from '@/components/ContributionActivity';
 import { getUserProfile } from '@/api/userApi';
-import { getProblemStats } from '@/api/problemApi';
+import { getProblems } from '@/api/problemApi';
 import { getChallenges } from '@/api/challengeApi';
 import { getLeaderboard } from '@/api/leaderboardApi';
 
@@ -33,19 +33,19 @@ const Index = () => {
   // Fetch problem stats with React Query
   const { data: problemStats } = useQuery({
     queryKey: ['problemStats'],
-    queryFn: () => getProblemStats(),
+    queryFn: () => getProblems(),
   });
   
   // Fetch recent challenges with React Query
   const { data: recentChallenges } = useQuery({
     queryKey: ['recentChallenges'],
-    queryFn: () => getChallenges({ limit: 3 }),
+    queryFn: () => getChallenges(),
   });
   
   // Fetch top performers with React Query
   const { data: topPerformers } = useQuery({
     queryKey: ['topPerformers'],
-    queryFn: () => getLeaderboard({ limit: 5, period: 'weekly' }),
+    queryFn: () => getLeaderboard({ period: 'weekly' }),
   });
 
   // Fetch user profile with React Query (separate from Redux for demonstration)
@@ -102,18 +102,18 @@ const Index = () => {
                 />
                 <StatsCard 
                   title="Current Streak" 
-                  value={`${userProfileData?.currentStreak || 7} days`}
+                  value={`${userProfileData?.dayStreak || 7} days`}
                   icon={<Zap className="h-4 w-4 text-amber-400" />}
                 />
                 <StatsCard 
                   title="Global Rank" 
-                  value={`#${userProfileData?.globalRank || 354}`} 
+                  value={`#${userProfileData?.ranking || 354}`} 
                   change="+12"
                   icon={<Trophy className="h-4 w-4 text-amber-500" />}
                 />
                 <StatsCard 
                   title="Current Rating" 
-                  value={userProfileData?.currentRating || 1750} 
+                  value={userProfileData?.ranking || 1750} 
                   change="+15"
                   icon={<Award className="h-4 w-4 text-blue-400" />}
                 />
