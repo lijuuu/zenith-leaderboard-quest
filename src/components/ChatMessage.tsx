@@ -3,10 +3,10 @@ import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Reply, ThumbsUp, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Message } from "@/api/types";
+import { ChatMessage as MessageType } from "@/api/types";
 
 interface ChatMessageProps {
-  message: Message;
+  message: MessageType;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
@@ -23,7 +23,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     setLiked(!liked);
   };
   
-  const isCurrentUser = message.user.id === "1"; // Assuming current user ID is 1
+  const isCurrentUser = message.sender?.id === "1"; // Assuming current user ID is 1
   
   return (
     <div 
@@ -33,11 +33,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     >
       <div className="relative flex-shrink-0">
         <img 
-          src={message.user.avatar || "https://randomuser.me/api/portraits/men/32.jpg"} 
-          alt={message.user.name}
+          src={message.sender?.profileImage || "https://randomuser.me/api/portraits/men/32.jpg"} 
+          alt={message.sender?.username || "User"}
           className="w-10 h-10 rounded-full object-cover"
         />
-        {message.user.isOnline && (
+        {message.sender?.isOnline && (
           <span className="absolute bottom-0 right-0 bg-green-500 w-2.5 h-2.5 rounded-full border-2 border-zinc-900"></span>
         )}
       </div>
@@ -46,7 +46,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         <div className="flex items-center gap-2 mb-1">
           {!isCurrentUser && (
             <>
-              <span className="font-medium">{message.user.name}</span>
+              <span className="font-medium">{message.sender?.username || "User"}</span>
               <span className="text-xs text-zinc-400">
                 {formatDistanceToNow(new Date(message.timestamp), { addSuffix: true })}
               </span>

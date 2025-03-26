@@ -19,6 +19,7 @@ export interface User {
   following?: number;
   followers?: number;
   is2FAEnabled?: boolean;
+  isOnline?: boolean;
 }
 
 export interface UserProfile extends User {
@@ -34,6 +35,10 @@ export interface UserProfile extends User {
   };
   badges: Badge[];
   activityHeatmap: HeatmapData;
+  currentStreak?: number;
+  longestStreak?: number;
+  currentRating?: number;
+  globalRank?: number;
 }
 
 export interface Friend {
@@ -43,6 +48,7 @@ export interface Friend {
   profileImage?: string;
   status: 'online' | 'offline' | 'in-match' | 'coding';
   lastActive?: string;
+  isOnline?: boolean;
 }
 
 export interface Badge {
@@ -123,6 +129,15 @@ export interface Challenge {
   createdAt: string;
   isActive: boolean;
   problems?: string[];
+  description?: string;
+  participantCount?: number;
+  participants?: {
+    id?: string;
+    avatar?: string;
+    name?: string;
+  }[];
+  date?: string;
+  type?: string;
 }
 
 // Chat related types
@@ -142,6 +157,7 @@ export interface ChatMessage {
     id: string;
     username: string;
     profileImage?: string;
+    isOnline?: boolean;
   };
   content: string;
   timestamp: string;
@@ -150,6 +166,8 @@ export interface ChatMessage {
     type: 'image' | 'code' | 'link';
     content: string;
   }[];
+  liked?: boolean;
+  likeCount?: number;
 }
 
 // Leaderboard related types
@@ -212,6 +230,7 @@ export interface Submission {
       error?: string;
     }[];
   };
+  difficulty?: string;
 }
 
 // Compiler related types

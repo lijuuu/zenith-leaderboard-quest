@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -55,7 +54,7 @@ const Problems = () => {
   
   const { data: problems, isLoading, refetch } = useQuery({
     queryKey: ["problems"],
-    queryFn: getProblems,
+    queryFn: () => getProblems(),
   });
   
   useEffect(() => {

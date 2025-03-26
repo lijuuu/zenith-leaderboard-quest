@@ -51,9 +51,9 @@ const SubmissionHistory = ({ submissions, isLoading = false, limit }: Submission
                   <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
                     <CheckCircle className="h-4 w-4 text-green-500" />
                   </div>
-                ) : submission.status === "Processing" ? (
+                ) : submission.status === "Time Limit Exceeded" || submission.status === "Memory Limit Exceeded" ? (
                   <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
-                    <Clock className="h-4 w-4 text-blue-400 animate-spin" />
+                    <Clock className="h-4 w-4 text-blue-400" />
                   </div>
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center">
@@ -63,22 +63,22 @@ const SubmissionHistory = ({ submissions, isLoading = false, limit }: Submission
                 
                 <div>
                   <h3 className="font-medium group-hover:text-green-400 transition-colors">
-                    {submission.problem.title}
+                    {submission.problemTitle}
                   </h3>
                   <div className="flex items-center gap-3 text-xs mt-1">
                     <span className="text-zinc-400">
-                      {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
+                      {formatDistanceToNow(new Date(submission.timestamp), { addSuffix: true })}
                     </span>
                     <div 
                       className={`px-2 py-0.5 rounded-full ${
-                        submission.problem.difficulty === "Easy" 
+                        submission.difficulty === "Easy" 
                           ? "bg-green-500/20 text-green-400" 
-                          : submission.problem.difficulty === "Medium"
+                          : submission.difficulty === "Medium"
                             ? "bg-amber-500/20 text-amber-400"
                             : "bg-red-500/20 text-red-400"
                       }`}
                     >
-                      {submission.problem.difficulty}
+                      {submission.difficulty || "Medium"}
                     </div>
                     <div className="px-2 py-0.5 bg-zinc-700/50 rounded-full">
                       {submission.language}
@@ -91,7 +91,7 @@ const SubmissionHistory = ({ submissions, isLoading = false, limit }: Submission
                 <div className={`text-sm font-medium ${
                   submission.status === "Accepted" 
                     ? "text-green-400" 
-                    : submission.status === "Processing"
+                    : submission.status === "Time Limit Exceeded" || submission.status === "Memory Limit Exceeded"
                       ? "text-blue-400"
                       : "text-red-400"
                 }`}>

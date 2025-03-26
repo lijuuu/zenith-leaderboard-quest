@@ -20,7 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { getUserProfile } from "@/api/userApi";
 import { getUserSubmissions } from "@/api/submissionApi";
-import { getUserChallenges } from "@/api/challengeApi";
+import { getChallenges } from "@/api/challengeApi";
 import ActivityHeatmap from "@/components/ActivityHeatmap";
 import SubmissionHistory from "@/components/SubmissionHistory";
 import MainNavbar from "@/components/MainNavbar";
@@ -41,7 +41,7 @@ const Profile = () => {
   
   const { data: challenges, isLoading: isLoadingChallenges } = useQuery({
     queryKey: ["challenges", userId],
-    queryFn: () => getUserChallenges(userId || "1"),
+    queryFn: () => getChallenges({ participated: true }),
   });
   
   useEffect(() => {
@@ -101,16 +101,16 @@ const Profile = () => {
                 <Separator className="bg-zinc-700/50" />
                 
                 <div className="space-y-3">
-                  {profile?.country && (
+                  {profile?.location && (
                     <div className="flex items-center gap-3 text-sm">
                       <MapPin className="h-4 w-4 text-zinc-500" />
-                      <span>{profile.country}</span>
+                      <span>{profile.location}</span>
                     </div>
                   )}
                   
                   <div className="flex items-center gap-3 text-sm">
                     <Calendar className="h-4 w-4 text-zinc-500" />
-                    <span>Joined {profile?.joinDate ? format(new Date(profile.joinDate), 'MMMM yyyy') : 'January 2023'}</span>
+                    <span>Joined {profile?.joinedDate ? format(new Date(profile.joinedDate), 'MMMM yyyy') : 'January 2023'}</span>
                   </div>
                 </div>
                 
