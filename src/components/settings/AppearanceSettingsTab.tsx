@@ -1,205 +1,134 @@
 
-import React from "react";
-import { Moon, Sun, Palette } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAccentColor } from "@/contexts/AccentColorContext";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useToast } from "@/hooks/use-toast";
+import { Laptop, Moon, Sun } from "lucide-react";
 
-type AccentColorType = {
-  name: string;
-  value: "green" | "blue" | "purple" | "orange" | "red" | "teal";
-  class: string;
-};
-
-const AppearanceSettingsTab: React.FC = () => {
+const AppearanceSettingsTab = () => {
   const { theme, setTheme } = useTheme();
   const { accentColor, setAccentColor } = useAccentColor();
-  
-  const accentColors: AccentColorType[] = [
-    { name: "Green", value: "green", class: "bg-[hsl(var(--accent-green))]" },
-    { name: "Blue", value: "blue", class: "bg-[hsl(var(--accent-blue))]" },
-    { name: "Purple", value: "purple", class: "bg-[hsl(var(--accent-purple))]" },
-    { name: "Orange", value: "orange", class: "bg-[hsl(var(--accent-orange))]" },
-    { name: "Red", value: "red", class: "bg-[hsl(var(--accent-red))]" },
-    { name: "Teal", value: "teal", class: "bg-[hsl(var(--accent-teal))]" },
+  const { toast } = useToast();
+  const [selectedAccentColor, setSelectedAccentColor] = useState<string>(accentColor);
+
+  const accentColors = [
+    { value: "green", label: "Green", color: "bg-[hsl(var(--accent-green))]" },
+    { value: "blue", label: "Blue", color: "bg-[hsl(var(--accent-blue))]" },
+    { value: "purple", label: "Purple", color: "bg-[hsl(var(--accent-purple))]" },
+    { value: "orange", label: "Orange", color: "bg-[hsl(var(--accent-orange))]" },
+    { value: "red", label: "Red", color: "bg-[hsl(var(--accent-red))]" },
+    { value: "teal", label: "Teal", color: "bg-[hsl(var(--accent-teal))]" },
   ];
 
+  const handleAccentColorChange = (color: string) => {
+    setSelectedAccentColor(color);
+  };
+
+  const saveAccentColor = () => {
+    setAccentColor(selectedAccentColor as any);
+    toast({
+      title: "Accent color updated",
+      description: "Your accent color preference has been saved.",
+    });
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">Appearance</CardTitle>
-        <CardDescription>
-          Customize how the application looks and feels
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          <div>
-            <h3 className="font-medium mb-3">Theme</h3>
-            <Separator className="mb-4" />
-            
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className={`border rounded-md p-4 cursor-pointer ${
-                theme === "light" 
-                  ? "border-[hsl(var(--accent-" + accentColor + "))]" 
-                  : "border-zinc-200 dark:border-zinc-700"
-              }`}
-                onClick={() => setTheme("light")}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Sun className="h-5 w-5" />
-                    <span className="font-medium">Light</span>
-                  </div>
-                  {theme === "light" && (
-                    <div className={`w-4 h-4 rounded-full accent-color`}></div>
-                  )}
-                </div>
-                <div className="h-20 bg-white border border-zinc-200 rounded-md"></div>
-              </div>
-              
-              <div className={`border rounded-md p-4 cursor-pointer ${
-                theme === "dark" 
-                  ? "border-[hsl(var(--accent-" + accentColor + "))]" 
-                  : "border-zinc-200 dark:border-zinc-700"
-              }`}
-                onClick={() => setTheme("dark")}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Moon className="h-5 w-5" />
-                    <span className="font-medium">Dark</span>
-                  </div>
-                  {theme === "dark" && (
-                    <div className={`w-4 h-4 rounded-full accent-color`}></div>
-                  )}
-                </div>
-                <div className="h-20 bg-zinc-900 border border-zinc-700 rounded-md"></div>
-              </div>
-              
-              <div className={`border rounded-md p-4 cursor-pointer ${
-                theme === "system" 
-                  ? "border-[hsl(var(--accent-" + accentColor + "))]" 
-                  : "border-zinc-200 dark:border-zinc-700"
-              }`}
-                onClick={() => setTheme("system")}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex">
-                      <Sun className="h-5 w-5" />
-                      <Moon className="h-5 w-5 -ml-1" />
-                    </div>
-                    <span className="font-medium">System</span>
-                  </div>
-                  {theme === "system" && (
-                    <div className={`w-4 h-4 rounded-full accent-color`}></div>
-                  )}
-                </div>
-                <div className="h-20 bg-gradient-to-r from-white to-zinc-900 border border-zinc-200 rounded-md"></div>
-              </div>
-            </div>
-          </div>
-          
-          <div>
-            <h3 className="font-medium mb-3">Accent Color</h3>
-            <Separator className="mb-4" />
-            
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-              {accentColors.map(color => (
-                <div 
-                  key={color.value}
-                  className={`border rounded-md p-4 cursor-pointer ${
-                    accentColor === color.value 
-                      ? `border-[hsl(var(--accent-${color.value}))]` 
-                      : "border-zinc-200 dark:border-zinc-700"
-                  }`}
-                  onClick={() => setAccentColor(color.value)}
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    <div className={`w-10 h-10 rounded-full ${color.class}`}>
-                      {accentColor === color.value && (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Palette className="h-5 w-5 text-white" />
-                        </div>
-                      )}
-                    </div>
-                    <span className="font-medium text-sm">{color.name}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div>
-            <h3 className="font-medium mb-3">Editor Preferences</h3>
-            <Separator className="mb-4" />
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="font-size">Font Size</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Adjust the font size in the code editor
-                  </p>
-                </div>
-                <div className="w-32">
-                  <Input
-                    id="font-size"
-                    type="number"
-                    defaultValue="14"
-                    min="10"
-                    max="24"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="tab-size">Tab Size</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Number of spaces for indentation
-                  </p>
-                </div>
-                <div className="w-32">
-                  <Input
-                    id="tab-size"
-                    type="number"
-                    defaultValue="2"
-                    min="2"
-                    max="8"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="word-wrap">Word Wrap</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Wrap long lines to fit in the editor
-                  </p>
-                </div>
-                <Switch id="word-wrap" defaultChecked />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="line-numbers">Line Numbers</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Show line numbers in the editor
-                  </p>
-                </div>
-                <Switch id="line-numbers" defaultChecked />
-              </div>
-            </div>
-          </div>
+    <div className="space-y-8">
+      <div>
+        <h3 className="text-lg font-medium mb-4">Theme</h3>
+        <div className="flex flex-wrap gap-4">
+          <Button
+            variant="outline"
+            size="lg"
+            className={`flex flex-col items-center justify-center h-24 w-24 gap-2 ${
+              theme === "light" ? "ring-2 ring-primary" : ""
+            }`}
+            onClick={() => {
+              setTheme("light");
+              toast({
+                title: "Theme updated",
+                description: "Light theme has been applied.",
+              });
+            }}
+          >
+            <Sun className="h-8 w-8" />
+            <span>Light</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="lg"
+            className={`flex flex-col items-center justify-center h-24 w-24 gap-2 ${
+              theme === "dark" ? "ring-2 ring-primary" : ""
+            }`}
+            onClick={() => {
+              setTheme("dark");
+              toast({
+                title: "Theme updated",
+                description: "Dark theme has been applied.",
+              });
+            }}
+          >
+            <Moon className="h-8 w-8" />
+            <span>Dark</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="lg"
+            className={`flex flex-col items-center justify-center h-24 w-24 gap-2 ${
+              theme === "system" ? "ring-2 ring-primary" : ""
+            }`}
+            onClick={() => {
+              setTheme("system");
+              toast({
+                title: "Theme updated",
+                description: "System theme preference has been applied.",
+              });
+            }}
+          >
+            <Laptop className="h-8 w-8" />
+            <span>System</span>
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium mb-4">Accent Color</h3>
+        
+        <RadioGroup
+          value={selectedAccentColor}
+          onValueChange={handleAccentColorChange}
+          className="grid grid-cols-3 gap-4"
+        >
+          {accentColors.map((color) => (
+            <div key={color.value} className="flex items-center space-x-2">
+              <RadioGroupItem value={color.value} id={`color-${color.value}`} className="sr-only" />
+              <Label
+                htmlFor={`color-${color.value}`}
+                className={`flex items-center space-x-2 rounded-md border px-3 py-3 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+                  selectedAccentColor === color.value ? "ring-2 ring-primary" : ""
+                }`}
+              >
+                <div className={`w-5 h-5 rounded-full ${color.color}`}></div>
+                <span>{color.label}</span>
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+
+        <Button 
+          onClick={saveAccentColor} 
+          className="accent-color"
+          disabled={selectedAccentColor === accentColor}
+        >
+          Save Accent Color
+        </Button>
+      </div>
+    </div>
   );
 };
 

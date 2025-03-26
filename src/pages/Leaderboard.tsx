@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import Header from '@/components/Header';
+import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Medal, Search, Trophy, Users, Filter, ArrowUp, ArrowDown } from 'lucide-react';
 
@@ -246,8 +246,8 @@ const Leaderboard = () => {
   };
 
   return (
-    <div className="animate-page-in min-h-screen flex flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-300/20 via-white to-white dark:from-zinc-800/20 dark:via-zinc-900 dark:to-zinc-900 foggy-grain">
-      <Header />
+    <div className="animate-page-in min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-300/20 via-white to-white dark:from-zinc-800/20 dark:via-zinc-900 dark:to-zinc-900 foggy-grain">
+      <Navbar isAuthenticated={false} />
       
       <main className="flex-grow pt-24 pb-16">
         <div className="page-container">
