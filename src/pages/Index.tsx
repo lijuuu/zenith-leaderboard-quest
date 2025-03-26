@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAppDispatch, useAppSelector } from '@/hooks';
@@ -15,11 +14,13 @@ import { getUserProfile } from '@/api/userApi';
 import { getProblems } from '@/api/problemApi';
 import { getChallenges } from '@/api/challengeApi';
 import { getLeaderboard } from '@/api/leaderboardApi';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
   const { toast } = useToast();
   const dispatch = useAppDispatch();
   const userProfile = useAppSelector((state) => state.user.profile);
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     // Scroll to top on component mount
@@ -168,8 +169,8 @@ const Index = () => {
             
             {/* Right Column - Activity & Leaderboard */}
             <div className="space-y-6">
-              {/* Monthly Activity with GitHub-like style */}
-              <MonthlyActivityHeatmap />
+              {/* Monthly Activity with GitHub-like style - only on small screens */}
+              {isMobile && <MonthlyActivityHeatmap />}
               
               {/* Leaderboard Preview */}
               <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">

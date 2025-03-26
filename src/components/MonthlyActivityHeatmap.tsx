@@ -102,23 +102,24 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({
               </div>
               
               <TooltipProvider>
-                <div className="grid grid-cols-7 gap-2 justify-items-center">
+                <div className="grid grid-cols-7 gap-1 justify-items-center">
                   {grid.map((row, rowIndex) => (
                     // For each day of the week (row)
                     row.map((day, colIndex) => {
-                      if (!day) return <div key={`empty-${rowIndex}-${colIndex}`} className="w-8 h-8 opacity-0" />;
+                      if (!day) return <div key={`empty-${rowIndex}-${colIndex}`} className="w-10 h-10 opacity-0" />;
                       
                       return (
                         <Tooltip key={`${rowIndex}-${colIndex}`}>
                           <TooltipTrigger asChild>
                             <div 
-                              className={`w-8 h-8 rounded-full cursor-pointer transition-all duration-200 transform hover:scale-125 ${
+                              className={`w-10 h-10 rounded-full cursor-pointer transition-all duration-200 transform hover:scale-130 hover:z-10 ${
                                 day.isActive 
                                   ? 'bg-green-500 hover:bg-green-400' 
                                   : 'bg-red-500 hover:bg-red-400'
                               }`}
                               onMouseEnter={() => setHoveredDay(day)}
                               onMouseLeave={() => setHoveredDay(null)}
+                              style={{ transformOrigin: 'center' }}
                             />
                           </TooltipTrigger>
                           <TooltipContent 

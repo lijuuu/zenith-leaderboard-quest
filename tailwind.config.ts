@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -19,6 +18,9 @@ export default {
 			}
 		},
 		extend: {
+			scale: {
+				'130': '1.3',
+			},
 			fontFamily: {
 				sans: ['Urbanist', 'Inter', 'sans-serif'],
 				display: ['Urbanist', 'SF Pro Display', 'Inter', 'sans-serif'],

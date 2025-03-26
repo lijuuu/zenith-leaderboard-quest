@@ -18,7 +18,6 @@ import ProfileStats from "@/components/profile/ProfileStats";
 import ChallengesList from "@/components/profile/ChallengesList";
 import ContributionActivity from "@/components/ContributionActivity";
 import MonthlyActivityHeatmap from "@/components/MonthlyActivityHeatmap";
-import YearlyActivityHeatmap from "@/components/YearlyActivityHeatmap";
 import ProblemsSolvedChart from "@/components/profile/ProblemsSolvedChart";
 import RecentSubmissions from "@/components/profile/RecentSubmissions";
 import ProfileAchievements from "@/components/profile/ProfileAchievements";
@@ -203,21 +202,19 @@ const Profile = () => {
               </CardContent>
             </Card>
             
-            {/* Activity Section */}
-            <Card className="mb-6 bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
-              <CardHeader className="pb-0">
-                <CardTitle className="text-lg font-medium flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-green-500" /> Activity
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                {isMobile ? (
+            {/* Activity Section - Only show on small screens */}
+            {isMobile && (
+              <Card className="mb-6 bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50 sm:hidden">
+                <CardHeader className="pb-0">
+                  <CardTitle className="text-lg font-medium flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-green-500" /> Activity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
                   <MonthlyActivityHeatmap showTitle={false} />
-                ) : (
-                  <YearlyActivityHeatmap showTitle={false} />
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
             
             {/* Activity & Challenges Section */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
