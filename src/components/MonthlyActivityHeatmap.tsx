@@ -16,19 +16,21 @@ interface MonthlyActivityHeatmapProps {
   data?: ActivityDay[];
   className?: string;
   showTitle?: boolean;
+  compact?: boolean;
 }
 
 const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({ 
   data, 
   className = "",
-  showTitle = true
+  showTitle = true,
+  compact = false
 }) => {
   const [activityData, setActivityData] = useState<ActivityDay[]>([]);
   const [hoveredDay, setHoveredDay] = useState<ActivityDay | null>(null);
   const isMobile = useIsMobile();
   
   useEffect(() => {
-    // Generate the past 30 days if no data is provided
+    // Generate the past 28 days if no data is provided
     if (!data) {
       const today = new Date();
       const startDate = subDays(today, 27); // Get 4 weeks (28 days) including today
@@ -79,6 +81,10 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({
   // Days of the week labels
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
+  // Determine the size of circles based on compact mode
+  const circleSize = compact ? 'w-8 h-8' : 'w-10 h-10';
+  const gap = compact ? 'gap-0.5' : 'gap-1';
+  
   return (
     <Card className={`bg-zinc-950 border-zinc-800/50 ${className}`}>
       {showTitle && (
@@ -89,11 +95,11 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({
           </CardTitle>
         </CardHeader>
       )}
-      <CardContent className="p-4">
+      <CardContent className={compact ? "p-3" : "p-4"}>
         <div className="flex flex-col">
           <div className="flex justify-center">
             <div className="w-full">
-              <div className="grid grid-cols-7 gap-1 mb-3 justify-items-center">
+              <div className={`grid grid-cols-7 ${gap} mb-2 justify-items-center`}>
                 {daysOfWeek.map((day, i) => (
                   <div key={day} className="text-xs text-zinc-500">
                     {isMobile ? day.charAt(0) : day}
@@ -102,17 +108,17 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({
               </div>
               
               <TooltipProvider>
-                <div className="grid grid-cols-7 gap-1 justify-items-center">
+                <div className={`grid grid-cols-7 ${gap} justify-items-center`}>
                   {grid.map((row, rowIndex) => (
                     // For each day of the week (row)
                     row.map((day, colIndex) => {
-                      if (!day) return <div key={`empty-${rowIndex}-${colIndex}`} className="w-10 h-10 opacity-0" />;
+                      if (!day) return <div key={`empty-${rowIndex}-${colIndex}`} className={`${circleSize} opacity-0`} />;
                       
                       return (
                         <Tooltip key={`${rowIndex}-${colIndex}`}>
                           <TooltipTrigger asChild>
                             <div 
-                              className={`w-10 h-10 rounded-full cursor-pointer transition-all duration-200 transform hover:scale-130 hover:z-10 ${
+                              className={`${circleSize} rounded-full cursor-pointer transition-all duration-200 transform hover:scale-130 hover:z-10 ${
                                 day.isActive 
                                   ? 'bg-green-500 hover:bg-green-400' 
                                   : 'bg-red-500 hover:bg-red-400'
@@ -141,7 +147,7 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({
                 </div>
               </TooltipProvider>
               
-              <div className="mt-4 flex items-center justify-between pt-1 text-xs text-zinc-500">
+              <div className="mt-3 flex items-center justify-between pt-1 text-xs text-zinc-500">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
                   <span>Inactive</span>

@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAppDispatch, useAppSelector } from '@/hooks';
@@ -169,8 +170,8 @@ const Index = () => {
             
             {/* Right Column - Activity & Leaderboard */}
             <div className="space-y-6">
-              {/* Monthly Activity with GitHub-like style - only on small screens */}
-              {isMobile && <MonthlyActivityHeatmap />}
+              {/* Monthly Activity Heatmap - Show on all screen sizes but make it compact */}
+              <MonthlyActivityHeatmap compact={true} />
               
               {/* Leaderboard Preview */}
               <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
