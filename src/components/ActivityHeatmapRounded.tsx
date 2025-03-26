@@ -99,11 +99,48 @@ const ActivityHeatmapRounded: React.FC<ActivityHeatmapRoundedProps> = ({
     }
   }
 
+  // Group month labels with proper spacing
+  const getMonthLabels = () => {
+    if (activityData.length === 0) return [];
+    
+    const months: { label: string, index: number }[] = [];
+    let prevMonth = '';
+    
+    activityData.forEach((day, index) => {
+      const date = parseISO(day.date);
+      const monthLabel = format(date, 'MMM');
+      
+      if (monthLabel !== prevMonth) {
+        months.push({ label: monthLabel, index });
+        prevMonth = monthLabel;
+      }
+    });
+    
+    return months;
+  };
+
+  const monthLabels = getMonthLabels();
+
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full">
       <div className="py-2">
+        {/* Month labels */}
+        <div className="flex text-xs text-zinc-500 mb-1 relative">
+          {monthLabels.map((month, idx) => (
+            <div 
+              key={`${month.label}-${idx}`} 
+              className="absolute" 
+              style={{ 
+                left: `${(month.index / activityData.length) * 100}%` 
+              }}
+            >
+              {month.label}
+            </div>
+          ))}
+        </div>
+        
         <TooltipProvider>
-          <div className="flex gap-1">
+          <div className="flex gap-1 flex-wrap">
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} className="flex flex-col gap-1">
                 {week.map((day, dayIndex) => (
@@ -127,12 +164,15 @@ const ActivityHeatmapRounded: React.FC<ActivityHeatmapRoundedProps> = ({
         </TooltipProvider>
       </div>
       
-      {hoveredDay && (
-        <div className="mt-3 text-sm font-medium animate-fade-in">
-          <span className="mr-2 text-zinc-400">{format(parseISO(hoveredDay.date), 'MMMM d, yyyy')}:</span>
-          <span className="text-green-400">{hoveredDay.count} {hoveredDay.count === 1 ? 'contribution' : 'contributions'}</span>
-        </div>
-      )}
+      {/* Fixed height container for the hover information to prevent layout shifts */}
+      <div className="h-6 mt-3">
+        {hoveredDay && (
+          <div className="text-sm font-medium animate-fade-in">
+            <span className="mr-2 text-zinc-400">{format(parseISO(hoveredDay.date), 'MMMM d, yyyy')}:</span>
+            <span className="text-green-400">{hoveredDay.count} {hoveredDay.count === 1 ? 'contribution' : 'contributions'}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

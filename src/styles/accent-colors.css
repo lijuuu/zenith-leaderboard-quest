@@ -1,0 +1,173 @@
+
+/* Accent color utility classes */
+.accent-color {
+  @apply bg-[hsl(var(--accent-green))] text-white dark:text-white hover:bg-[hsl(var(--accent-green))]/90;
+}
+
+.accent-green .accent-color {
+  @apply bg-[hsl(var(--accent-green))] text-white dark:text-white hover:bg-[hsl(var(--accent-green))]/90;
+}
+
+.accent-blue .accent-color {
+  @apply bg-[hsl(var(--accent-blue))] text-white dark:text-white hover:bg-[hsl(var(--accent-blue))]/90;
+}
+
+.accent-purple .accent-color {
+  @apply bg-[hsl(var(--accent-purple))] text-white dark:text-white hover:bg-[hsl(var(--accent-purple))]/90;
+}
+
+.accent-orange .accent-color {
+  @apply bg-[hsl(var(--accent-orange))] text-white dark:text-white hover:bg-[hsl(var(--accent-orange))]/90;
+}
+
+.accent-red .accent-color {
+  @apply bg-[hsl(var(--accent-red))] text-white dark:text-white hover:bg-[hsl(var(--accent-red))]/90;
+}
+
+.accent-teal .accent-color {
+  @apply bg-[hsl(var(--accent-teal))] text-white dark:text-white hover:bg-[hsl(var(--accent-teal))]/90;
+}
+
+/* Text color utility classes */
+.text-accent {
+  @apply text-[hsl(var(--accent-green))];
+}
+
+.accent-green .text-accent {
+  @apply text-[hsl(var(--accent-green))];
+}
+
+.accent-blue .text-accent {
+  @apply text-[hsl(var(--accent-blue))];
+}
+
+.accent-purple .text-accent {
+  @apply text-[hsl(var(--accent-purple))];
+}
+
+.accent-orange .text-accent {
+  @apply text-[hsl(var(--accent-orange))];
+}
+
+.accent-red .text-accent {
+  @apply text-[hsl(var(--accent-red))];
+}
+
+.accent-teal .text-accent {
+  @apply text-[hsl(var(--accent-teal))];
+}
+
+/* Border color utility classes */
+.border-accent {
+  @apply border-[hsl(var(--accent-green))];
+}
+
+.accent-green .border-accent {
+  @apply border-[hsl(var(--accent-green))];
+}
+
+.accent-blue .border-accent {
+  @apply border-[hsl(var(--accent-blue))];
+}
+
+.accent-purple .border-accent {
+  @apply border-[hsl(var(--accent-purple))];
+}
+
+.accent-orange .border-accent {
+  @apply border-[hsl(var(--accent-orange))];
+}
+
+.accent-red .border-accent {
+  @apply border-[hsl(var(--accent-red))];
+}
+
+.accent-teal .border-accent {
+  @apply border-[hsl(var(--accent-teal))];
+}
+
+/* Background color utility classes with opacity */
+.bg-accent-5 {
+  @apply bg-[hsl(var(--accent-green))]/5;
+}
+
+.accent-green .bg-accent-5 {
+  @apply bg-[hsl(var(--accent-green))]/5;
+}
+
+.accent-blue .bg-accent-5 {
+  @apply bg-[hsl(var(--accent-blue))]/5;
+}
+
+.accent-purple .bg-accent-5 {
+  @apply bg-[hsl(var(--accent-purple))]/5;
+}
+
+.accent-orange .bg-accent-5 {
+  @apply bg-[hsl(var(--accent-orange))]/5;
+}
+
+.accent-red .bg-accent-5 {
+  @apply bg-[hsl(var(--accent-red))]/5;
+}
+
+.accent-teal .bg-accent-5 {
+  @apply bg-[hsl(var(--accent-teal))]/5;
+}
+
+.bg-accent-10 {
+  @apply bg-[hsl(var(--accent-green))]/10;
+}
+
+.accent-green .bg-accent-10 {
+  @apply bg-[hsl(var(--accent-green))]/10;
+}
+
+.accent-blue .bg-accent-10 {
+  @apply bg-[hsl(var(--accent-blue))]/10;
+}
+
+.accent-purple .bg-accent-10 {
+  @apply bg-[hsl(var(--accent-purple))]/10;
+}
+
+.accent-orange .bg-accent-10 {
+  @apply bg-[hsl(var(--accent-orange))]/10;
+}
+
+.accent-red .bg-accent-10 {
+  @apply bg-[hsl(var(--accent-red))]/10;
+}
+
+.accent-teal .bg-accent-10 {
+  @apply bg-[hsl(var(--accent-teal))]/10;
+}
+
+/* Ring/focus styles for accent colors */
+.ring-accent {
+  @apply ring-[hsl(var(--accent-green))];
+}
+
+.accent-green .ring-accent {
+  @apply ring-[hsl(var(--accent-green))];
+}
+
+.accent-blue .ring-accent {
+  @apply ring-[hsl(var(--accent-blue))];
+}
+
+.accent-purple .ring-accent {
+  @apply ring-[hsl(var(--accent-purple))];
+}
+
+.accent-orange .ring-accent {
+  @apply ring-[hsl(var(--accent-orange))];
+}
+
+.accent-red .ring-accent {
+  @apply ring-[hsl(var(--accent-red))];
+}
+
+.accent-teal .ring-accent {
+  @apply ring-[hsl(var(--accent-teal))];
+}
