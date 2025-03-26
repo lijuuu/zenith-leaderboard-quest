@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { 
   User, Lock, Bell, Moon, Sun, Smartphone,
-  Save, X, Eye, EyeOff
+  Save, X, Eye, EyeOff, PenSquare
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";

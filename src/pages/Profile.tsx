@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
   Activity, Trophy, Award, Code, BarChart2, Users,
-  Calendar, PenSquare, Github, Globe, MapPin
+  Calendar, PenSquare, Github, Globe, MapPin, Mail
 } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
