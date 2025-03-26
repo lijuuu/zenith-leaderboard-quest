@@ -1,95 +1,119 @@
 
+import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { ChatMessage as ChatMessageType } from "@/api/types";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Reply, ThumbsUp, MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Message } from "@/api/types";
 
 interface ChatMessageProps {
-  message: ChatMessageType;
+  message: Message;
 }
 
-const ChatMessage = ({ message }: ChatMessageProps) => {
-  const { sender, content, timestamp, isCurrentUser, attachments } = message;
+const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+  const [showActions, setShowActions] = useState(false);
+  const [liked, setLiked] = useState(message.liked || false);
+  const [likeCount, setLikeCount] = useState(message.likeCount || 0);
   
-  // Format timestamp to relative time (e.g., "5 minutes ago")
-  const formattedTime = formatDistanceToNow(new Date(timestamp), { addSuffix: false });
+  const handleLike = () => {
+    if (liked) {
+      setLikeCount(prev => Math.max(0, prev - 1));
+    } else {
+      setLikeCount(prev => prev + 1);
+    }
+    setLiked(!liked);
+  };
   
-  // Format absolute time for title attribute (e.g., "12:34 PM")
-  const absoluteTime = new Date(timestamp).toLocaleTimeString([], { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  });
+  const isCurrentUser = message.user.id === "1"; // Assuming current user ID is 1
   
   return (
-    <div className={`mb-4 ${isCurrentUser ? 'ml-auto' : ''}`}>
-      <div className="flex items-start gap-3">
-        {!isCurrentUser && (
-          <Avatar className="mt-0.5">
-            <AvatarImage src={sender.profileImage} />
-            <AvatarFallback>{sender.username.charAt(0).toUpperCase()}</AvatarFallback>
-          </Avatar>
+    <div 
+      className={`group flex gap-3 items-start mb-6 ${isCurrentUser ? 'flex-row-reverse' : ''}`}
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={() => setShowActions(false)}
+    >
+      <div className="relative flex-shrink-0">
+        <img 
+          src={message.user.avatar || "https://randomuser.me/api/portraits/men/32.jpg"} 
+          alt={message.user.name}
+          className="w-10 h-10 rounded-full object-cover"
+        />
+        {message.user.isOnline && (
+          <span className="absolute bottom-0 right-0 bg-green-500 w-2.5 h-2.5 rounded-full border-2 border-zinc-900"></span>
         )}
-        
-        <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'}`}>
-          <div className="flex items-center gap-2 mb-1">
-            {!isCurrentUser && (
-              <span className="font-medium text-sm">{sender.username}</span>
-            )}
-            <span className="text-xs text-muted-foreground" title={new Date(timestamp).toLocaleString()}>
-              {absoluteTime}
-            </span>
-            {isCurrentUser && (
-              <span className="font-medium text-sm">Me</span>
-            )}
-          </div>
-          
-          <div 
-            className={`max-w-[80%] rounded-lg px-4 py-2 ${
-              isCurrentUser 
-                ? 'bg-green-500 text-white ml-auto' 
-                : 'bg-zinc-800 dark:bg-zinc-800 text-white'
-            }`}
-          >
-            {content}
-          </div>
-          
-          {attachments && attachments.length > 0 && (
-            <div className="mt-1">
-              {attachments.map((attachment, index) => (
-                <div key={index} className="mt-2">
-                  {attachment.type === 'image' && (
-                    <img 
-                      src={attachment.content} 
-                      alt="attachment" 
-                      className="max-w-xs rounded-md border border-zinc-300 dark:border-zinc-700" 
-                    />
-                  )}
-                  {attachment.type === 'code' && (
-                    <pre className="text-xs p-2 bg-zinc-900 text-zinc-100 rounded-md overflow-x-auto">
-                      <code>{attachment.content}</code>
-                    </pre>
-                  )}
-                  {attachment.type === 'link' && (
-                    <a 
-                      href={attachment.content} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      {attachment.content}
-                    </a>
-                  )}
-                </div>
-              ))}
-            </div>
+      </div>
+      
+      <div className={`flex-1 max-w-[80%] ${isCurrentUser ? 'text-right' : ''}`}>
+        <div className="flex items-center gap-2 mb-1">
+          {!isCurrentUser && (
+            <>
+              <span className="font-medium">{message.user.name}</span>
+              <span className="text-xs text-zinc-400">
+                {formatDistanceToNow(new Date(message.timestamp), { addSuffix: true })}
+              </span>
+            </>
+          )}
+          {isCurrentUser && (
+            <>
+              <span className="text-xs text-zinc-400 ml-auto">
+                {formatDistanceToNow(new Date(message.timestamp), { addSuffix: true })}
+              </span>
+              <span className="font-medium">You</span>
+            </>
           )}
         </div>
         
-        {isCurrentUser && (
-          <Avatar className="mt-0.5">
-            <AvatarImage src={sender.profileImage} />
-            <AvatarFallback>{sender.username.charAt(0).toUpperCase()}</AvatarFallback>
-          </Avatar>
-        )}
+        <div 
+          className={`p-3 rounded-lg ${
+            isCurrentUser 
+              ? 'bg-green-500/20 text-white ml-auto' 
+              : 'bg-zinc-800 border border-zinc-700/40'
+          }`}
+        >
+          <p>{message.content}</p>
+        </div>
+        
+        <div 
+          className={`flex items-center gap-2 mt-1 text-xs ${
+            isCurrentUser ? 'justify-end' : 'justify-start'
+          }`}
+        >
+          {(showActions || likeCount > 0) && (
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className={`h-6 px-2 text-xs ${
+                  liked ? 'text-green-400' : 'text-zinc-400 hover:text-white'
+                }`}
+                onClick={handleLike}
+              >
+                <ThumbsUp className="h-3 w-3 mr-1" />
+                {likeCount > 0 && likeCount}
+              </Button>
+              
+              {showActions && (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 px-2 text-xs text-zinc-400 hover:text-white"
+                  >
+                    <Reply className="h-3 w-3 mr-1" />
+                    Reply
+                  </Button>
+                  
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 px-2 text-zinc-400 hover:text-white"
+                  >
+                    <MoreHorizontal className="h-3 w-3" />
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

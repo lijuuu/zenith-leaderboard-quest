@@ -1,159 +1,155 @@
 
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Home, User, Code, Terminal, Zap, Award, MessageSquare, Settings, LogOut, Menu, X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import DarkModeToggle from "./DarkModeToggle";
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks';
+import { 
+  Home, 
+  User, 
+  Code, 
+  Zap, 
+  Award, 
+  MessageCircle, 
+  Settings, 
+  LogOut,
+  Menu,
+  X,
+  TerminalSquare
+} from 'lucide-react';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Button } from '@/components/ui/button';
 
-interface NavItem {
-  name: string;
-  path: string;
-  icon: React.ReactNode;
-}
+const navItems = [
+  { path: '/', label: 'Home', icon: Home },
+  { path: '/profile', label: 'Profile', icon: User },
+  { path: '/problems', label: 'Problems', icon: Code },
+  { path: '/compiler', label: 'Compiler', icon: TerminalSquare },
+  { path: '/challenges', label: 'Challenges', icon: Zap, isHighlighted: true },
+  { path: '/leaderboard', label: 'Leaderboard', icon: Award },
+  { path: '/chat', label: 'Chat', icon: MessageCircle },
+  { path: '/settings', label: 'Settings', icon: Settings },
+];
 
 const MainNavbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-
-  const navItems: NavItem[] = [
-    { name: "Home", path: "/", icon: <Home className="w-4 h-4" /> },
-    { name: "Profile", path: "/profile", icon: <User className="w-4 h-4" /> },
-    { name: "Problems", path: "/problems", icon: <Code className="w-4 h-4" /> },
-    { name: "Compiler", path: "/compiler", icon: <Terminal className="w-4 h-4" /> },
-    { name: "Challenges", path: "/challenges", icon: <Zap className="w-4 h-4" /> },
-    { name: "Leaderboard", path: "/leaderboard", icon: <Award className="w-4 h-4" /> },
-    { name: "Chat", path: "/chat", icon: <MessageSquare className="w-4 h-4" /> },
-    { name: "Settings", path: "/settings", icon: <Settings className="w-4 h-4" /> },
-  ];
+  const isMobile = useIsMobile();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 10);
     };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
-    // Close mobile menu when route changes
-    setMobileMenuOpen(false);
-  }, [location]);
+    setIsOpen(false); // Close mobile nav when route changes
+  }, [location.pathname]);
 
-  const isActive = (path: string) => {
-    if (path === "/") {
-      return location.pathname === "/";
-    }
-    return location.pathname.startsWith(path);
-  };
-
-  return (
-    <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ease-in-out",
-        isScrolled || mobileMenuOpen
-          ? "bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg border-b border-zinc-200 dark:border-zinc-800"
-          : "bg-transparent"
-      )}
-    >
-      <div className="page-container">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-zinc-900 dark:bg-zinc-700 flex items-center justify-center text-white font-bold text-lg">
-                z
-              </div>
-              <span className="text-2xl lowercase font-bold font-display tracking-tight hidden sm:block">
-                zenx
-              </span>
-            </Link>
+  const NavContent = () => (
+    <>
+      <div className="flex items-center gap-2 px-3 py-2">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="bg-zinc-800 hover:bg-zinc-700 transition-colors w-8 h-8 flex items-center justify-center rounded-md">
+            <span className="font-bold text-xl text-white">z</span>
           </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={cn(
-                  "relative px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2",
-                  isActive(item.path)
-                    ? "text-white bg-green-500 dark:bg-green-600"
-                    : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                )}
-              >
-                {item.icon}
-                {item.name}
-              </Link>
-            ))}
-            
-            <div className="pl-2">
-              <DarkModeToggle />
-            </div>
-            
-            <Link
-              to="/logout"
-              className="px-3 py-2 rounded-md text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-2"
-            >
-              <LogOut className="w-4 h-4" />
-              Logout
-            </Link>
-          </nav>
-
-          {/* Mobile menu button */}
-          <div className="flex items-center gap-2 md:hidden">
-            <DarkModeToggle />
-            <button
-              className="p-2 rounded-md text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
-          </div>
-        </div>
+          <span className="font-bold text-xl text-white">zenx</span>
+        </Link>
       </div>
 
-      {/* Mobile Navigation */}
-      <div
-        className={cn(
-          "md:hidden transition-transform duration-300 ease-in-out",
-          mobileMenuOpen ? "transform translate-y-0" : "transform -translate-y-full"
-        )}
-      >
-        <nav className="border-t border-zinc-200 dark:border-zinc-800 py-4 px-6 space-y-1 backdrop-blur-lg">
-          {navItems.map((item) => (
-            <Link
-              key={item.name}
-              to={item.path}
+      <div className={cn(
+        "flex items-center gap-1",
+        isMobile ? "flex-col w-full mt-6" : "ml-6"
+      )}>
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <Button
+              key={item.path}
+              asChild
+              variant="ghost"
+              size={isMobile ? "lg" : "sm"}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium transition-colors",
-                isActive(item.path)
-                  ? "text-white bg-green-500 dark:bg-green-600"
-                  : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                "gap-2 font-medium transition-all duration-200",
+                isActive 
+                  ? "bg-zinc-800 text-white" 
+                  : "text-zinc-400 hover:text-white hover:bg-zinc-800/50",
+                item.isHighlighted && !isActive && "bg-green-500/10 text-green-400 hover:bg-green-500/20 hover:text-green-300",
+                item.isHighlighted && isActive && "bg-green-500 text-white hover:bg-green-600",
+                isMobile && "justify-start w-full"
               )}
             >
-              {item.icon}
-              {item.name}
-            </Link>
-          ))}
-          <Link
-            to="/logout"
-            className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
+              <Link to={item.path} className="flex items-center gap-2">
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </Link>
+            </Button>
+          );
+        })}
+      </div>
+
+      {isMobile ? (
+        <div className="mt-auto pt-6 pb-4">
+          <Button variant="ghost" size="lg" className="w-full justify-start gap-2 text-zinc-400 hover:text-white">
+            <LogOut className="h-4 w-4" />
             Logout
-          </Link>
-        </nav>
+          </Button>
+        </div>
+      ) : (
+        <div className="ml-auto pr-4">
+          <Button variant="ghost" size="sm" className="gap-2 text-zinc-400 hover:text-white">
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
+        </div>
+      )}
+    </>
+  );
+
+  return (
+    <header 
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
+        isScrolled 
+          ? "bg-zinc-900/90 backdrop-blur-md border-b border-zinc-800/70" 
+          : "bg-zinc-900 border-b border-zinc-800"
+      )}
+    >
+      <div className="flex items-center justify-between h-14">
+        {isMobile ? (
+          <>
+            <div className="flex items-center gap-2 px-4">
+              <Link to="/" className="flex items-center gap-2">
+                <div className="bg-zinc-800 w-8 h-8 flex items-center justify-center rounded-md">
+                  <span className="font-bold text-lg text-white">z</span>
+                </div>
+                <span className="font-bold text-lg text-white">zenx</span>
+              </Link>
+            </div>
+
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="mr-2">
+                  <Menu className="h-5 w-5 text-white" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="p-0 w-80 border-r border-zinc-800 bg-zinc-900">
+                <NavContent />
+              </SheetContent>
+            </Sheet>
+          </>
+        ) : (
+          <div className="flex items-center w-full">
+            <NavContent />
+          </div>
+        )}
       </div>
     </header>
   );

@@ -1,211 +1,366 @@
 
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Filter, Search, BarChart2, Zap, Code } from "lucide-react";
+import { Link } from "react-router-dom";
+import { 
+  Search, 
+  Filter, 
+  CheckCircle, 
+  Tag, 
+  ChevronRight, 
+  ArrowUp, 
+  ArrowDown, 
+  RefreshCw,
+  Code
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import ProblemCard from "@/components/ProblemCard";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import MainNavbar from "@/components/MainNavbar";
 import { getProblems } from "@/api/problemApi";
 import { Problem } from "@/api/types";
-import Navbar from "@/components/Navbar";
+
+type SortField = "title" | "difficulty" | "acceptance" | "solved";
+type SortOrder = "asc" | "desc";
+
+const DIFFICULTY_COLORS = {
+  Easy: "bg-green-500/20 text-green-400",
+  Medium: "bg-amber-500/20 text-amber-400",
+  Hard: "bg-red-500/20 text-red-400"
+};
 
 const Problems = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [difficulty, setDifficulty] = useState<string>("All");
-  const [status, setStatus] = useState<string>("All");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [difficulty, setDifficulty] = useState<string | null>(null);
+  const [tags, setTags] = useState<string[]>([]);
+  const [showSolved, setShowSolved] = useState(true);
+  const [sortBy, setSortBy] = useState<SortField>("title");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   
-  // Get all problems
-  const { data: problems, isLoading } = useQuery({
+  const { data: problems, isLoading, refetch } = useQuery({
     queryKey: ["problems"],
-    queryFn: () => getProblems(),
+    queryFn: getProblems,
   });
   
-  // Extract all unique tags from problems
+  useEffect(() => {
+    // Scroll to top on component mount
+    window.scrollTo(0, 0);
+  }, []);
+  
+  const toggleSort = (field: SortField) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+  };
+  
+  // Derived state for filtered and sorted problems
+  const filteredProblems = problems
+    ? problems.filter((problem: Problem) => {
+        // Text search
+        const matchesSearch = 
+          searchQuery === "" || 
+          problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          problem.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+        
+        // Difficulty filter
+        const matchesDifficulty = !difficulty || problem.difficulty === difficulty;
+        
+        // Tags filter
+        const matchesTags = tags.length === 0 || 
+          tags.every(tag => problem.tags.includes(tag));
+        
+        // Solved filter
+        const matchesSolved = showSolved || !problem.solved;
+        
+        return matchesSearch && matchesDifficulty && matchesTags && matchesSolved;
+      })
+    : [];
+  
+  // Sort filtered problems
+  const sortedProblems = [...filteredProblems].sort((a, b) => {
+    if (sortBy === "title") {
+      return sortOrder === "asc" 
+        ? a.title.localeCompare(b.title)
+        : b.title.localeCompare(a.title);
+    } else if (sortBy === "difficulty") {
+      const difficultyOrder = { "Easy": 1, "Medium": 2, "Hard": 3 };
+      return sortOrder === "asc"
+        ? difficultyOrder[a.difficulty as keyof typeof difficultyOrder] - difficultyOrder[b.difficulty as keyof typeof difficultyOrder]
+        : difficultyOrder[b.difficulty as keyof typeof difficultyOrder] - difficultyOrder[a.difficulty as keyof typeof difficultyOrder];
+    } else if (sortBy === "acceptance") {
+      return sortOrder === "asc"
+        ? a.acceptanceRate - b.acceptanceRate
+        : b.acceptanceRate - a.acceptanceRate;
+    } else if (sortBy === "solved") {
+      // Sort by solved status (boolean value)
+      return sortOrder === "asc"
+        ? (a.solved ? 1 : 0) - (b.solved ? 1 : 0)
+        : (b.solved ? 1 : 0) - (a.solved ? 1 : 0);
+    }
+    return 0;
+  });
+  
+  const getSortIcon = (field: SortField) => {
+    if (sortBy !== field) return null;
+    return sortOrder === "asc" ? <ArrowUp className="h-3 w-3 ml-1" /> : <ArrowDown className="h-3 w-3 ml-1" />;
+  };
+  
+  // Get unique tags from all problems
   const allTags = problems
     ? Array.from(new Set(problems.flatMap(problem => problem.tags)))
     : [];
   
-  // Filter problems based on search, difficulty, status, and tags
-  const filteredProblems = problems
-    ? problems.filter(problem => {
-        // Filter by search query
-        const matchesSearch = searchQuery
-          ? problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            problem.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-          : true;
-        
-        // Filter by difficulty
-        const matchesDifficulty = difficulty === "All" 
-          ? true 
-          : problem.difficulty === difficulty;
-        
-        // Filter by status
-        const matchesStatus = status === "All"
-          ? true
-          : (status === "Solved" && problem.solved) ||
-            (status === "Unsolved" && !problem.solved);
-        
-        // Filter by tags
-        const matchesTags = selectedTags.length === 0
-          ? true
-          : selectedTags.some(tag => problem.tags.includes(tag));
-        
-        return matchesSearch && matchesDifficulty && matchesStatus && matchesTags;
-      })
-    : [];
-
   return (
-    <div className="min-h-screen bg-background text-foreground pt-16">
-      <Navbar />
+    <div className="min-h-screen bg-zinc-900 text-white pt-14">
+      <MainNavbar />
       
       <main className="page-container py-8">
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Filters sidebar */}
-          <div className="w-full md:w-80 shrink-0">
-            <div className="bg-card dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6">
-              <div className="flex items-center gap-2 mb-6">
-                <Filter className="w-5 h-5" />
-                <h2 className="text-lg font-bold">Filters</h2>
-              </div>
-              
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-medium mb-3">Difficulty</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {["All", "Easy", "Medium", "Hard"].map(level => (
-                      <Button
-                        key={level}
-                        variant={difficulty === level ? "default" : "outline"}
-                        className={
-                          difficulty === level
-                            ? level === "Easy"
-                              ? "bg-green-500 hover:bg-green-600"
-                              : level === "Medium"
-                              ? "bg-amber-500 hover:bg-amber-600"
-                              : level === "Hard"
-                              ? "bg-red-500 hover:bg-red-600"
-                              : ""
-                            : ""
-                        }
-                        onClick={() => setDifficulty(level)}
-                      >
-                        {level}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="font-medium mb-3">Status</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {["All", "Solved", "Unsolved"].map(statusOption => (
-                      <Button
-                        key={statusOption}
-                        variant={status === statusOption ? "default" : "outline"}
-                        onClick={() => setStatus(statusOption)}
-                      >
-                        {statusOption}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="font-medium mb-3">Tags</h3>
-                  <ScrollArea className="h-[200px] pr-4">
-                    <div className="space-y-2">
-                      {allTags.map(tag => (
-                        <div key={tag} className="flex items-center">
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              className="rounded border-zinc-300 dark:border-zinc-700"
-                              checked={selectedTags.includes(tag)}
-                              onChange={() => {
-                                if (selectedTags.includes(tag)) {
-                                  setSelectedTags(selectedTags.filter(t => t !== tag));
-                                } else {
-                                  setSelectedTags([...selectedTags, tag]);
-                                }
-                              }}
-                            />
-                            <span>{tag}</span>
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-              </div>
-            </div>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">Problem Set</h1>
+            <p className="text-zinc-400 mt-1">
+              Practice your coding skills by solving our carefully curated problems
+            </p>
           </div>
           
-          {/* Main content */}
-          <div className="flex-1">
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold font-display mb-2">Problem Collection</h1>
-              <p className="text-muted-foreground">
-                Practice coding problems and track your progress
-              </p>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" className="border-zinc-700 hover:bg-zinc-800" onClick={() => refetch()}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
+            
+            <Button className="bg-green-500 hover:bg-green-600">
+              <Code className="h-4 w-4 mr-2" />
+              Create Problem
+            </Button>
+          </div>
+        </div>
+        
+        <div className="bg-zinc-800/40 border border-zinc-700/40 rounded-lg p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-4 mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 h-4 w-4" />
+              <Input 
+                placeholder="Search problems by title or tag" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-zinc-800 border-zinc-700 focus-visible:ring-green-500"
+              />
             </div>
             
-            <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
-              <div className="relative w-full md:w-[400px]">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Search problems..."
-                  className="pl-10"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <BarChart2 className="w-4 h-4" />
-                  Statistics
-                </Button>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Zap className="w-4 h-4" />
-                  Challenge Mode
-                </Button>
-                <Button className="flex items-center gap-2 accent-color">
-                  <Code className="w-4 h-4" />
-                  New Problem
-                </Button>
-              </div>
-            </div>
+            <Select value={difficulty || ''} onValueChange={(value) => setDifficulty(value || null)}>
+              <SelectTrigger className="bg-zinc-800 border-zinc-700">
+                <SelectValue placeholder="Difficulty" />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-800 border-zinc-700">
+                <SelectItem value="">All Difficulties</SelectItem>
+                <SelectItem value="Easy">Easy</SelectItem>
+                <SelectItem value="Medium">Medium</SelectItem>
+                <SelectItem value="Hard">Hard</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="outline" size="sm" className="border-zinc-700 hover:bg-zinc-800">
+              <Filter className="h-4 w-4 mr-2" />
+              Filter
+            </Button>
             
-            <div className="mb-6">
-              <p className="text-muted-foreground">
-                {filteredProblems.length} problem{filteredProblems.length !== 1 ? 's' : ''} found
-              </p>
-              <Separator className="mt-2" />
-            </div>
-            
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3, 4, 5, 6].map(i => (
-                  <div key={i} className="h-[180px] bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded-lg"></div>
-                ))}
-              </div>
+            {tags.length > 0 ? (
+              tags.map(tag => (
+                <Badge 
+                  key={tag} 
+                  variant="secondary" 
+                  className="bg-zinc-700/50 hover:bg-zinc-700 cursor-pointer"
+                  onClick={() => setTags(tags.filter(t => t !== tag))}
+                >
+                  {tag}
+                  <span className="ml-1 text-xs">×</span>
+                </Badge>
+              ))
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProblems.map((problem: Problem) => (
-                  <ProblemCard
-                    key={problem.id}
-                    id={problem.id}
-                    title={problem.title}
-                    difficulty={problem.difficulty}
-                    tags={problem.tags}
-                    solved={problem.solved}
-                  />
-                ))}
-              </div>
+              <span className="text-sm text-zinc-500">No tags selected</span>
             )}
+            
+            <div className="ml-auto flex items-center gap-2">
+              <Checkbox 
+                id="showSolved" 
+                checked={showSolved} 
+                onCheckedChange={(checked) => setShowSolved(!!checked)} 
+                className="border-zinc-600 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+              />
+              <label htmlFor="showSolved" className="text-sm cursor-pointer">
+                Show solved problems
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-zinc-800/40 border border-zinc-700/40 rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader className="bg-zinc-800/80">
+                <TableRow className="hover:bg-transparent border-zinc-700/50">
+                  <TableHead className="w-16 text-center text-zinc-400">Status</TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-zinc-400"
+                    onClick={() => toggleSort("title")}
+                  >
+                    <div className="flex items-center">
+                      Title
+                      {getSortIcon("title")}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-zinc-400"
+                    onClick={() => toggleSort("difficulty")}
+                  >
+                    <div className="flex items-center">
+                      Difficulty
+                      {getSortIcon("difficulty")}
+                    </div>
+                  </TableHead>
+                  <TableHead 
+                    className="cursor-pointer text-zinc-400"
+                    onClick={() => toggleSort("acceptance")}
+                  >
+                    <div className="flex items-center">
+                      Acceptance
+                      {getSortIcon("acceptance")}
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-zinc-400">Tags</TableHead>
+                  <TableHead className="w-24 text-zinc-400"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  Array(5).fill(0).map((_, i) => (
+                    <TableRow key={i} className="border-zinc-800/50 hover:bg-zinc-800/50">
+                      <TableCell className="px-4 py-4">
+                        <div className="w-6 h-6 rounded-full bg-zinc-700/50 animate-pulse mx-auto" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-6 bg-zinc-700/50 rounded w-full max-w-[200px] animate-pulse" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-6 bg-zinc-700/50 rounded w-20 animate-pulse" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-6 bg-zinc-700/50 rounded w-16 animate-pulse" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <div className="h-6 bg-zinc-700/50 rounded w-16 animate-pulse" />
+                          <div className="h-6 bg-zinc-700/50 rounded w-16 animate-pulse" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-8 bg-zinc-700/50 rounded w-full animate-pulse" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : sortedProblems.length > 0 ? (
+                  sortedProblems.map((problem: Problem) => (
+                    <TableRow key={problem.id} className="border-zinc-800/50 hover:bg-zinc-800/50">
+                      <TableCell className="px-4 py-4">
+                        {problem.solved ? (
+                          <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
+                        ) : (
+                          <div className="w-5 h-5 border border-zinc-700 rounded-full mx-auto" />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Link to={`/problems/${problem.id}`} className="hover:text-green-400 transition-colors">
+                          {problem.title}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <div className={`inline-flex px-2 py-1 rounded-full text-xs ${DIFFICULTY_COLORS[problem.difficulty as keyof typeof DIFFICULTY_COLORS]}`}>
+                          {problem.difficulty}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          {problem.acceptanceRate.toFixed(1)}%
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-2">
+                          {problem.tags.slice(0, 2).map(tag => (
+                            <Badge 
+                              key={tag} 
+                              variant="outline" 
+                              className="border-zinc-700 text-zinc-400 cursor-pointer hover:bg-zinc-800"
+                              onClick={() => !tags.includes(tag) && setTags([...tags, tag])}
+                            >
+                              <Tag className="h-3 w-3 mr-1" /> {tag}
+                            </Badge>
+                          ))}
+                          {problem.tags.length > 2 && (
+                            <Badge variant="outline" className="border-zinc-700 text-zinc-400">
+                              +{problem.tags.length - 2} more
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Button 
+                          asChild
+                          variant="ghost" 
+                          size="sm" 
+                          className="hover:bg-zinc-700/50 hover:text-green-400 w-full"
+                        >
+                          <Link to={`/problems/${problem.id}`}>
+                            Solve <ChevronRight className="h-4 w-4 ml-1" />
+                          </Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow className="border-zinc-800/50">
+                    <TableCell colSpan={6} className="h-52 text-center text-zinc-400">
+                      <div className="flex flex-col items-center justify-center h-full">
+                        <p>No problems found matching your criteria</p>
+                        <Button 
+                          variant="outline" 
+                          className="mt-4 border-zinc-700 hover:bg-zinc-800"
+                          onClick={() => {
+                            setSearchQuery("");
+                            setDifficulty(null);
+                            setTags([]);
+                            setShowSolved(true);
+                          }}
+                        >
+                          Clear filters
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
         </div>
       </main>

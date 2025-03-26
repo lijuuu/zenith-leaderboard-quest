@@ -66,7 +66,7 @@ const Compiler = () => {
   };
   
   return (
-    <div className="min-h-screen bg-background text-foreground pt-16">
+    <div className="min-h-screen bg-zinc-900 text-white pt-14">
       <MainNavbar />
       
       <main className="page-container py-8">
@@ -79,7 +79,7 @@ const Compiler = () => {
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
-                  className="bg-background border border-zinc-200 dark:border-zinc-700 rounded-md px-3 py-2 text-sm"
+                  className="bg-zinc-800 border-zinc-700 rounded-md px-3 py-2 text-sm focus:ring-green-500 focus:border-green-500"
                 >
                   <option value="javascript">JavaScript</option>
                   <option value="python">Python</option>
@@ -94,7 +94,7 @@ const Compiler = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 bg-zinc-800 border-zinc-700 hover:bg-zinc-700 text-white"
                   onClick={handleCopyCode}
                 >
                   <Copy className="h-4 w-4" />
@@ -103,7 +103,7 @@ const Compiler = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 bg-zinc-800 border-zinc-700 hover:bg-zinc-700 text-white"
                   onClick={handleClearCode}
                 >
                   <Trash2 className="h-4 w-4" />
@@ -112,7 +112,7 @@ const Compiler = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 bg-zinc-800 border-zinc-700 hover:bg-zinc-700 text-white"
                 >
                   <Upload className="h-4 w-4" />
                   Load
@@ -120,7 +120,7 @@ const Compiler = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 bg-zinc-800 border-zinc-700 hover:bg-zinc-700 text-white"
                 >
                   <Download className="h-4 w-4" />
                   Save
@@ -128,7 +128,7 @@ const Compiler = () => {
               </div>
             </div>
             
-            <div className="relative border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+            <div className="relative border border-zinc-700 rounded-lg overflow-hidden">
               <div className="bg-zinc-800 text-white px-4 py-2 text-xs flex items-center justify-between">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
@@ -152,58 +152,68 @@ const Compiler = () => {
               <Textarea
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="font-mono text-sm p-4 rounded-none border-none min-h-[400px] resize-none focus-visible:ring-0"
+                className="font-mono text-sm p-4 rounded-none border-none min-h-[400px] resize-none focus-visible:ring-0 bg-zinc-900 text-white"
                 spellCheck={false}
               />
             </div>
           </div>
           
           <div className="space-y-4">
-            <Tabs defaultValue="input">
-              <TabsList className="w-full">
-                <TabsTrigger value="input" className="flex-1">Input</TabsTrigger>
-                <TabsTrigger value="output" className="flex-1">Output</TabsTrigger>
+            <Tabs defaultValue="input" className="w-full">
+              <TabsList className="w-full bg-zinc-800 border-zinc-700">
+                <TabsTrigger 
+                  value="input" 
+                  className="flex-1 data-[state=active]:bg-green-500 data-[state=active]:text-white"
+                >
+                  Input
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="output" 
+                  className="flex-1 data-[state=active]:bg-green-500 data-[state=active]:text-white"
+                >
+                  Output
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="input">
-                <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
-                  <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2 text-xs font-medium border-b border-zinc-200 dark:border-zinc-800">
+                <div className="border border-zinc-700 rounded-lg overflow-hidden">
+                  <div className="bg-zinc-800 px-4 py-2 text-xs font-medium border-b border-zinc-700">
                     Standard Input
                   </div>
                   <Textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Enter input for your program..."
-                    className="font-mono text-sm p-4 rounded-none border-none min-h-[300px] resize-none focus-visible:ring-0"
+                    className="font-mono text-sm p-4 rounded-none border-none min-h-[300px] resize-none focus-visible:ring-0 bg-zinc-900 text-white"
                   />
                 </div>
               </TabsContent>
               
               <TabsContent value="output">
-                <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
-                  <div className="bg-zinc-100 dark:bg-zinc-800 px-4 py-2 text-xs font-medium border-b border-zinc-200 dark:border-zinc-800 flex justify-between">
+                <div className="border border-zinc-700 rounded-lg overflow-hidden">
+                  <div className="bg-zinc-800 px-4 py-2 text-xs font-medium border-b border-zinc-700 flex justify-between">
                     <span>Standard Output</span>
                     {mutation.data?.executionTime && (
-                      <span className="text-muted-foreground">
+                      <span className="text-green-400">
                         Time: {mutation.data.executionTime}
                       </span>
                     )}
                   </div>
-                  <div className="font-mono text-sm p-4 bg-white dark:bg-zinc-900 min-h-[300px] overflow-auto">
+                  <div className="font-mono text-sm p-4 bg-zinc-900 min-h-[300px] overflow-auto">
                     {mutation.isPending ? (
-                      <div className="text-muted-foreground animate-pulse">
+                      <div className="text-zinc-400 animate-pulse">
                         Running...
                       </div>
                     ) : mutation.data ? (
                       <pre className="whitespace-pre-wrap">
                         {mutation.data.error ? (
-                          <span className="text-red-500">{mutation.data.error}</span>
+                          <span className="text-red-400">{mutation.data.error}</span>
                         ) : (
-                          mutation.data.output
+                          <span className="text-green-400">{mutation.data.output}</span>
                         )}
                       </pre>
                     ) : (
-                      <div className="text-muted-foreground">
+                      <div className="text-zinc-500">
                         Run your code to see the output here
                       </div>
                     )}
@@ -212,16 +222,16 @@ const Compiler = () => {
               </TabsContent>
             </Tabs>
             
-            <div className="bg-card dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4">
+            <div className="bg-zinc-800/40 border border-zinc-700 rounded-lg p-4">
               <h3 className="font-medium mb-2">Compiler Information</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Language:</span>
-                  <span>{language}</span>
+                  <span className="text-zinc-400">Language:</span>
+                  <span className="text-white">{language}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Version:</span>
-                  <span>
+                  <span className="text-zinc-400">Version:</span>
+                  <span className="text-white">
                     {language === "javascript" && "Node.js 18.15.0"}
                     {language === "python" && "Python 3.11.4"}
                     {language === "java" && "Java 17.0.6"}
@@ -231,12 +241,12 @@ const Compiler = () => {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Memory Limit:</span>
-                  <span>512 MB</span>
+                  <span className="text-zinc-400">Memory Limit:</span>
+                  <span className="text-white">512 MB</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Time Limit:</span>
-                  <span>15 seconds</span>
+                  <span className="text-zinc-400">Time Limit:</span>
+                  <span className="text-white">15 seconds</span>
                 </div>
               </div>
             </div>

@@ -1,86 +1,60 @@
 
-import { useState } from 'react';
-import { Share, Copy, Check, Timer } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { toast } from '@/hooks/use-toast';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Copy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const ReferralBanner = () => {
-  const [isCopied, setIsCopied] = useState(false);
-  const referralCode = 'ZENX-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-  const referralLink = `https://zenx.com/ref/${referralCode}`;
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(referralLink);
-    setIsCopied(true);
+  const { toast } = useToast();
+  
+  const handleCopy = () => {
+    navigator.clipboard.writeText("https://zenx.com/ref/ZENX-MDJYWA");
     toast({
       title: "Referral link copied!",
-      description: "Share with your friends to clear your recent inactivity.",
+      description: "Share it with your friends to earn points",
     });
-    
-    setTimeout(() => {
-      setIsCopied(false);
-    }, 3000);
   };
   
   return (
-    <Card className="border-green-500/20 bg-green-950/10 backdrop-blur-sm dark:border-green-500/10 overflow-hidden relative border-zinc-700/50">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,197,94,0.15),transparent_50%)] pointer-events-none" />
+    <div className="relative overflow-hidden rounded-lg bg-gradient-to-r from-green-500/20 to-green-900/20 border border-green-500/30 p-6">
+      <div className="absolute inset-0 bg-grid-white/[0.05] [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))]" />
       
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-xl">
-          <div className="bg-green-500 text-white p-1.5 rounded-full">
-            <Share className="h-4 w-4" />
-          </div>
-          Clear Recent Inactivity
-        </CardTitle>
-        <CardDescription className="text-zinc-400">
-          Refer a friend to instantly clean up your activity heatmap and earn bonus points
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-sm">
-            <Timer className="h-4 w-4 text-green-400" />
-            <span className="text-zinc-300">
+      <div className="relative z-10">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <span className="inline-block w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-sm font-bold text-white">
+                +
+              </span>
+              Clear Recent Inactivity
+            </h3>
+            <p className="text-zinc-300 mt-1">
+              Refer a friend to instantly clean up your activity heatmap and earn bonus points
+            </p>
+            <p className="text-sm text-green-400 mt-2">
               Each successful referral will replace 5 inactive days with activity
-            </span>
+            </p>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
+          <div className="flex gap-2">
+            <div className="relative flex-1 min-w-[200px]">
               <input
                 type="text"
-                value={referralLink}
+                value="https://zenx.com/ref/ZENX-MDJYWA"
                 readOnly
-                className="w-full px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-800 text-sm text-zinc-300 focus:ring-2 focus:ring-green-500 focus:outline-none pr-10"
+                className="w-full bg-zinc-800/70 border border-zinc-700 rounded py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
               />
-              <button 
-                onClick={copyToClipboard}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
-                aria-label="Copy referral link"
-              >
-                {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-              </button>
             </div>
-            
             <Button 
-              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors font-medium flex-shrink-0"
-              onClick={copyToClipboard}
+              className="bg-green-500 hover:bg-green-600 flex-nowrap whitespace-nowrap" 
+              onClick={handleCopy}
             >
-              {isCopied ? 'Copied!' : 'Copy & Share'}
+              <Copy className="h-4 w-4 mr-2" />
+              Copy & Share
             </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

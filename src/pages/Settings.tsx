@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser } from "@/api/userApi";
-import Navbar from "@/components/Navbar";
 import SettingsTabs from "@/components/settings/SettingsTabs";
 import LoadingFallback from "@/components/settings/LoadingFallback";
+import MainNavbar from "@/components/MainNavbar";
 
 const Settings = () => {
   const { data: user, isLoading } = useQuery({
@@ -12,24 +12,21 @@ const Settings = () => {
     queryFn: getCurrentUser,
   });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background text-foreground pt-16">
-        <Navbar />
-        <main className="page-container py-8">
-          <LoadingFallback />
-        </main>
-      </div>
-    );
-  }
+  useEffect(() => {
+    // Scroll to top on component mount
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground pt-16">
-      <Navbar />
+    <div className="min-h-screen bg-zinc-900 text-white pt-14">
+      <MainNavbar />
       
       <main className="page-container py-8">
         <h1 className="text-3xl font-bold mb-6">Settings</h1>
-        <SettingsTabs user={user!} />
+        
+        <div className="bg-zinc-800/40 border border-zinc-700/40 rounded-lg p-6">
+          {isLoading ? <LoadingFallback /> : <SettingsTabs user={user!} />}
+        </div>
       </main>
     </div>
   );

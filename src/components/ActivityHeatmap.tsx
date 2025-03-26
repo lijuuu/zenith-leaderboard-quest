@@ -1,110 +1,158 @@
 
 import { useEffect, useState } from "react";
+import { format, parseISO, eachDayOfInterval, subDays } from "date-fns";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Activity } from "lucide-react";
+
+type ActivityLevel = 0 | 1 | 2 | 3 | 4;
 
 type HeatmapDataPoint = {
   date: string;
   count: number;
   present: boolean;
+  level: ActivityLevel;
 };
 
 type HeatmapProps = {
-  data: HeatmapDataPoint[];
-  startDate: string;
+  data?: HeatmapDataPoint[];
+  startDate?: string;
   loading?: boolean;
+  className?: string;
 };
 
-const ActivityHeatmap = ({ data, startDate, loading = false }: HeatmapProps) => {
+const ActivityHeatmap = ({ data, startDate, loading = false, className }: HeatmapProps) => {
+  const [activityData, setActivityData] = useState<HeatmapDataPoint[]>([]);
   const [weeks, setWeeks] = useState<HeatmapDataPoint[][]>([]);
   const [months, setMonths] = useState<string[]>([]);
+  const [hoveredDay, setHoveredDay] = useState<HeatmapDataPoint | null>(null);
   
   useEffect(() => {
-    if (!data || loading) return;
+    if (loading) return;
 
+    // If no data is provided, generate random activity data
+    if (!data || data.length === 0) {
+      const today = new Date();
+      const startDate = subDays(today, 365);
+      
+      const days = eachDayOfInterval({ 
+        start: startDate, 
+        end: today 
+      });
+      
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const tempMonths: string[] = [];
+      let prevMonth = -1;
+      
+      const generatedData: HeatmapDataPoint[] = days.map(day => {
+        const month = day.getMonth();
+        
+        // Add month label when month changes
+        if (month !== prevMonth) {
+          tempMonths.push(monthNames[month]);
+          prevMonth = month;
+        }
+        
+        // Random activity count between 0 and 10
+        const count = Math.floor(Math.random() * 11);
+        
+        // Determine activity level based on count
+        let level: ActivityLevel = 0;
+        if (count > 0 && count <= 2) level = 1;
+        else if (count > 2 && count <= 5) level = 2;
+        else if (count > 5 && count <= 8) level = 3;
+        else if (count > 8) level = 4;
+        
+        return {
+          date: format(day, 'yyyy-MM-dd'),
+          count,
+          present: count > 0,
+          level
+        };
+      });
+      
+      setActivityData(generatedData);
+      setMonths(tempMonths);
+    } else {
+      setActivityData(data);
+      
+      // Extract months from data for labels
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const tempMonths: string[] = [];
+      let prevMonth = -1;
+      
+      data.forEach(day => {
+        const date = parseISO(day.date);
+        const month = date.getMonth();
+        
+        if (month !== prevMonth) {
+          tempMonths.push(monthNames[month]);
+          prevMonth = month;
+        }
+      });
+      
+      setMonths(tempMonths);
+    }
+  }, [data, loading]);
+  
+  useEffect(() => {
     // Group data into weeks
     const tempWeeks: HeatmapDataPoint[][] = [];
     let currentWeek: HeatmapDataPoint[] = [];
 
-    // Get month labels
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const tempMonths: string[] = [];
-    
-    let prevMonth = -1;
-    
-    data.forEach((day, i) => {
-      const date = new Date(day.date);
+    for (let i = 0; i < activityData.length; i++) {
+      const date = parseISO(activityData[i].date);
       const dayOfWeek = date.getDay();
-      const month = date.getMonth();
       
-      // Add month label when month changes
-      if (month !== prevMonth) {
-        tempMonths.push(monthNames[month]);
-        prevMonth = month;
-      }
-      
-      // Start a new week on Sunday or at the beginning
-      if (dayOfWeek === 0 || i === 0) {
-        if (currentWeek.length > 0) {
-          tempWeeks.push(currentWeek);
-        }
+      if (dayOfWeek === 0 && currentWeek.length > 0) {
+        tempWeeks.push(currentWeek);
         currentWeek = [];
-        
-        // Add empty cells for days before the first day of the week
-        if (i === 0 && dayOfWeek !== 0) {
-          for (let j = 0; j < dayOfWeek; j++) {
-            currentWeek.push({ date: "", count: 0, present: false });
-          }
-        }
       }
       
-      currentWeek.push(day);
+      currentWeek.push(activityData[i]);
       
-      // Push the last week
-      if (i === data.length - 1) {
-        // Fill the remaining days of the last week
-        const remainingDays = 7 - currentWeek.length;
-        for (let j = 0; j < remainingDays; j++) {
-          currentWeek.push({ date: "", count: 0, present: false });
-        }
+      if (i === activityData.length - 1) {
         tempWeeks.push(currentWeek);
       }
-    });
+    }
     
     setWeeks(tempWeeks);
-    setMonths(tempMonths);
-  }, [data, loading]);
+  }, [activityData]);
+
+  // Function to get color based on activity level
+  const getColor = (level: ActivityLevel) => {
+    switch (level) {
+      case 0: return 'bg-zinc-800/70 hover:bg-zinc-800';
+      case 1: return 'bg-green-900/80 hover:bg-green-900';
+      case 2: return 'bg-green-700/80 hover:bg-green-700';
+      case 3: return 'bg-green-600/80 hover:bg-green-600';
+      case 4: return 'bg-green-500/90 hover:bg-green-500';
+      default: return 'bg-zinc-800/70 hover:bg-zinc-800';
+    }
+  };
 
   if (loading) {
     return (
-      <Card>
+      <Card className="bg-zinc-900/60 border-zinc-800/50">
         <CardHeader className="pb-2">
           <CardTitle className="text-xl flex items-center gap-2">
+            <Activity className="h-5 w-5 text-green-400" />
             Activity Heatmap
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Skeleton className="w-full h-[160px] rounded-md" />
+          <div className="w-full h-[160px] rounded-md bg-zinc-800/50 animate-pulse" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="bg-card dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+    <Card className="bg-zinc-900/60 border-zinc-800/50">
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl flex items-center justify-between">
-          <span>Activity Heatmap</span>
-          <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-red-500"></span>
-              <span className="text-zinc-600 dark:text-zinc-400">Absent</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-green-500"></span>
-              <span className="text-zinc-600 dark:text-zinc-400">Present</span>
-            </div>
-          </div>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Activity className="h-5 w-5 text-green-400" />
+          Activity Heatmap
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -115,27 +163,44 @@ const ActivityHeatmap = ({ data, startDate, loading = false }: HeatmapProps) => 
                 <div key={`month-${i}`} className="pl-2">{month}</div>
               ))}
             </div>
-            <div className="flex flex-col gap-[3px]">
-              {Array(7).fill(0).map((_, dayIndex) => (
-                <div key={`row-${dayIndex}`} className="flex gap-[3px]">
-                  {weeks.map((week, weekIndex) => (
-                    <div 
-                      key={`cell-${weekIndex}-${dayIndex}`} 
-                      className={`w-[14px] h-[14px] rounded-full ${
-                        !week[dayIndex]?.date 
-                          ? "opacity-0" 
-                          : week[dayIndex]?.present 
-                            ? "bg-green-500" 
-                            : "bg-red-500"
-                      }`}
-                      title={week[dayIndex]?.date ? new Date(week[dayIndex].date).toLocaleDateString() : ""}
-                    />
-                  ))}
-                </div>
-              ))}
-            </div>
+            
+            <TooltipProvider>
+              <div className="flex gap-1">
+                {weeks.map((week, weekIndex) => (
+                  <div key={weekIndex} className="flex flex-col gap-1">
+                    {Array(7).fill(0).map((_, dayIndex) => {
+                      const day = week[dayIndex];
+                      if (!day) return <div key={dayIndex} className="w-3 h-3 opacity-0" />;
+                      
+                      return (
+                        <Tooltip key={dayIndex}>
+                          <TooltipTrigger asChild>
+                            <div 
+                              className={`w-3 h-3 rounded-sm ${getColor(day.level)} cursor-pointer transition-all duration-200 hover:scale-110`}
+                              onMouseEnter={() => setHoveredDay(day)}
+                              onMouseLeave={() => setHoveredDay(null)}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="text-xs font-medium bg-zinc-900 border-zinc-700">
+                            <p>{format(parseISO(day.date), 'MMMM d, yyyy')}</p>
+                            <p>{day.count} {day.count === 1 ? 'contribution' : 'contributions'}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </TooltipProvider>
           </div>
         </div>
+        
+        {hoveredDay && (
+          <div className="mt-3 text-sm font-medium animate-fade-in">
+            <span className="mr-2 text-zinc-400">{format(parseISO(hoveredDay.date), 'MMMM d, yyyy')}:</span>
+            <span className="text-green-400">{hoveredDay.count} {hoveredDay.count === 1 ? 'contribution' : 'contributions'}</span>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

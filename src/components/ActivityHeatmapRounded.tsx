@@ -35,8 +35,17 @@ const ActivityHeatmapRounded: React.FC<ActivityHeatmapRoundedProps> = ({
       });
       
       const generatedData: ActivityDay[] = days.map(day => {
+        // More activity on weekends and random distribution
+        const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+        let randomWeight = Math.random();
+        if (isWeekend) randomWeight *= 1.5;
+        
+        // Higher chance of activity in recent days
+        const recencyBoost = Math.min(1, (daysToShow - days.indexOf(day)) / 100);
+        randomWeight *= recencyBoost;
+        
         // Random activity count between 0 and 10
-        const count = Math.floor(Math.random() * 11);
+        const count = Math.floor(randomWeight * 10);
         
         // Determine activity level based on count
         let level: ActivityLevel = 0;
@@ -61,16 +70,16 @@ const ActivityHeatmapRounded: React.FC<ActivityHeatmapRoundedProps> = ({
   // Function to get color based on activity level
   const getColor = (level: ActivityLevel) => {
     switch (level) {
-      case 0: return 'bg-zinc-200 dark:bg-zinc-800';
-      case 1: return 'bg-green-200 dark:bg-green-900';
-      case 2: return 'bg-green-300 dark:bg-green-700';
-      case 3: return 'bg-green-400 dark:bg-green-600';
-      case 4: return 'bg-green-500 dark:bg-green-500';
-      default: return 'bg-zinc-200 dark:bg-zinc-800';
+      case 0: return 'bg-zinc-800/70 hover:bg-zinc-800';
+      case 1: return 'bg-green-900/80 hover:bg-green-900';
+      case 2: return 'bg-green-700/80 hover:bg-green-700';
+      case 3: return 'bg-green-600/80 hover:bg-green-600';
+      case 4: return 'bg-green-500/90 hover:bg-green-500';
+      default: return 'bg-zinc-800/70 hover:bg-zinc-800';
     }
   };
 
-  // Split data into weeks
+  // Calculate weeks for display
   const weeks: ActivityDay[][] = [];
   let currentWeek: ActivityDay[] = [];
 
@@ -101,12 +110,12 @@ const ActivityHeatmapRounded: React.FC<ActivityHeatmapRoundedProps> = ({
                   <Tooltip key={dayIndex}>
                     <TooltipTrigger asChild>
                       <div 
-                        className={`w-3 h-3 rounded-full ${getColor(day.level)} cursor-pointer transition-all hover:scale-125 hover:ring-2 hover:ring-zinc-300 dark:hover:ring-zinc-700`}
+                        className={`w-3 h-3 rounded-sm ${getColor(day.level)} cursor-pointer transition-all duration-200 hover:scale-110`}
                         onMouseEnter={() => setHoveredDay(day)}
                         onMouseLeave={() => setHoveredDay(null)}
                       />
                     </TooltipTrigger>
-                    <TooltipContent side="top" className="text-xs font-medium">
+                    <TooltipContent side="top" className="text-xs font-medium bg-zinc-900 border-zinc-700">
                       <p>{format(parseISO(day.date), 'MMMM d, yyyy')}</p>
                       <p>{day.count} {day.count === 1 ? 'contribution' : 'contributions'}</p>
                     </TooltipContent>
@@ -119,9 +128,9 @@ const ActivityHeatmapRounded: React.FC<ActivityHeatmapRoundedProps> = ({
       </div>
       
       {hoveredDay && (
-        <div className="mt-2 text-sm font-medium">
-          <span className="mr-2">{format(parseISO(hoveredDay.date), 'MMMM d, yyyy')}:</span>
-          <span className="text-green-500 dark:text-green-400">{hoveredDay.count} {hoveredDay.count === 1 ? 'contribution' : 'contributions'}</span>
+        <div className="mt-3 text-sm font-medium animate-fade-in">
+          <span className="mr-2 text-zinc-400">{format(parseISO(hoveredDay.date), 'MMMM d, yyyy')}:</span>
+          <span className="text-green-400">{hoveredDay.count} {hoveredDay.count === 1 ? 'contribution' : 'contributions'}</span>
         </div>
       )}
     </div>
