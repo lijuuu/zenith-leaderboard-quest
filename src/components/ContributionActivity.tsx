@@ -1,14 +1,12 @@
 
 import { useEffect, useState } from 'react';
-import { Activity } from 'lucide-react';
+import { Activity, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { format, parseISO, subDays, eachDayOfInterval } from 'date-fns';
-
-interface ContributionProps {
-  className?: string;
-}
+import { format, parseISO, subDays, eachDayOfInterval, getDay, startOfYear, endOfYear, getYear } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 type ActivityLevel = 0 | 1 | 2 | 3 | 4;
 
@@ -18,41 +16,39 @@ interface ActivityDay {
   level: ActivityLevel;
 }
 
+interface ContributionProps {
+  className?: string;
+}
+
 const ContributionActivity = ({ className }: ContributionProps) => {
   const [activityData, setActivityData] = useState<ActivityDay[]>([]);
-  const [months, setMonths] = useState<string[]>([]);
+  const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
   const [hoveredDay, setHoveredDay] = useState<ActivityDay | null>(null);
   
   useEffect(() => {
-    // Generate mock activity data for the past year
-    const today = new Date();
-    const startDate = subDays(today, 365);
+    // Generate mock activity data for the selected year
+    const year = currentYear;
+    const startDate = new Date(year, 0, 1);
+    const endDate = new Date(year, 11, 31);
+    
+    if (endDate > new Date()) {
+      endDate.setTime(new Date().getTime());
+    }
     
     const days = eachDayOfInterval({ 
       start: startDate, 
-      end: today 
+      end: endDate 
     });
     
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const tempMonths: string[] = [];
-    let prevMonth = -1;
-    
     const generatedData: ActivityDay[] = days.map(day => {
-      const month = day.getMonth();
-      
-      // Add month label when month changes
-      if (month !== prevMonth) {
-        tempMonths.push(monthNames[month]);
-        prevMonth = month;
-      }
-      
       // More activity on weekends and random distribution
       const isWeekend = day.getDay() === 0 || day.getDay() === 6;
       let randomWeight = Math.random();
       if (isWeekend) randomWeight *= 1.5;
       
       // Higher chance of activity in recent days
-      const recencyBoost = Math.min(1, (365 - days.indexOf(day)) / 100);
+      const daysFromStart = Math.floor((day.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      const recencyBoost = Math.min(1, (days.length - daysFromStart) / 100);
       randomWeight *= recencyBoost;
       
       // Random activity count between 0 and 10
@@ -73,28 +69,7 @@ const ContributionActivity = ({ className }: ContributionProps) => {
     });
     
     setActivityData(generatedData);
-    setMonths(tempMonths);
-  }, []);
-
-  // Split data into weeks
-  const weeks: ActivityDay[][] = [];
-  let currentWeek: ActivityDay[] = [];
-
-  for (let i = 0; i < activityData.length; i++) {
-    const date = parseISO(activityData[i].date);
-    const dayOfWeek = date.getDay();
-    
-    if (dayOfWeek === 0 && currentWeek.length > 0) {
-      weeks.push(currentWeek);
-      currentWeek = [];
-    }
-    
-    currentWeek.push(activityData[i]);
-    
-    if (i === activityData.length - 1) {
-      weeks.push(currentWeek);
-    }
-  }
+  }, [currentYear]);
 
   // Function to get color based on activity level
   const getColor = (level: ActivityLevel) => {
@@ -107,38 +82,149 @@ const ContributionActivity = ({ className }: ContributionProps) => {
       default: return 'bg-zinc-800/70 hover:bg-zinc-800';
     }
   };
+
+  // Format calendar data for rendering
+  const formatCalendarData = () => {
+    const calendarData = [];
+    const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    
+    // Get first day of each month for month labels
+    const months = [];
+    let currentMonth = -1;
+    
+    for (const day of activityData) {
+      const date = parseISO(day.date);
+      const month = date.getMonth();
+      
+      if (month !== currentMonth) {
+        months.push({
+          month,
+          index: months.length,
+          label: monthLabels[month]
+        });
+        currentMonth = month;
+      }
+    }
+    
+    // Group days by week
+    const weeks: ActivityDay[][] = [];
+    let currentWeek: ActivityDay[] = [];
+    let lastDay = 0;
+    
+    for (const day of activityData) {
+      const date = parseISO(day.date);
+      const dayOfWeek = date.getDay();
+      
+      // Start a new week when we hit Sunday (0) unless it's the first entry
+      if (dayOfWeek === 0 && currentWeek.length > 0) {
+        weeks.push([...currentWeek]);
+        currentWeek = [];
+      }
+      
+      currentWeek.push(day);
+      lastDay = dayOfWeek;
+    }
+    
+    // Add the last week if it's not empty
+    if (currentWeek.length > 0) {
+      weeks.push([...currentWeek]);
+    }
+    
+    return { weeks, months };
+  };
+  
+  const { weeks, months } = formatCalendarData();
+  
+  // Function to get the last 30 days for monthly view
+  const getMonthlyData = () => {
+    const today = new Date();
+    const startDate = subDays(today, 29);
+    
+    return activityData.filter(day => {
+      const date = parseISO(day.date);
+      return date >= startDate && date <= today;
+    });
+  };
+  
+  const monthlyData = getMonthlyData();
+  
+  // Group the monthly data into weeks
+  const groupedMonthlyData = monthlyData.reduce<ActivityDay[][]>((acc, day, index) => {
+    const weekIndex = Math.floor(index / 7);
+    if (!acc[weekIndex]) {
+      acc[weekIndex] = [];
+    }
+    acc[weekIndex].push(day);
+    return acc;
+  }, []);
+  
+  const handlePrevYear = () => {
+    setCurrentYear(prev => prev - 1);
+  };
+  
+  const handleNextYear = () => {
+    const nextYear = currentYear + 1;
+    if (nextYear <= new Date().getFullYear()) {
+      setCurrentYear(nextYear);
+    }
+  };
   
   return (
     <Card className={cn("bg-zinc-900/60 border-zinc-800/50", className)}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Activity className="h-5 w-5 text-green-400" />
-          Contribution Activity
-        </CardTitle>
-        <p className="text-sm text-zinc-400">Your coding activity in the past year</p>
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Activity className="h-5 w-5 text-green-400" />
+            Activity Heatmap
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="h-7 w-7 border-zinc-700"
+              onClick={handlePrevYear}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm font-medium">{currentYear}</span>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="h-7 w-7 border-zinc-700"
+              onClick={handleNextYear}
+              disabled={currentYear >= new Date().getFullYear()}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto pb-2">
-          <div className="min-w-max">
-            <div className="flex mb-1 text-xs text-zinc-500">
-              {months.map((month, i) => (
-                <div key={`month-${i}`} className="pl-2">{month}</div>
-              ))}
-            </div>
-            
-            <TooltipProvider>
-              <div className="flex gap-[2px]">
-                {weeks.map((week, weekIndex) => (
-                  <div key={weekIndex} className="flex flex-col gap-[2px]">
-                    {Array(7).fill(0).map((_, dayIndex) => {
-                      const day = week[dayIndex];
-                      if (!day) return <div key={dayIndex} className="w-2 h-2 opacity-0" />;
-                      
-                      return (
-                        <Tooltip key={dayIndex}>
+        <Tabs defaultValue="yearly" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 bg-zinc-800 border-zinc-700">
+            <TabsTrigger value="monthly" className="data-[state=active]:bg-green-500">Monthly</TabsTrigger>
+            <TabsTrigger value="yearly" className="data-[state=active]:bg-green-500">Yearly</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="monthly" className="mt-3">
+            <div className="flex flex-col space-y-1">
+              <div className="grid grid-cols-7 gap-1 mb-1">
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
+                  <div key={day} className="text-xs text-zinc-500 text-center">
+                    {day}
+                  </div>
+                ))}
+              </div>
+              
+              <TooltipProvider>
+                <div className="space-y-1">
+                  {groupedMonthlyData.map((week, weekIndex) => (
+                    <div key={weekIndex} className="grid grid-cols-7 gap-1">
+                      {week.map((day) => (
+                        <Tooltip key={day.date}>
                           <TooltipTrigger asChild>
                             <div 
-                              className={`w-2 h-2 rounded-sm ${getColor(day.level)} cursor-pointer transition-all duration-200 hover:scale-110`}
+                              className={`aspect-square w-4 h-4 rounded-sm transition-all cursor-pointer ${getColor(day.level)}`}
                               onMouseEnter={() => setHoveredDay(day)}
                               onMouseLeave={() => setHoveredDay(null)}
                             />
@@ -148,21 +234,92 @@ const ContributionActivity = ({ className }: ContributionProps) => {
                             <p>{day.count} {day.count === 1 ? 'contribution' : 'contributions'}</p>
                           </TooltipContent>
                         </Tooltip>
-                      );
-                    })}
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </TooltipProvider>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="yearly" className="mt-4">
+            <div className="overflow-x-auto">
+              <div className="min-w-max">
+                <div className="flex justify-center mb-1 text-xs text-zinc-500">
+                  {months.map((month) => (
+                    <div key={month.index} className="w-7">{month.label}</div>
+                  ))}
+                </div>
+                
+                <div className="flex gap-y-2">
+                  <div className="grid grid-rows-7 grid-flow-row gap-1 mr-2 text-xs text-zinc-500">
+                    <div></div>
+                    <div>Mon</div>
+                    <div></div>
+                    <div>Wed</div>
+                    <div></div>
+                    <div>Fri</div>
+                    <div></div>
                   </div>
-                ))}
+                  
+                  <TooltipProvider>
+                    <div className="flex gap-1">
+                      {weeks.map((week, weekIndex) => (
+                        <div key={weekIndex} className="flex flex-col gap-1">
+                          {Array(7).fill(0).map((_, dayIndex) => {
+                            const day = week.find((d) => {
+                              const date = parseISO(d.date);
+                              return date.getDay() === dayIndex;
+                            });
+                            
+                            if (!day) {
+                              return <div key={dayIndex} className="w-4 h-4"></div>;
+                            }
+                            
+                            return (
+                              <Tooltip key={dayIndex}>
+                                <TooltipTrigger asChild>
+                                  <div 
+                                    className={`w-4 h-4 rounded-sm transition-all cursor-pointer ${getColor(day.level)}`}
+                                    onMouseEnter={() => setHoveredDay(day)}
+                                    onMouseLeave={() => setHoveredDay(null)}
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs font-medium bg-zinc-900 border-zinc-700">
+                                  <p>{format(parseISO(day.date), 'MMMM d, yyyy')}</p>
+                                  <p>{day.count} {day.count === 1 ? 'contribution' : 'contributions'}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                  </TooltipProvider>
+                </div>
               </div>
-            </TooltipProvider>
-          </div>
-        </div>
-        
-        {hoveredDay && (
-          <div className="mt-2 text-sm font-medium animate-fade-in">
-            <span className="mr-2 text-zinc-400">{format(parseISO(hoveredDay.date), 'MMMM d, yyyy')}:</span>
-            <span className="text-green-400">{hoveredDay.count} {hoveredDay.count === 1 ? 'contribution' : 'contributions'}</span>
-          </div>
-        )}
+            </div>
+            
+            {hoveredDay && (
+              <div className="mt-2 text-sm font-medium animate-fade-in">
+                <span className="mr-2 text-zinc-400">{format(parseISO(hoveredDay.date), 'MMMM d, yyyy')}:</span>
+                <span className="text-green-400">{hoveredDay.count} {hoveredDay.count === 1 ? 'contribution' : 'contributions'}</span>
+              </div>
+            )}
+            
+            <div className="flex items-center justify-between pt-3 text-xs text-zinc-500">
+              <span>Less</span>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded-sm bg-zinc-800"></div>
+                <div className="w-3 h-3 rounded-sm bg-green-900"></div>
+                <div className="w-3 h-3 rounded-sm bg-green-700"></div>
+                <div className="w-3 h-3 rounded-sm bg-green-600"></div>
+                <div className="w-3 h-3 rounded-sm bg-green-500"></div>
+              </div>
+              <span>More</span>
+            </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );

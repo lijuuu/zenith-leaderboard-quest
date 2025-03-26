@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import StatsCard from '@/components/StatsCard';
-import MonthlyActivityHeatmap from '@/components/MonthlyActivityHeatmap';
+import ContributionActivity from '@/components/ContributionActivity';
 import ClearInactivityCard from '@/components/ClearInactivityCard';
 import { getUserProfile } from '@/api/userApi';
 import { getProblems } from '@/api/problemApi';
@@ -168,8 +168,12 @@ const Index = () => {
             
             {/* Right Column - Activity & Leaderboard */}
             <div className="space-y-6">
-              {/* Monthly Activity */}
-              <MonthlyActivityHeatmap />
+              {/* Monthly Activity with GitHub-like style */}
+              <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
+                <CardContent className="p-4">
+                  <ContributionActivity />
+                </CardContent>
+              </Card>
               
               {/* Leaderboard Preview */}
               <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">

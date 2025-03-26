@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, Puzzle, Trophy, UserPlus, Github, Globe, MapPin, Clock, BarChart3 } from "lucide-react";
+import { Calendar, Puzzle, Trophy, UserPlus, Github, Globe, MapPin, Clock, BarChart3, Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,8 +16,7 @@ import { UserProfile, Challenge } from "@/api/types";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileStats from "@/components/profile/ProfileStats";
 import ChallengesList from "@/components/profile/ChallengesList";
-import YearlyActivityHeatmap from "@/components/YearlyActivityHeatmap";
-import MonthlyActivityHeatmap from "@/components/MonthlyActivityHeatmap";
+import ContributionActivity from "@/components/ContributionActivity";
 import ProblemsSolvedChart from "@/components/profile/ProblemsSolvedChart";
 import RecentSubmissions from "@/components/profile/RecentSubmissions";
 import ProfileAchievements from "@/components/profile/ProfileAchievements";
@@ -55,47 +55,6 @@ const Profile = () => {
     
     loadChallenges();
   }, [profile, toast]);
-  
-  // Transform the activity data to include the required properties
-  const transformActivityData = () => {
-    if (!profile?.activityHeatmap?.data) return [];
-    
-    return profile.activityHeatmap.data.map(item => {
-      // Determine if active based on count
-      const isActive = item.count > 0;
-      
-      // Determine level based on count (similar logic to what's in ActivityHeatmapRounded)
-      let level = 0;
-      if (item.count > 0 && item.count <= 2) level = 1;
-      else if (item.count > 2 && item.count <= 5) level = 2;
-      else if (item.count > 5 && item.count <= 8) level = 3;
-      else if (item.count > 8) level = 4;
-      
-      return {
-        date: item.date,
-        count: item.count,
-        isActive,
-        level: level as 0 | 1 | 2 | 3 | 4
-      };
-    });
-  };
-  
-  // Transform for the monthly view
-  const transformMonthlyData = () => {
-    if (!profile?.activityHeatmap?.data) return [];
-    
-    // Get the last 30 days of data
-    const now = new Date();
-    const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
-    
-    return profile.activityHeatmap.data
-      .filter(item => new Date(item.date) >= thirtyDaysAgo)
-      .map(item => ({
-        date: item.date,
-        count: item.count,
-        isActive: item.count > 0
-      }));
-  };
   
   // Count private and public challenges
   const privateChallenges = challenges.filter(c => c.isPrivate).length;
@@ -241,16 +200,16 @@ const Profile = () => {
               </CardContent>
             </Card>
             
-            {/* Activity Section - Made more compact */}
+            {/* Activity Section */}
             <Card className="mb-6 bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
               <CardContent className="p-4">
-                <YearlyActivityHeatmap data={transformActivityData()} />
+                <ContributionActivity />
               </CardContent>
             </Card>
             
             {/* Activity & Challenges Section */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left Column - Activity and Problems Solved */}
+              {/* Left Column - Problems Solved */}
               <div className="lg:col-span-8 space-y-6">
                 <Tabs defaultValue="problems" className="w-full">
                   <TabsList className="w-full justify-start bg-zinc-800 border-zinc-700">
@@ -283,13 +242,6 @@ const Profile = () => {
                     </Card>
                   </TabsContent>
                 </Tabs>
-                
-                {/* Monthly Heatmap - Made more compact */}
-                <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
-                  <CardContent className="p-4">
-                    <MonthlyActivityHeatmap data={transformMonthlyData()} />
-                  </CardContent>
-                </Card>
               </div>
               
               {/* Right Column - Challenges */}

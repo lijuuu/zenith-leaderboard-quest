@@ -85,10 +85,10 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({ data, c
                     <Tooltip key={day.date}>
                       <TooltipTrigger asChild>
                         <div 
-                          className={`aspect-square w-5 h-5 rounded-sm transition-all cursor-pointer ${
+                          className={`aspect-square w-4 h-4 rounded-sm transition-all cursor-pointer ${
                             day.isActive 
-                              ? 'bg-green-500 hover:scale-110' 
-                              : 'bg-red-500 hover:scale-110'
+                              ? 'bg-green-500 hover:bg-green-400' 
+                              : 'bg-red-500 hover:bg-red-400'
                           }`}
                           onMouseEnter={() => setHoveredDay(day)}
                           onMouseLeave={() => setHoveredDay(null)}
