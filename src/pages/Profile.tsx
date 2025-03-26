@@ -2,23 +2,30 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, Puzzle } from "lucide-react";
-import MainNavbar from "@/components/MainNavbar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar, Puzzle, Trophy, UserPlus, Github, Globe, MapPin, Clock, BarChart3 } from "lucide-react";
+import MainNavbarWithNotifications from "@/components/ui/MainNavbarWithNotifications";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { getAllChallenges, getUserChallenges } from "@/api/challengeApi";
 import { getUserProfile } from "@/api/userApi";
 import { UserProfile, Challenge } from "@/api/types";
 
-// Import our new components
+// Import our components
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileStats from "@/components/profile/ProfileStats";
 import ChallengesList from "@/components/profile/ChallengesList";
 import ActivityHeatmapRounded from "@/components/ActivityHeatmapRounded";
+import ProblemsSolvedChart from "@/components/profile/ProblemsSolvedChart";
+import RecentSubmissions from "@/components/profile/RecentSubmissions";
+import ProfileAchievements from "@/components/profile/ProfileAchievements";
 
 const Profile = () => {
-  const { username } = useParams<{ username: string }>();
+  const { userId } = useParams<{ userId: string }>();
   const { toast } = useToast();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   
@@ -27,8 +34,8 @@ const Profile = () => {
     isLoading: profileLoading, 
     isError: profileError 
   } = useQuery({
-    queryKey: ["profile", username],
-    queryFn: () => getUserProfile(username!),
+    queryKey: ["profile", userId],
+    queryFn: () => getUserProfile(userId || 'current'),
     retry: false,
   });
   
@@ -72,12 +79,16 @@ const Profile = () => {
     });
   };
   
+  // Count private and public challenges
+  const privateChallenges = challenges.filter(c => c.isPrivate).length;
+  const publicChallenges = challenges.filter(c => !c.isPrivate).length;
+  
   if (profileLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground pt-16 pb-8">
-        <MainNavbar />
+        <MainNavbarWithNotifications />
         <main className="page-container py-8">
-          <Card className="w-full max-w-5xl mx-auto">
+          <Card className="w-full max-w-6xl mx-auto">
             <CardHeader>
               <div className="h-24 w-full animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded-md"></div>
             </CardHeader>
@@ -106,9 +117,9 @@ const Profile = () => {
   if (profileError) {
     return (
       <div className="min-h-screen bg-background text-foreground pt-16 pb-8">
-        <MainNavbar />
+        <MainNavbarWithNotifications />
         <main className="page-container py-8">
-          <Card className="w-full max-w-5xl mx-auto">
+          <Card className="w-full max-w-6xl mx-auto">
             <CardHeader>
               <CardTitle className="text-lg font-medium">Error</CardTitle>
             </CardHeader>
@@ -123,22 +134,101 @@ const Profile = () => {
   
   return (
     <div className="min-h-screen bg-background text-foreground pt-16 pb-8">
-      <MainNavbar />
+      <MainNavbarWithNotifications />
       <main className="page-container py-8">
-        <Card className="w-full max-w-5xl mx-auto">
-          <CardContent className="p-6">
-            {/* Profile Header Section */}
-            <ProfileHeader profile={profile!} username={username} />
-            
-            <Separator className="my-6" />
-            
-            {/* Stats Section */}
-            <ProfileStats profile={profile!} />
-            
-            <Separator className="my-6" />
-            
-            {/* Activity & Challenges Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-6">
+        <div className="w-full max-w-6xl mx-auto">
+          {/* Profile Overview */}
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              {/* Profile Header Section */}
+              <ProfileHeader profile={profile!} userId={userId} />
+            </CardContent>
+          </Card>
+          
+          {/* Stats Section */}
+          <Card className="mb-6">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-medium flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-accent-color" /> Statistics Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <ProfileStats profile={profile!} />
+              
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="border border-border/50">
+                  <CardHeader className="p-4 pb-2">
+                    <CardTitle className="text-sm font-medium">Challenges</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0">
+                    <div className="flex justify-between items-center mt-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                        <span className="text-sm">Public</span>
+                      </div>
+                      <span className="font-medium">{publicChallenges}</span>
+                    </div>
+                    <div className="flex justify-between items-center mt-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                        <span className="text-sm">Private</span>
+                      </div>
+                      <span className="font-medium">{privateChallenges}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border border-border/50">
+                  <CardHeader className="p-4 pb-2">
+                    <CardTitle className="text-sm font-medium">Streak</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0">
+                    <div className="flex justify-between items-center mt-1">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-green-500" />
+                        <span className="text-sm">Current</span>
+                      </div>
+                      <span className="font-medium">{profile?.currentStreak || 0} days</span>
+                    </div>
+                    <div className="flex justify-between items-center mt-2">
+                      <div className="flex items-center gap-2">
+                        <Trophy className="h-4 w-4 text-amber-500" />
+                        <span className="text-sm">Longest</span>
+                      </div>
+                      <span className="font-medium">{profile?.longestStreak || 0} days</span>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border border-border/50">
+                  <CardHeader className="p-4 pb-2">
+                    <CardTitle className="text-sm font-medium">Rating</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0">
+                    <div className="flex justify-between items-center mt-1">
+                      <div className="flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm">Current</span>
+                      </div>
+                      <span className="font-medium">{profile?.currentRating || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center mt-2">
+                      <div className="flex items-center gap-2">
+                        <UserPlus className="h-4 w-4 text-purple-500" />
+                        <span className="text-sm">Global Rank</span>
+                      </div>
+                      <span className="font-medium">#{profile?.globalRank || '-'}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Activity & Challenges Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left Column - Activity and Problems Solved */}
+            <div className="lg:col-span-8 space-y-6">
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg flex items-center gap-2">
@@ -150,19 +240,104 @@ const Profile = () => {
                 </CardContent>
               </Card>
               
+              <Tabs defaultValue="problems" className="w-full">
+                <TabsList className="w-full justify-start">
+                  <TabsTrigger value="problems">Problems Solved</TabsTrigger>
+                  <TabsTrigger value="submissions">Recent Submissions</TabsTrigger>
+                  <TabsTrigger value="achievements">Achievements</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="problems" className="mt-4">
+                  <Card>
+                    <CardContent className="p-4">
+                      <ProblemsSolvedChart profile={profile!} />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="submissions" className="mt-4">
+                  <Card>
+                    <CardContent className="p-4">
+                      <RecentSubmissions userId={profile?.id} />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="achievements" className="mt-4">
+                  <Card>
+                    <CardContent className="p-4">
+                      <ProfileAchievements badges={profile?.badges || []} />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
+            
+            {/* Right Column - Challenges */}
+            <div className="lg:col-span-4">
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Puzzle className="h-5 w-5 text-blue-500" /> Challenges
+                    <Trophy className="h-5 w-5 text-amber-500" /> Challenges
                   </CardTitle>
+                  <CardDescription>
+                    Total: {challenges.length} ({publicChallenges} public, {privateChallenges} private)
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ChallengesList challenges={challenges} />
+                  
+                  <div className="mt-4 pt-4 border-t border-border/50">
+                    <Button className="w-full accent-color">
+                      <Puzzle className="mr-2 h-4 w-4" />
+                      View All Challenges
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
+              
+              {profile?.website || profile?.githubProfile || profile?.location ? (
+                <Card className="mt-6">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">Links & Info</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {profile?.website && (
+                      <a 
+                        href={profile.website}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Globe className="h-4 w-4" />
+                        <span className="text-sm truncate">{profile.website}</span>
+                      </a>
+                    )}
+                    
+                    {profile?.githubProfile && (
+                      <a 
+                        href={`https://github.com/${profile.githubProfile}`}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Github className="h-4 w-4" />
+                        <span className="text-sm truncate">{profile.githubProfile}</span>
+                      </a>
+                    )}
+                    
+                    {profile?.location && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <MapPin className="h-4 w-4" />
+                        <span className="text-sm">{profile.location}</span>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ) : null}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </main>
     </div>
   );

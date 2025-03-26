@@ -12,7 +12,8 @@ import {
   Loader2,
   Github,
   Link as LinkIcon,
-  MapPin
+  MapPin,
+  CalendarDays
 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -26,157 +27,195 @@ import { Badge } from "@/components/ui/badge";
 
 interface ProfileHeaderProps {
   profile: UserProfile;
-  username?: string;
+  userId?: string;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, username }) => {
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, userId }) => {
   const { toast } = useToast();
   const [isFollowing, setIsFollowing] = useState(false);
-  const [loading, setLoading] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const isOwnProfile = !userId || userId === profile.id;
+  
+  const handleCopyUsername = () => {
+    navigator.clipboard.writeText(profile.username);
+    toast({
+      title: "Username copied",
+      description: `@${profile.username} copied to clipboard`,
+    });
+  };
+  
   const handleFollow = async () => {
-    setLoading(true);
+    setIsLoading(true);
     
-    // Simulate follow/unfollow action
-    setTimeout(() => {
-      setIsFollowing(!isFollowing);
-      setLoading(false);
+    try {
+      // This would be an API call in a real app
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
+      setIsFollowing(!isFollowing);
       toast({
         title: isFollowing ? "Unfollowed" : "Followed",
         description: isFollowing 
-          ? `You have unfollowed @${username}`
-          : `You are now following @${username}`,
+          ? `You unfollowed @${profile.username}` 
+          : `You are now following @${profile.username}`,
       });
-    }, 500);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update follow status",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  const copyProfileLink = () => {
-    const profileLink = window.location.href;
-    navigator.clipboard.writeText(profileLink);
-    toast({
-      title: "Copied!",
-      description: "Profile link copied to clipboard",
-    });
-  };
-
   return (
-    <div className="space-y-4">
-      <div className="flex items-center space-x-4">
-        <Avatar className="h-24 w-24 border-2 border-accent-color/20">
-          <AvatarImage src={profile?.profileImage || `https://avatar.vercel.sh/${username}.png`} alt={profile?.fullName} />
-          <AvatarFallback>{profile?.fullName.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <div className="space-y-2">
-          <div>
-            <h3 className="text-lg font-semibold">{profile?.username}</h3>
-            <div className="flex items-center space-x-2">
-              {profile?.isVerified && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <CheckCircle className="h-4 w-4 text-blue-500" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Verified Account</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-              {profile?.isBanned && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <ShieldAlert className="h-4 w-4 text-red-500" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Banned Account</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
-          <p className="text-sm text-muted-foreground">{profile?.bio || "No bio available"}</p>
+    <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col items-center md:items-start">
+        <div className="relative">
+          <Avatar className="h-24 w-24 border-4 border-background shadow-md">
+            <AvatarImage src={profile.profileImage} alt={profile.fullName} />
+            <AvatarFallback className="text-xl font-bold">
+              {profile.fullName.split(' ').map(n => n[0]).join('')}
+            </AvatarFallback>
+          </Avatar>
           
-          <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-            {profile?.location && (
-              <div className="flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                <span>{profile.location}</span>
-              </div>
-            )}
-            
-            {profile?.website && (
-              <div className="flex items-center gap-1">
-                <LinkIcon className="h-3 w-3" />
-                <a href={profile.website} target="_blank" rel="noopener noreferrer" className="hover:text-accent-color transition-colors">
-                  {new URL(profile.website).hostname}
-                </a>
-              </div>
-            )}
-            
-            {profile?.githubProfile && (
-              <div className="flex items-center gap-1">
-                <Github className="h-3 w-3" />
-                <a href={`https://github.com/${profile.githubProfile}`} target="_blank" rel="noopener noreferrer" className="hover:text-accent-color transition-colors">
-                  {profile.githubProfile}
-                </a>
-              </div>
-            )}
-          </div>
-          
-          <div className="flex items-center space-x-2">
+          {profile.isOnline && (
+            <span className="absolute bottom-1 right-1 h-4 w-4 rounded-full bg-green-500 border-2 border-background"></span>
+          )}
+        </div>
+        
+        <div className="flex gap-2 mt-3">
+          {profile.isVerified && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={copyProfileLink}>
-                    <Copy className="h-4 w-4" />
-                  </Button>
+                  <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center">
+                    <CheckCircle className="h-3 w-3 text-white" />
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Copy profile link</p>
+                  <p>Verified User</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <Button variant="outline" size="sm">
-              <Edit className="mr-2 h-4 w-4" /> Edit Profile
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleFollow} 
-              disabled={loading}
-              className={isFollowing ? "bg-accent/10" : ""}
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : isFollowing ? (
-                <>
-                  <UserMinus className="mr-2 h-4 w-4" /> Unfollow
-                </>
-              ) : (
-                <>
-                  <UserPlus className="mr-2 h-4 w-4" /> Follow
-                </>
-              )}
-            </Button>
-          </div>
+          )}
+          
+          {profile.isBanned && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="h-5 w-5 rounded-full bg-red-500 flex items-center justify-center">
+                    <ShieldAlert className="h-3 w-3 text-white" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Account Restricted</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          
+          {profile.country && (
+            <img 
+              src={`https://flagcdn.com/24x18/${profile.countryCode?.toLowerCase()}.png`}
+              alt={profile.country}
+              className="h-5 rounded"
+            />
+          )}
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-        <div className="bg-accent/5 rounded-lg p-4 text-center">
-          <h4 className="text-sm font-medium">Problems Solved</h4>
-          <p className="text-2xl font-bold">{profile?.problemsSolved}</p>
+      <div className="flex-1 flex flex-col md:items-start items-center text-center md:text-left">
+        <div className="flex flex-wrap gap-2 items-center">
+          <h1 className="text-2xl font-bold">{profile.fullName}</h1>
+          
+          {profile.ranking <= 100 && (
+            <Badge className="bg-gradient-to-r from-amber-500 to-yellow-300 text-zinc-900">
+              Top {profile.ranking}
+            </Badge>
+          )}
         </div>
-        <div className="bg-accent/5 rounded-lg p-4 text-center">
-          <h4 className="text-sm font-medium">Current Streak</h4>
-          <p className="text-2xl font-bold">{profile?.dayStreak} days</p>
+        
+        <div className="flex items-center gap-1 mt-1">
+          <span className="text-lg text-muted-foreground font-medium">@{profile.username}</span>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-6 w-6" 
+                  onClick={handleCopyUsername}
+                >
+                  <Copy className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Copy username</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
-        <div className="bg-accent/5 rounded-lg p-4 text-center">
-          <h4 className="text-sm font-medium">Ranking</h4>
-          <p className="text-2xl font-bold">#{profile?.ranking}</p>
+        
+        {profile.bio && (
+          <p className="mt-2 text-muted-foreground">{profile.bio}</p>
+        )}
+        
+        <div className="flex flex-wrap items-center gap-4 mt-3">
+          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <CalendarDays className="h-4 w-4" />
+            <span>Joined {new Date(profile.joinedDate).toLocaleDateString()}</span>
+          </div>
+          
+          {profile.followers !== undefined && (
+            <div className="flex items-center gap-4">
+              <span className="text-sm"><strong>{profile.followers}</strong> followers</span>
+              <span className="text-sm"><strong>{profile.following}</strong> following</span>
+            </div>
+          )}
+        </div>
+        
+        <div className="flex flex-wrap gap-2 mt-4">
+          {isOwnProfile ? (
+            <Button variant="outline" className="flex items-center gap-1.5">
+              <Edit className="h-4 w-4" />
+              Edit Profile
+            </Button>
+          ) : (
+            <Button 
+              variant={isFollowing ? "outline" : "default"}
+              className={isFollowing ? "" : "accent-color"}
+              onClick={handleFollow}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : isFollowing ? (
+                <UserMinus className="h-4 w-4 mr-2" />
+              ) : (
+                <UserPlus className="h-4 w-4 mr-2" />
+              )}
+              {isFollowing ? "Following" : "Follow"}
+            </Button>
+          )}
+          
+          <Button variant="outline">
+            Message
+          </Button>
+        </div>
+      </div>
+      
+      <div className="md:ml-auto flex items-center gap-4 mt-4 md:mt-0">
+        <div className="flex flex-col items-center p-3 border border-border/50 rounded-lg min-w-[100px]">
+          <span className="text-2xl font-bold">{profile.problemsSolved}</span>
+          <span className="text-sm text-muted-foreground">Problems</span>
+        </div>
+        
+        <div className="flex flex-col items-center p-3 border border-border/50 rounded-lg min-w-[100px]">
+          <span className="text-2xl font-bold">{profile.dayStreak}</span>
+          <span className="text-sm text-muted-foreground">Day Streak</span>
         </div>
       </div>
     </div>

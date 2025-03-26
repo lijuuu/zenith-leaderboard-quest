@@ -18,7 +18,18 @@ import {
   Share2,
   Users,
   User,
-  Copy
+  Copy,
+  BarChart3,
+  UserX,
+  LucideProps,
+  AlertTriangle,
+  ChevronDown,
+  ChevronRight,
+  Code,
+  Trophy,
+  CheckCircle,
+  FileOutput,
+  ListChecks
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -48,8 +59,16 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Progress } from "@/components/ui/progress";
 import { cn } from '@/lib/utils';
 import { Challenge } from '@/api/types';
+import { toast } from 'sonner';
 
 interface ChallengeInterfaceProps {
   challenge?: Challenge;
@@ -63,6 +82,8 @@ const ChallengeInterface: React.FC<ChallengeInterfaceProps> = ({ challenge, isPr
   const [opponentProgress, setOpponentProgress] = useState(0);
   const [myProgress, setMyProgress] = useState(0);
   const [showOpponentCode, setShowOpponentCode] = useState(false);
+  const [exitWarningOpen, setExitWarningOpen] = useState(false);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
   
   // Simulate time decreasing
   useEffect(() => {
@@ -119,398 +140,562 @@ const ChallengeInterface: React.FC<ChallengeInterfaceProps> = ({ challenge, isPr
     }
   };
   
+  const handleForfeitChallenge = () => {
+    setExitWarningOpen(true);
+  };
+  
+  const confirmForfeit = () => {
+    toast({
+      title: "Challenge forfeited",
+      description: "You have exited the challenge. This will not be counted in your stats.",
+      variant: "destructive"
+    });
+    setExitWarningOpen(false);
+    // In a real app, this would navigate away from the challenge
+  };
+  
+  const cancelForfeit = () => {
+    setExitWarningOpen(false);
+  };
+  
+  // Mock problems in the challenge
+  const problems = [
+    { id: 'p1', title: 'Two Sum', difficulty: 'Easy', completed: true },
+    { id: 'p2', title: 'Valid Parentheses', difficulty: 'Easy', completed: false },
+    { id: 'p3', title: 'Merge Two Sorted Lists', difficulty: 'Medium', completed: false },
+    { id: 'p4', title: 'LRU Cache', difficulty: 'Hard', completed: false },
+  ];
+  
+  const currentProblem = problems[currentProblemIndex];
+  
+  // Mock participants
+  const participants = [
+    { id: '1', name: 'John Doe', avatar: 'https://i.pravatar.cc/150?img=1', progress: 75, completed: 2, status: 'active' },
+    { id: '2', name: 'Jane Smith', avatar: 'https://i.pravatar.cc/150?img=2', progress: 50, completed: 1, status: 'active' },
+    { id: '3', name: 'Bob Johnson', avatar: 'https://i.pravatar.cc/150?img=3', progress: 25, completed: 0, status: 'active' },
+    { id: '4', name: 'Alice Brown', avatar: 'https://i.pravatar.cc/150?img=4', progress: 0, completed: 0, status: 'exited' },
+  ];
+  
+  // Mock leaderboard
+  const leaderboard = participants.sort((a, b) => b.progress - a.progress);
+  
+  const getDifficultyBadge = (difficulty: string) => {
+    switch (difficulty.toLowerCase()) {
+      case 'easy':
+        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">Easy</Badge>;
+      case 'medium':
+        return <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">Medium</Badge>;
+      case 'hard':
+        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">Hard</Badge>;
+      default:
+        return <Badge variant="outline">{difficulty}</Badge>;
+    }
+  };
+  
   return (
-    <div className="h-full flex flex-col lg:flex-row">
-      {/* Left side - Code Editor */}
-      <div className="flex-1 min-h-[400px] lg:min-h-full flex flex-col">
-        {isPrivate && (
-          <div className="bg-amber-100 dark:bg-amber-900/30 p-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Lock className="text-amber-500 h-4 w-4" />
-              <span className="font-medium text-amber-700 dark:text-amber-400">Private Challenge</span>
+    <div className="h-full flex flex-col">
+      {/* Top bar with challenge info and actions */}
+      <div className="border-b border-border flex justify-between p-3 bg-background sticky top-0 z-30">
+        <div className="flex items-center gap-2">
+          {isPrivate ? (
+            <>
+              <Lock className="text-amber-500 h-5 w-5" />
+              <span className="font-medium text-lg">Private Challenge</span>
               {accessCode && (
                 <Badge variant="outline" className="ml-2 border-amber-300 dark:border-amber-700">
                   Code: {accessCode}
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-5 w-5 ml-1 -mr-1 p-0.5"
+                    onClick={copyAccessCode}
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                  </Button>
                 </Badge>
               )}
-            </div>
-            
-            {accessCode && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={copyAccessCode}
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Copy access code</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </div>
-        )}
+            </>
+          ) : (
+            <>
+              <Trophy className="text-blue-500 h-5 w-5" />
+              <span className="font-medium text-lg">Coding Challenge</span>
+            </>
+          )}
+        </div>
         
-        <div className="bg-zinc-100 dark:bg-zinc-900 p-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Zap className="text-amber-500 h-4 w-4" />
-            <span className="font-medium">Challenge: Two Sum</span>
-          </div>
-          
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-3 py-1.5 border border-red-200 dark:border-red-800/50 bg-red-100/50 dark:bg-red-900/20 rounded-md">
             <Clock className="h-4 w-4 text-red-500" />
-            <span className="font-medium">{timeRemaining}</span>
+            <span className="font-medium text-red-700 dark:text-red-400">{timeRemaining}</span>
           </div>
-        </div>
-        
-        {/* Code editor placeholder */}
-        <div className="flex-1 bg-zinc-50 dark:bg-zinc-950 p-4 font-mono text-sm">
-          <div className="flex justify-between mb-2">
-            <span className="text-zinc-500">// Write your solution here</span>
-            <span className="text-zinc-500">JavaScript</span>
-          </div>
-          <div className="text-zinc-800 dark:text-zinc-200">
-            function twoSum(nums, target) {'{'}
-              <br />
-            &nbsp;&nbsp;// Your code here<br />
-            &nbsp;&nbsp;const map = {'{'}{'}'};
-              <br />
-            &nbsp;&nbsp;for (let i = 0; i &lt; nums.length; i++) {'{'}
-              <br />
-            &nbsp;&nbsp;&nbsp;&nbsp;const complement = target - nums[i];<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;if (map[complement] !== undefined) {'{'}
-              <br />
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return [map[complement], i];<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;{'}'}
-              <br />
-            &nbsp;&nbsp;&nbsp;&nbsp;map[nums[i]] = i;<br />
-            &nbsp;&nbsp;{'}'}
-              <br />
-            {'}'}
-          </div>
-        </div>
-        
-        <div className="bg-zinc-100 dark:bg-zinc-900 p-3 flex items-center justify-between">
-          <Button variant="default" className="bg-green-600 hover:bg-green-700">
-            <Play className="h-4 w-4 mr-2" />
-            Run Code
-          </Button>
           
-          <Button variant="default">
-            <Send className="h-4 w-4 mr-2" />
-            Submit Solution
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="text-red-600 border-red-200 dark:border-red-800/50 hover:bg-red-100/50 dark:hover:bg-red-900/20"
+                  onClick={handleForfeitChallenge}
+                >
+                  <UserX className="h-4 w-4 mr-2" />
+                  Forfeit
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Exit the challenge without completing</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
       
-      {/* Right side - Problem and Chat */}
-      <div className="w-full lg:w-[350px] flex flex-col border-l border-zinc-200 dark:border-zinc-800">
-        <Tabs defaultValue="problem" className="h-full flex flex-col">
-          <TabsList className="grid grid-cols-3 mx-4 mt-2">
-            <TabsTrigger value="problem">Problem</TabsTrigger>
-            <TabsTrigger value="progress">Progress</TabsTrigger>
-            <TabsTrigger value="chat">Chat</TabsTrigger>
-          </TabsList>
+      <div className="flex-1 flex flex-col lg:flex-row">
+        {/* Left side - Problems list and editor */}
+        <div className="lg:w-[250px] border-r border-border flex flex-col">
+          <div className="p-3 border-b border-border bg-muted/30">
+            <h3 className="font-medium flex items-center gap-1.5">
+              <ListChecks className="h-4 w-4 text-accent-color" />
+              Challenge Problems
+            </h3>
+          </div>
           
-          <TabsContent value="problem" className="flex-1 overflow-auto p-4">
-            <h2 className="text-xl font-bold mb-2">Two Sum</h2>
-            <div className="flex items-center gap-2 mb-4">
-              <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">Easy</Badge>
-              <Badge className="bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100">Array</Badge>
-              <Badge className="bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100">Hash Table</Badge>
-            </div>
-            
-            <p className="mb-4">
-              Given an array of integers <code className="bg-zinc-100 dark:bg-zinc-800 px-1 rounded">nums</code> and an integer <code className="bg-zinc-100 dark:bg-zinc-800 px-1 rounded">target</code>, return indices of the two numbers such that they add up to <code className="bg-zinc-100 dark:bg-zinc-800 px-1 rounded">target</code>.
-            </p>
-            
-            <p className="mb-4">
-              You may assume that each input would have exactly one solution, and you may not use the same element twice.
-            </p>
-            
-            <div className="mb-4">
-              <h3 className="font-bold mb-2">Example 1:</h3>
-              <pre className="bg-zinc-100 dark:bg-zinc-800 p-3 rounded">
-                <code>
-                  Input: nums = [2,7,11,15], target = 9<br />
-                  Output: [0,1]<br />
-                  Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
-                </code>
-              </pre>
-            </div>
-            
-            <div className="mb-4">
-              <h3 className="font-bold mb-2">Example 2:</h3>
-              <pre className="bg-zinc-100 dark:bg-zinc-800 p-3 rounded">
-                <code>
-                  Input: nums = [3,2,4], target = 6<br />
-                  Output: [1,2]
-                </code>
-              </pre>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="progress" className="flex-1 overflow-auto p-4 space-y-6">
-            {isPrivate && (
-              <Card className="shadow-none bg-amber-50/50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/50">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-amber-500" />
-                    Private Challenge
-                  </CardTitle>
-                  <CardDescription>
-                    <span className="text-amber-700 dark:text-amber-400">
-                      Only invited participants can join this challenge
-                    </span>
-                  </CardDescription>
-                </CardHeader>
-                {accessCode && (
-                  <CardContent>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-amber-100 dark:bg-amber-900/50 p-2 rounded border border-amber-200 dark:border-amber-800/50 font-mono text-center">
-                        {accessCode}
-                      </div>
-                      <Button 
-                        size="icon" 
-                        variant="outline"
-                        className="h-9 w-9 border-amber-200 dark:border-amber-800/50"
-                        onClick={copyAccessCode}
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
-                      Share this code with others to invite them to your challenge
-                    </p>
-                  </CardContent>
+          <div className="flex flex-col overflow-y-auto">
+            {problems.map((problem, index) => (
+              <button
+                key={problem.id}
+                className={cn(
+                  "flex flex-col p-3 border-b border-border/50 text-left hover:bg-accent/5 transition-colors",
+                  index === currentProblemIndex && "bg-accent/10"
                 )}
-              </Card>
-            )}
-            
-            <Card className="shadow-none">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Award className="h-4 w-4 text-amber-500" />
-                  Challenge Progress
-                </CardTitle>
-                <CardDescription>
-                  Track progress against your opponents
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-green-500 text-white flex items-center justify-center">
-                        Y
-                      </div>
-                      <span className="font-medium">You</span>
-                    </div>
-                    <span className="text-sm">{Math.round(myProgress)}%</span>
-                  </div>
-                  <div className="h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-green-500 transition-all duration-1000"
-                      style={{ width: `${myProgress}%` }}
-                    />
-                  </div>
+                onClick={() => setCurrentProblemIndex(index)}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{problem.title}</span>
+                  {problem.completed && <CheckCircle className="h-4 w-4 text-green-500" />}
                 </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
-                        O
-                      </div>
-                      <span className="font-medium">Opponent</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => setShowOpponentCode(!showOpponentCode)}
-                      >
-                        {showOpponentCode ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                      <span className="text-sm">{Math.round(opponentProgress)}%</span>
-                    </div>
-                  </div>
-                  <div className="h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-blue-500 transition-all duration-1000"
-                      style={{ width: `${opponentProgress}%` }}
-                    />
-                  </div>
+                <div className="flex items-center justify-between mt-1">
+                  {getDifficultyBadge(problem.difficulty)}
+                  <span className="text-xs text-muted-foreground">#{index + 1}</span>
                 </div>
-              </CardContent>
-            </Card>
+              </button>
+            ))}
+          </div>
+          
+          <div className="mt-auto p-3 border-t border-border">
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Problems Completed</h4>
+              <Progress value={25} className="h-2" />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>1/4 completed</span>
+                <span>25%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Middle - Code Editor */}
+        <div className="flex-1 flex flex-col">
+          <div className="flex items-center justify-between p-3 border-b border-border bg-muted/30">
+            <div>
+              <h3 className="font-medium">{currentProblem.title}</h3>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Problem #{currentProblemIndex + 1}</span>
+                <span>•</span>
+                <span>{getDifficultyBadge(currentProblem.difficulty)}</span>
+              </div>
+            </div>
             
-            {showOpponentCode && (
-              <Card className="shadow-none">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Opponent's Code</CardTitle>
+            <Button variant="outline" size="sm">
+              <Eye className="h-4 w-4 mr-2" />
+              View Problem
+            </Button>
+          </div>
+          
+          <div className="flex-1 bg-muted/10 p-4 font-mono text-sm overflow-auto">
+            <div className="flex justify-between mb-2">
+              <span className="text-muted-foreground">// Write your solution here</span>
+              <span className="text-muted-foreground">JavaScript</span>
+            </div>
+            <div className="text-foreground">
+              function twoSum(nums, target) {'{'}
+                <br />
+              &nbsp;&nbsp;// Your code here<br />
+              &nbsp;&nbsp;const map = {'{'}{'}'};
+                <br />
+              &nbsp;&nbsp;for (let i = 0; i &lt; nums.length; i++) {'{'}
+                <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;const complement = target - nums[i];<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;if (map[complement] !== undefined) {'{'}
+                <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return [map[complement], i];<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;{'}'}
+                <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;map[nums[i]] = i;<br />
+              &nbsp;&nbsp;{'}'}
+                <br />
+              {'}'}
+            </div>
+          </div>
+          
+          <div className="bg-background p-3 border-t border-border flex items-center justify-between">
+            <div className="flex gap-2">
+              <Button variant="default" className="bg-green-600 hover:bg-green-700">
+                <Play className="h-4 w-4 mr-2" />
+                Run Code
+              </Button>
+              
+              <Button variant="outline">
+                <FileOutput className="h-4 w-4 mr-2" />
+                Test Cases
+              </Button>
+            </div>
+            
+            <Button variant="default" className="accent-color">
+              <Send className="h-4 w-4 mr-2" />
+              Submit Solution
+            </Button>
+          </div>
+        </div>
+        
+        {/* Right side - Challenge Progress and Leaderboard */}
+        <div className="lg:w-[300px] border-l border-border flex flex-col">
+          <Tabs defaultValue="progress" className="flex-1 flex flex-col">
+            <TabsList className="mx-3 mt-3 mb-0">
+              <TabsTrigger value="progress">Progress</TabsTrigger>
+              <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
+              <TabsTrigger value="chat">Chat</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="progress" className="flex-1 overflow-auto p-3 m-0">
+              {isPrivate && (
+                <Card className="shadow-none bg-amber-50/50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/50 mb-4">
+                  <CardHeader className="py-3 px-4">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Lock className="h-4 w-4 text-amber-500" />
+                      Private Challenge
+                    </CardTitle>
+                  </CardHeader>
+                  {accessCode && (
+                    <CardContent className="py-0 px-4 pb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 bg-amber-100 dark:bg-amber-900/50 p-2 rounded border border-amber-200 dark:border-amber-800/50 font-mono text-center">
+                          {accessCode}
+                        </div>
+                        <Button 
+                          size="icon" 
+                          variant="outline"
+                          className="h-9 w-9 border-amber-200 dark:border-amber-800/50"
+                          onClick={copyAccessCode}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  )}
+                </Card>
+              )}
+              
+              <Card className="shadow-none mb-4">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 text-accent-color" />
+                    Your Progress
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <pre className="text-xs bg-zinc-100 dark:bg-zinc-800 p-3 rounded overflow-x-auto">
-                    <code>
-                      function twoSum(nums, target) {'{'}<br />
-                      &nbsp;&nbsp;for (let i = 0; i &lt; nums.length; i++) {'{'}<br />
-                      &nbsp;&nbsp;&nbsp;&nbsp;for (let j = i + 1; j &lt; nums.length; j++) {'{'}<br />
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (nums[i] + nums[j] === target) {'{'}<br />
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return [i, j];<br />
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{'}'}<br />
-                      &nbsp;&nbsp;&nbsp;&nbsp;{'}'}<br />
-                      &nbsp;&nbsp;{'}'}<br />
-                      &nbsp;&nbsp;return [];<br />
-                      {'}'}
-                    </code>
-                  </pre>
+                <CardContent className="py-0 px-4 pb-3">
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-sm">Overall</span>
+                        <span className="text-sm font-medium">{Math.round(myProgress)}%</span>
+                      </div>
+                      <Progress value={myProgress} className="h-2" />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                      {problems.map((problem, index) => (
+                        <div key={problem.id} className="border border-border/50 rounded-md p-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-muted-foreground">Problem #{index + 1}</span>
+                            {problem.completed ? (
+                              <CheckCircle className="h-3 w-3 text-green-500" />
+                            ) : (
+                              <Clock className="h-3 w-3 text-amber-500" />
+                            )}
+                          </div>
+                          <div className="text-sm font-medium truncate mt-1">{problem.title}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
-            )}
+              
+              <Card className="shadow-none mb-4">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Users className="h-4 w-4 text-blue-500" />
+                    Participants
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="py-0 px-4 pb-3">
+                  <div className="space-y-3">
+                    {participants.map((participant) => (
+                      <div key={participant.id} className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={participant.avatar} alt={participant.name} />
+                          <AvatarFallback>
+                            {participant.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-sm truncate">{participant.name}</span>
+                            {participant.status === 'exited' && (
+                              <Badge variant="outline" className="text-muted-foreground text-xs">Exited</Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <Progress value={participant.progress} className="h-1.5 flex-1" />
+                            <span className="text-xs">{participant.progress}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="shadow-none">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Code className="h-4 w-4 text-purple-500" />
+                    Opponent's Code
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="py-0 px-4 pb-3">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm">View opponent's solutions</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowOpponentCode(!showOpponentCode)}
+                    >
+                      {showOpponentCode ? (
+                        <>
+                          <EyeOff className="h-3 w-3 mr-1.5" />
+                          Hide
+                        </>
+                      ) : (
+                        <>
+                          <Eye className="h-3 w-3 mr-1.5" />
+                          Show
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  {showOpponentCode ? (
+                    <pre className="text-xs bg-muted p-3 rounded overflow-x-auto mt-2">
+                      <code>
+                        function twoSum(nums, target) {'{'}<br />
+                        &nbsp;&nbsp;for (let i = 0; i &lt; nums.length; i++) {'{'}<br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;for (let j = i + 1; j &lt; nums.length; j++) {'{'}<br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (nums[i] + nums[j] === target) {'{'}<br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return [i, j];<br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{'}'}<br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;{'}'}<br />
+                        &nbsp;&nbsp;{'}'}<br />
+                        &nbsp;&nbsp;return [];<br />
+                        {'}'}
+                      </code>
+                    </pre>
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <EyeOff className="h-8 w-8 mx-auto mb-2 opacity-20" />
+                      <p className="text-sm">Code is hidden</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
             
-            <Card className="shadow-none">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Test Cases</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm p-2 bg-green-100 dark:bg-green-900/30 rounded">
-                    <span>Test Case #1</span>
-                    <Check className="h-4 w-4 text-green-600 dark:text-green-500" />
+            <TabsContent value="leaderboard" className="flex-1 overflow-auto p-3 m-0">
+              <Card className="shadow-none">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Trophy className="h-4 w-4 text-amber-500" />
+                    Live Leaderboard
+                  </CardTitle>
+                  <CardDescription>
+                    Real-time rankings of participants
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="py-0 px-4 pb-3">
+                  <div className="space-y-3">
+                    {leaderboard.map((participant, index) => (
+                      <div 
+                        key={participant.id} 
+                        className={cn(
+                          "flex items-center gap-3 p-2 rounded-md",
+                          index === 0 && "bg-amber-100/50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/50"
+                        )}
+                      >
+                        <div className={cn(
+                          "flex items-center justify-center w-6 h-6 rounded-full text-xs font-medium",
+                          index === 0 && "bg-amber-500 text-white",
+                          index === 1 && "bg-zinc-400 text-white",
+                          index === 2 && "bg-amber-800 text-white",
+                          index > 2 && "bg-muted text-muted-foreground"
+                        )}>
+                          {index + 1}
+                        </div>
+                        
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={participant.avatar} alt={participant.name} />
+                          <AvatarFallback>
+                            {participant.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-sm truncate">{participant.name}</span>
+                            <span className="text-sm font-medium">{participant.progress}%</span>
+                          </div>
+                          <div className="flex items-center justify-between mt-0.5">
+                            <span className="text-xs text-muted-foreground">
+                              {participant.completed} completed
+                            </span>
+                            <Progress value={participant.progress} className="w-24 h-1.5" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="flex items-center justify-between text-sm p-2 bg-green-100 dark:bg-green-900/30 rounded">
-                    <span>Test Case #2</span>
-                    <Check className="h-4 w-4 text-green-600 dark:text-green-500" />
+                </CardContent>
+              </Card>
+              
+              <Card className="shadow-none mt-4">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    Problems Solved
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="py-0 px-4 pb-3">
+                  <div className="space-y-3">
+                    {problems.map((problem, index) => (
+                      <div key={problem.id} className="border border-border/50 rounded-md p-3">
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium">{problem.title}</span>
+                          {getDifficultyBadge(problem.difficulty)}
+                        </div>
+                        
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-sm text-muted-foreground">
+                            Solved by {index === 0 ? '2/4' : '0/4'} participants
+                          </span>
+                          <Progress value={index === 0 ? 50 : 0} className="w-24 h-1.5" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="flex items-center justify-between text-sm p-2 bg-red-100 dark:bg-red-900/30 rounded">
-                    <span>Test Case #3</span>
-                    <X className="h-4 w-4 text-red-600 dark:text-red-500" />
-                  </div>
-                  <div className="flex items-center justify-between text-sm p-2 bg-zinc-100 dark:bg-zinc-800 rounded">
-                    <span>Test Case #4</span>
-                    <Clock className="h-4 w-4 text-zinc-500" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
             
-            <Card className="shadow-none">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Users className="h-4 w-4 text-blue-500" />
-                  Participants
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex -space-x-2 overflow-hidden mb-3">
-                  {[1, 2, 3, 4, 5].map((idx) => (
-                    <Avatar key={idx} className="border-2 border-background w-8 h-8">
-                      <AvatarImage src={`https://i.pravatar.cc/300?img=${idx}`} alt="Participant" />
-                      <AvatarFallback>
-                        <User className="h-4 w-4" />
-                      </AvatarFallback>
-                    </Avatar>
-                  ))}
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 text-xs border-2 border-background">
-                    +3
+            <TabsContent value="chat" className="flex-1 flex flex-col m-0 p-0">
+              <div className="flex-1 overflow-y-auto p-3 space-y-4">
+                <div className="flex gap-2">
+                  <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0">
+                    B
+                  </div>
+                  <div className="bg-muted rounded-lg p-3 max-w-[80%] text-sm">
+                    <p>Hey, have you solved problems like this before?</p>
+                    <span className="text-xs text-muted-foreground mt-1 block">10:30 AM</span>
                   </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="flex items-center gap-1">
-                      <User className="h-3 w-3" />
-                      Total Participants
-                    </span>
-                    <span>8</span>
+                <div className="flex gap-2 justify-end">
+                  <div className="bg-accent-5 rounded-lg p-3 max-w-[80%] text-sm">
+                    <p>Yeah, I think we need to use a hash map to optimize this!</p>
+                    <span className="text-xs text-muted-foreground mt-1 block">10:32 AM</span>
                   </div>
-                  <Separator />
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="flex items-center gap-1">
-                      <Check className="h-3 w-3 text-green-600 dark:text-green-500" />
-                      Completed
-                    </span>
-                    <span>2</span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3 text-amber-600 dark:text-amber-500" />
-                      In Progress
-                    </span>
-                    <span>6</span>
+                  <div className="h-8 w-8 rounded-full bg-accent-color text-white flex items-center justify-center flex-shrink-0">
+                    Y
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="chat" className="flex-1 flex flex-col">
-            <div className="flex-1 p-4 overflow-y-auto space-y-4">
-              <div className="flex gap-2">
-                <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex-center flex-shrink-0">
-                  O
+                
+                <div className="flex gap-2">
+                  <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0">
+                    B
+                  </div>
+                  <div className="bg-muted rounded-lg p-3 max-w-[80%] text-sm">
+                    <p>Good idea! I was thinking of a brute force approach but a hash map would be O(n) instead of O(n²).</p>
+                    <span className="text-xs text-muted-foreground mt-1 block">10:33 AM</span>
+                  </div>
                 </div>
-                <div className="bg-zinc-100 dark:bg-zinc-800 rounded-lg p-3 max-w-[80%]">
-                  <p className="text-sm">Hey, have you solved problems like this before?</p>
-                  <span className="text-xs text-zinc-500 mt-1 block">10:30 AM</span>
+                
+                <div className="flex justify-center">
+                  <div className="bg-muted/50 rounded-full px-3 py-1 text-xs text-muted-foreground">
+                    System: Test case #1 passed by John Doe
+                  </div>
                 </div>
               </div>
               
-              <div className="flex gap-2 justify-end">
-                <div className="bg-green-100 dark:bg-green-900/30 rounded-lg p-3 max-w-[80%]">
-                  <p className="text-sm">Yeah, I think we need to use a hash map to optimize this!</p>
-                  <span className="text-xs text-zinc-500 mt-1 block">10:32 AM</span>
+              <div className="p-3 border-t border-border mt-auto">
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="text" 
+                    placeholder="Type a message..." 
+                    className="flex-1 bg-muted border-none rounded-lg px-4 py-2 focus:ring-1 focus:ring-accent-color focus:outline-none text-sm"
+                  />
+                  <Button size="icon" className="accent-color h-9 w-9 rounded-lg">
+                    <Send className="h-4 w-4" />
+                  </Button>
                 </div>
-                <div className="h-8 w-8 rounded-full bg-green-500 text-white flex-center flex-shrink-0">
-                  Y
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+      
+      {/* Exit confirmation dialog */}
+      {exitWarningOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-background border border-border rounded-lg max-w-md w-full shadow-lg">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-full">
+                  <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Forfeit Challenge?</h3>
+                  <p className="text-muted-foreground">
+                    Are you sure you want to exit this challenge? Your progress will not be saved and this will not count towards your stats.
+                  </p>
                 </div>
               </div>
               
-              <div className="flex gap-2">
-                <div className="h-8 w-8 rounded-full bg-blue-500 text-white flex-center flex-shrink-0">
-                  O
-                </div>
-                <div className="bg-zinc-100 dark:bg-zinc-800 rounded-lg p-3 max-w-[80%]">
-                  <p className="text-sm">Good idea! I was thinking of a brute force approach but a hash map would be O(n) instead of O(n²).</p>
-                  <span className="text-xs text-zinc-500 mt-1 block">10:33 AM</span>
-                </div>
-              </div>
-              
-              <div className="flex justify-center">
-                <div className="bg-zinc-100 dark:bg-zinc-800 rounded-full px-3 py-1 text-xs">
-                  System: Test case #1 passed by both players
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-4 border-t border-zinc-200 dark:border-zinc-800">
-              <div className="flex items-center gap-2">
-                <input 
-                  type="text" 
-                  placeholder="Type a message..." 
-                  className="flex-1 bg-zinc-100 dark:bg-zinc-800 border-none rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 dark:focus:ring-green-600 focus:outline-none"
-                />
-                <Button size="icon" className="bg-green-500 hover:bg-green-600">
-                  <Send className="h-4 w-4" />
+              <div className="flex justify-end gap-3 mt-6">
+                <Button variant="outline" onClick={cancelForfeit}>
+                  Cancel
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={confirmForfeit}
+                >
+                  <UserX className="h-4 w-4 mr-2" />
+                  Forfeit Challenge
                 </Button>
               </div>
             </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

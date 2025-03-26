@@ -1,318 +1,203 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('https://fonts.cdnfonts.com/s/59278/SFPRODISPLAYREGULAR.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('https://fonts.cdnfonts.com/s/59278/SFPRODISPLAYBOLD.woff') format('woff');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('https://fonts.cdnfonts.com/s/59278/SFPRODISPLAYMEDIUM.woff') format('woff');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
 
 @layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
-
+    
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
-
+    
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-
+    
     --primary: 240 5.9% 10%;
     --primary-foreground: 0 0% 98%;
-
+    
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
-
+    
     --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 5% 64.9%;
-
+    --muted-foreground: 240 3.8% 46.1%;
+    
     --accent: 240 4.8% 95.9%;
     --accent-foreground: 240 5.9% 10%;
-
+    
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-
+    
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-
+    --ring: 240 5% 64.9%;
+    
     --radius: 0.5rem;
     
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 98%;
-    
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 98%;
-    
-    --info: 221 83% 53%;
-    --info-foreground: 0 0% 98%;
-    
-    --green-glow: 135 100% 38%;
-    --red-glow: 0 100% 50%;
-
-    /* Accent Color Variables */
-    --accent-green: 142 76% 36%;
-    --accent-blue: 221 83% 53%; 
-    --accent-purple: 262 83% 58%;
-    --accent-orange: 24 94% 50%;
-    --accent-red: 0 84% 60%;
-    --accent-teal: 174 86% 45%;
+    /* Custom accent colors */
+    --accent-green: 142.1 76.2% 36.3%;
+    --accent-blue: 221.2 83.2% 53.3%;
+    --accent-purple: 262.1 83.3% 57.8%;
+    --accent-orange: 24.6 95% 53.1%;
+    --accent-red: 0 84.2% 60.2%;
+    --accent-teal: 173 80.4% 40.0%;
   }
 
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
-
+    
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
-
+    
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-
+    
     --primary: 0 0% 98%;
     --primary-foreground: 240 5.9% 10%;
-
+    
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
-
+    
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
-
+    
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
-
+    
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-
+    
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
-    
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 98%;
-    
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 98%;
-    
-    --info: 221 83% 53%;
-    --info-foreground: 0 0% 98%;
-    
-    --green-glow: 135 100% 38%;
-    --red-glow: 0 100% 50%;
-
-    /* Accent Color Variables */
-    --accent-green: 142 70% 45%;
-    --accent-blue: 214 100% 60%;
-    --accent-purple: 262 80% 65%;
-    --accent-orange: 24 90% 55%;
-    --accent-red: 0 90% 65%;
-    --accent-teal: 174 80% 50%;
   }
+}
 
+@layer base {
   * {
     @apply border-border;
   }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
   body {
-    @apply bg-background text-foreground antialiased selection:bg-zenblue/10 selection:text-zenblue;
-    font-feature-settings: "ss01", "ss03", "cv01", "cv02", "cv03";
+    @apply bg-background text-foreground;
   }
+}
 
-  /* Accent Color Classes */
-  .accent-green .accent-color {
-    @apply bg-[hsl(var(--accent-green))] text-white;
-  }
-  
-  .accent-blue .accent-color {
-    @apply bg-[hsl(var(--accent-blue))] text-white;
-  }
-  
-  .accent-purple .accent-color {
-    @apply bg-[hsl(var(--accent-purple))] text-white;
-  }
-  
-  .accent-orange .accent-color {
-    @apply bg-[hsl(var(--accent-orange))] text-white;
-  }
-  
-  .accent-red .accent-color {
-    @apply bg-[hsl(var(--accent-red))] text-white;
-  }
-  
-  .accent-teal .accent-color {
-    @apply bg-[hsl(var(--accent-teal))] text-white;
-  }
+.page-container {
+  @apply px-4 md:px-6 lg:px-8 mx-auto max-w-7xl;
+}
 
-  /* Custom Classes */
-  .glass {
-    @apply backdrop-blur-lg bg-white/50 border border-white/20 dark:bg-zinc-900/50 dark:border-zinc-700/30;
-  }
+/* Custom Class for accent colors */
+.text-accent-color {
+  @apply text-[hsl(var(--accent-green))];
+}
 
-  .dark-glass {
-    @apply backdrop-blur-md bg-zinc-900/70 border border-zinc-800/50;
-  }
-  
-  .bento-card {
-    @apply rounded-xl border border-zinc-200/50 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-zinc-800/50 dark:bg-zinc-900/50 dark:backdrop-blur-sm;
-  }
+.accent-green .text-accent-color {
+  @apply text-[hsl(var(--accent-green))];
+}
 
-  .flex-center {
-    @apply flex items-center justify-center;
-  }
+.accent-blue .text-accent-color {
+  @apply text-[hsl(var(--accent-blue))];
+}
 
-  .page-container {
-    @apply w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8;
-  }
+.accent-purple .text-accent-color {
+  @apply text-[hsl(var(--accent-purple))];
+}
 
-  .section-spacing {
-    @apply py-16 md:py-24 lg:py-32;
-  }
+.accent-orange .text-accent-color {
+  @apply text-[hsl(var(--accent-orange))];
+}
 
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
+.accent-red .text-accent-color {
+  @apply text-[hsl(var(--accent-red))];
+}
 
-  .text-balance {
-    text-wrap: balance;
-  }
+.accent-teal .text-accent-color {
+  @apply text-[hsl(var(--accent-teal))];
+}
 
-  .text-shadow-sm {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Foggy grainy texture */
-  .foggy-grain {
-    position: relative;
-  }
-  
-  .foggy-grain::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.15;
-    z-index: -1;
-    pointer-events: none;
-  }
+/* Background with accent color */
+.bg-accent-color {
+  @apply bg-[hsl(var(--accent-green))];
+}
 
-  /* Glow effects */
-  .glow-green {
-    box-shadow: 0 0 15px 2px rgba(var(--green-glow), 0.3);
-  }
-  
-  .glow-red {
-    box-shadow: 0 0 15px 2px rgba(var(--red-glow), 0.3);
-  }
+.accent-green .bg-accent-color {
+  @apply bg-[hsl(var(--accent-green))];
+}
 
-  /* Animation delays */
-  .delay-100 {
-    animation-delay: 100ms;
-  }
-  
-  .delay-200 {
-    animation-delay: 200ms;
-  }
-  
-  .delay-300 {
-    animation-delay: 300ms;
-  }
-  
-  .delay-400 {
-    animation-delay: 400ms;
-  }
-  
-  .delay-500 {
-    animation-delay: 500ms;
-  }
-  
-  .delay-700 {
-    animation-delay: 700ms;
-  }
-  
-  .delay-1000 {
-    animation-delay: 1000ms;
-  }
-  
-  /* Theme specific color classes */
-  .theme-green {
-    @apply text-green-500 dark:text-green-400;
-  }
-  
-  .theme-red {
-    @apply text-red-500 dark:text-red-400;
-  }
-  
-  .theme-success {
-    @apply bg-green-500 text-white dark:bg-green-600;
-  }
-  
-  .theme-warning {
-    @apply bg-amber-500 text-white dark:bg-amber-600;
-  }
-  
-  .theme-error {
-    @apply bg-red-500 text-white dark:bg-red-600;
-  }
-  
-  .theme-info {
-    @apply bg-blue-500 text-white dark:bg-blue-600;
-  }
-  
-  /* Coding platform specific classes */
-  .difficulty-easy {
-    @apply bg-green-500 text-white dark:bg-green-600;
-  }
-  
-  .difficulty-medium {
-    @apply bg-amber-500 text-white dark:bg-amber-600;
-  }
-  
-  .difficulty-hard {
-    @apply bg-red-500 text-white dark:bg-red-600;
-  }
-  
-  .tag-pill {
-    @apply px-3 py-1 rounded-full text-xs font-medium bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200;
-  }
-  
-  .problem-card {
-    @apply bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 transition-all hover:shadow-md;
-  }
-  
-  .code-editor {
-    @apply font-mono text-sm bg-zinc-100 dark:bg-zinc-900 rounded-lg p-4;
-  }
+.accent-blue .bg-accent-color {
+  @apply bg-[hsl(var(--accent-blue))];
+}
+
+.accent-purple .bg-accent-color {
+  @apply bg-[hsl(var(--accent-purple))];
+}
+
+.accent-orange .bg-accent-color {
+  @apply bg-[hsl(var(--accent-orange))];
+}
+
+.accent-red .bg-accent-color {
+  @apply bg-[hsl(var(--accent-red))];
+}
+
+.accent-teal .bg-accent-color {
+  @apply bg-[hsl(var(--accent-teal))];
+}
+
+.bg-accent-5 {
+  @apply bg-[hsl(var(--accent-green))]/5;
+}
+
+.accent-green .bg-accent-5 {
+  @apply bg-[hsl(var(--accent-green))]/5;
+}
+
+.accent-blue .bg-accent-5 {
+  @apply bg-[hsl(var(--accent-blue))]/5;
+}
+
+.accent-purple .bg-accent-5 {
+  @apply bg-[hsl(var(--accent-purple))]/5;
+}
+
+.accent-orange .bg-accent-5 {
+  @apply bg-[hsl(var(--accent-orange))]/5;
+}
+
+.accent-red .bg-accent-5 {
+  @apply bg-[hsl(var(--accent-red))]/5;
+}
+
+.accent-teal .bg-accent-5 {
+  @apply bg-[hsl(var(--accent-teal))]/5;
+}
+
+.bg-accent-10 {
+  @apply bg-[hsl(var(--accent-green))]/10;
+}
+
+.accent-green .bg-accent-10 {
+  @apply bg-[hsl(var(--accent-green))]/10;
+}
+
+.accent-blue .bg-accent-10 {
+  @apply bg-[hsl(var(--accent-blue))]/10;
+}
+
+.accent-purple .bg-accent-10 {
+  @apply bg-[hsl(var(--accent-purple))]/10;
+}
+
+.accent-orange .bg-accent-10 {
+  @apply bg-[hsl(var(--accent-orange))]/10;
+}
+
+.accent-red .bg-accent-10 {
+  @apply bg-[hsl(var(--accent-red))]/10;
+}
+
+.accent-teal .bg-accent-10 {
+  @apply bg-[hsl(var(--accent-teal))]/10;
 }

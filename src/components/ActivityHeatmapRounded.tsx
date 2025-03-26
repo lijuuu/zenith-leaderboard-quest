@@ -1,177 +1,130 @@
 
-import { useEffect, useState } from 'react';
-import { format, parseISO, eachDayOfInterval, addDays, subDays } from 'date-fns';
+import React, { useState } from 'react';
+import { format, parseISO, eachDayOfInterval, subMonths, getMonth } from 'date-fns';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAccentColor } from '@/contexts/AccentColorContext';
 
-type ActivityLevel = 0 | 1 | 2 | 3 | 4;
-
-interface ActivityDay {
+interface HeatmapDataPoint {
   date: string;
   count: number;
-  level: ActivityLevel;
+  level: 0 | 1 | 2 | 3 | 4;
 }
 
 interface ActivityHeatmapRoundedProps {
-  data?: ActivityDay[];
-  daysToShow?: number;
+  data: HeatmapDataPoint[];
+  monthCount?: number;
 }
 
 const ActivityHeatmapRounded: React.FC<ActivityHeatmapRoundedProps> = ({ 
   data = [], 
-  daysToShow = 365 
+  monthCount = 6 
 }) => {
-  const [activityData, setActivityData] = useState<ActivityDay[]>([]);
-  const [hoveredDay, setHoveredDay] = useState<ActivityDay | null>(null);
-
-  useEffect(() => {
-    // If no data is provided, generate random activity data
-    if (data.length === 0) {
-      const today = new Date();
-      const startDate = subDays(today, daysToShow);
-      
-      const days = eachDayOfInterval({ 
-        start: startDate, 
-        end: today 
-      });
-      
-      const generatedData: ActivityDay[] = days.map(day => {
-        // More activity on weekends and random distribution
-        const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-        let randomWeight = Math.random();
-        if (isWeekend) randomWeight *= 1.5;
-        
-        // Higher chance of activity in recent days
-        const recencyBoost = Math.min(1, (daysToShow - days.indexOf(day)) / 100);
-        randomWeight *= recencyBoost;
-        
-        // Random activity count between 0 and 10
-        const count = Math.floor(randomWeight * 10);
-        
-        // Determine activity level based on count
-        let level: ActivityLevel = 0;
-        if (count > 0 && count <= 2) level = 1;
-        else if (count > 2 && count <= 5) level = 2;
-        else if (count > 5 && count <= 8) level = 3;
-        else if (count > 8) level = 4;
-        
-        return {
-          date: format(day, 'yyyy-MM-dd'),
-          count,
-          level
-        };
-      });
-      
-      setActivityData(generatedData);
+  const { accentColor } = useAccentColor();
+  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
+  
+  // Generate date range for the last N months
+  const endDate = new Date();
+  const startDate = subMonths(endDate, monthCount);
+  
+  const allDays = eachDayOfInterval({ start: startDate, end: endDate });
+  
+  // Convert data to a map for easy lookup
+  const activityMap: Record<string, HeatmapDataPoint> = {};
+  data.forEach(item => {
+    activityMap[item.date] = item;
+  });
+  
+  // Group days by month for rendering
+  const monthsData: { month: number; days: Date[] }[] = [];
+  let currentMonth = -1;
+  
+  allDays.forEach(day => {
+    const month = getMonth(day);
+    if (month !== currentMonth) {
+      monthsData.push({ month, days: [day] });
+      currentMonth = month;
     } else {
-      setActivityData(data);
+      monthsData[monthsData.length - 1].days.push(day);
     }
-  }, [data, daysToShow]);
-
+  });
+  
   // Function to get color based on activity level
-  const getColor = (level: ActivityLevel) => {
-    switch (level) {
-      case 0: return 'bg-zinc-800/70 hover:bg-zinc-800';
-      case 1: return 'bg-green-900/80 hover:bg-green-900';
-      case 2: return 'bg-green-700/80 hover:bg-green-700';
-      case 3: return 'bg-green-600/80 hover:bg-green-600';
-      case 4: return 'bg-green-500/90 hover:bg-green-500';
-      default: return 'bg-zinc-800/70 hover:bg-zinc-800';
-    }
+  const getLevelColor = (level: number): string => {
+    const colors: Record<string, string[]> = {
+      green: ['bg-green-50/30 dark:bg-green-950/30', 'bg-green-200 dark:bg-green-800', 'bg-green-300 dark:bg-green-700', 'bg-green-400 dark:bg-green-600', 'bg-green-500 dark:bg-green-500'],
+      blue: ['bg-blue-50/30 dark:bg-blue-950/30', 'bg-blue-200 dark:bg-blue-800', 'bg-blue-300 dark:bg-blue-700', 'bg-blue-400 dark:bg-blue-600', 'bg-blue-500 dark:bg-blue-500'],
+      purple: ['bg-purple-50/30 dark:bg-purple-950/30', 'bg-purple-200 dark:bg-purple-800', 'bg-purple-300 dark:bg-purple-700', 'bg-purple-400 dark:bg-purple-600', 'bg-purple-500 dark:bg-purple-500'],
+      orange: ['bg-orange-50/30 dark:bg-orange-950/30', 'bg-orange-200 dark:bg-orange-800', 'bg-orange-300 dark:bg-orange-700', 'bg-orange-400 dark:bg-orange-600', 'bg-orange-500 dark:bg-orange-500'],
+      red: ['bg-red-50/30 dark:bg-red-950/30', 'bg-red-200 dark:bg-red-800', 'bg-red-300 dark:bg-red-700', 'bg-red-400 dark:bg-red-600', 'bg-red-500 dark:bg-red-500'],
+      teal: ['bg-teal-50/30 dark:bg-teal-950/30', 'bg-teal-200 dark:bg-teal-800', 'bg-teal-300 dark:bg-teal-700', 'bg-teal-400 dark:bg-teal-600', 'bg-teal-500 dark:bg-teal-500'],
+    };
+    
+    const colorSet = colors[accentColor] || colors.green;
+    return colorSet[level] || colorSet[0];
   };
 
-  // Calculate weeks for display
-  const weeks: ActivityDay[][] = [];
-  let currentWeek: ActivityDay[] = [];
-
-  for (let i = 0; i < activityData.length; i++) {
-    const date = parseISO(activityData[i].date);
-    const dayOfWeek = date.getDay();
-    
-    if (dayOfWeek === 0 && currentWeek.length > 0) {
-      weeks.push(currentWeek);
-      currentWeek = [];
-    }
-    
-    currentWeek.push(activityData[i]);
-    
-    if (i === activityData.length - 1) {
-      weeks.push(currentWeek);
-    }
-  }
-
-  // Group month labels with proper spacing
-  const getMonthLabels = () => {
-    if (activityData.length === 0) return [];
-    
-    const months: { label: string, index: number }[] = [];
-    let prevMonth = '';
-    
-    activityData.forEach((day, index) => {
-      const date = parseISO(day.date);
-      const monthLabel = format(date, 'MMM');
-      
-      if (monthLabel !== prevMonth) {
-        months.push({ label: monthLabel, index });
-        prevMonth = monthLabel;
-      }
-    });
-    
-    return months;
+  // Month label formatter
+  const getMonthLabel = (month: number): string => {
+    const date = new Date();
+    date.setMonth(month);
+    return format(date, 'MMM');
   };
-
-  const monthLabels = getMonthLabels();
-
+  
   return (
-    <div className="w-full">
-      <div className="py-2">
-        {/* Month labels */}
-        <div className="flex text-xs text-zinc-500 mb-1 relative">
-          {monthLabels.map((month, idx) => (
-            <div 
-              key={`${month.label}-${idx}`} 
-              className="absolute" 
-              style={{ 
-                left: `${(month.index / activityData.length) * 100}%` 
-              }}
-            >
-              {month.label}
-            </div>
-          ))}
-        </div>
-        
-        <TooltipProvider>
-          <div className="flex gap-1 flex-wrap">
-            {weeks.map((week, weekIndex) => (
-              <div key={weekIndex} className="flex flex-col gap-1">
-                {week.map((day, dayIndex) => (
-                  <Tooltip key={dayIndex}>
-                    <TooltipTrigger asChild>
-                      <div 
-                        className={`w-3 h-3 rounded-sm ${getColor(day.level)} cursor-pointer transition-all duration-200 hover:scale-110`}
-                        onMouseEnter={() => setHoveredDay(day)}
-                        onMouseLeave={() => setHoveredDay(null)}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="text-xs font-medium bg-zinc-900 border-zinc-700">
-                      <p>{format(parseISO(day.date), 'MMMM d, yyyy')}</p>
-                      <p>{day.count} {day.count === 1 ? 'contribution' : 'contributions'}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
+    <div className="space-y-1">
+      <div className="flex justify-start mb-1 space-x-6 px-4">
+        {monthsData.map(({ month }) => (
+          <div key={month} className="text-xs text-muted-foreground min-w-[24px]">
+            {getMonthLabel(month)}
+          </div>
+        ))}
+      </div>
+      
+      <div className="flex space-x-6 px-4">
+        {monthsData.map(({ month, days }, monthIndex) => (
+          <div key={month} className="flex flex-col gap-1">
+            {Array.from({ length: 7 }).map((_, weekdayIndex) => (
+              <div key={weekdayIndex} className="flex gap-1">
+                {days
+                  .filter((_, dayIndex) => dayIndex % 7 === weekdayIndex)
+                  .map(day => {
+                    const dateStr = format(day, 'yyyy-MM-dd');
+                    const activity = activityMap[dateStr];
+                    const level = activity?.level || 0;
+                    const count = activity?.count || 0;
+                    
+                    return (
+                      <TooltipProvider key={dateStr}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div
+                              className={`w-3 h-3 rounded-sm ${getLevelColor(level)} transition-all hover:scale-125 relative`}
+                              onMouseEnter={() => setHoveredDate(dateStr)}
+                              onMouseLeave={() => setHoveredDate(null)}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent side="top" align="center" className="text-xs">
+                            <div className="space-y-1">
+                              <p className="font-medium">{format(day, 'MMM d, yyyy')}</p>
+                              <p>{count} contribution{count !== 1 ? 's' : ''}</p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    );
+                  })}
               </div>
             ))}
           </div>
-        </TooltipProvider>
+        ))}
       </div>
       
-      {/* Fixed height container for the hover information to prevent layout shifts */}
-      <div className="h-6 mt-3">
-        {hoveredDay && (
-          <div className="text-sm font-medium animate-fade-in">
-            <span className="mr-2 text-zinc-400">{format(parseISO(hoveredDay.date), 'MMMM d, yyyy')}:</span>
-            <span className="text-green-400">{hoveredDay.count} {hoveredDay.count === 1 ? 'contribution' : 'contributions'}</span>
-          </div>
-        )}
+      <div className="flex items-center justify-end mt-2 gap-1">
+        <span className="text-xs text-muted-foreground mr-1">Less</span>
+        {[0, 1, 2, 3, 4].map(level => (
+          <div key={level} className={`w-3 h-3 rounded-sm ${getLevelColor(level)}`} />
+        ))}
+        <span className="text-xs text-muted-foreground ml-1">More</span>
       </div>
     </div>
   );

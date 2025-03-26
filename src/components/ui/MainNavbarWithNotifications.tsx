@@ -20,11 +20,11 @@ const MainNavbarWithNotifications = () => {
   const { accentColor } = useAccentColor();
   
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 border-b border-zinc-200 dark:border-zinc-800 bg-background/80 backdrop-blur-sm z-50">
+    <header className="fixed top-0 left-0 right-0 h-16 border-b border-border bg-background/80 backdrop-blur-sm z-50">
       <div className="page-container h-full flex items-center justify-between">
         <div className="flex items-center">
           <Link to="/" className="flex items-center mr-8">
-            <span className={`text-xl font-bold text-[hsl(var(--accent-${accentColor}))]`}>
+            <span className={`text-xl font-bold text-accent-color`}>
               zenx
             </span>
           </Link>
