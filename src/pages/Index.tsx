@@ -13,7 +13,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="animate-page-in">
+    <div className="animate-page-in min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-300/20 via-white to-white dark:from-zinc-800/20 dark:via-zinc-900 dark:to-zinc-900 foggy-grain">
       <Header />
       <main>
         <HeroSection />

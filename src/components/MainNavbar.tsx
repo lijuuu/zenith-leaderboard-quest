@@ -57,7 +57,7 @@ const MainNavbar = () => {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ease-in-out",
         isScrolled || mobileMenuOpen
-          ? "bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800"
+          ? "bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg border-b border-zinc-200 dark:border-zinc-800"
           : "bg-transparent"
       )}
     >
@@ -66,10 +66,10 @@ const MainNavbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-full bg-zinc-900 dark:bg-zinc-700 flex items-center justify-center text-white font-bold text-lg">
-                Z
+                z
               </div>
-              <span className="text-2xl font-bold font-display tracking-tight hidden sm:block">
-                zenX
+              <span className="text-2xl lowercase font-bold font-display tracking-tight hidden sm:block">
+                zenx
               </span>
             </Link>
           </div>
@@ -130,7 +130,7 @@ const MainNavbar = () => {
           mobileMenuOpen ? "transform translate-y-0" : "transform -translate-y-full"
         )}
       >
-        <nav className="border-t border-zinc-200 dark:border-zinc-800 py-4 px-6 space-y-1">
+        <nav className="border-t border-zinc-200 dark:border-zinc-800 py-4 px-6 space-y-1 backdrop-blur-lg">
           {navItems.map((item) => (
             <Link
               key={item.name}

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
+import DarkModeToggle from "./DarkModeToggle";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -12,6 +13,7 @@ const Header = () => {
   const navigationItems = [
     { name: "Home", href: "/" },
     { name: "Leaderboard", href: "/leaderboard" },
+    { name: "Problems", href: "/problems" },
     { name: "Features", href: "/#features" },
     { name: "About", href: "/#about" },
   ];
@@ -39,15 +41,18 @@ const Header = () => {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
         isScrolled
-          ? "bg-white/80 backdrop-blur-lg border-b border-zinc-200/70 py-3"
+          ? "bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg border-b border-zinc-200/70 dark:border-zinc-800/70 py-3"
           : "bg-transparent py-5"
       )}
     >
       <div className="page-container">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold font-display tracking-tight">
-              Zenx
+            <div className="w-10 h-10 rounded-full bg-zinc-900 dark:bg-zinc-700 flex items-center justify-center text-white font-bold text-lg">
+              z
+            </div>
+            <span className="text-2xl lowercase font-bold font-display tracking-tight">
+              zenx
             </span>
           </Link>
 
@@ -59,38 +64,52 @@ const Header = () => {
                 to={item.href}
                 className={cn(
                   "relative text-sm font-medium transition-colors duration-200",
-                  "after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2px] after:bg-zenblue after:origin-left after:scale-x-0 after:transition-transform after:duration-300",
-                  "hover:text-zenblue hover:after:scale-x-100",
+                  "after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2px] after:bg-green-500 after:origin-left after:scale-x-0 after:transition-transform after:duration-300",
+                  "hover:text-green-500 hover:after:scale-x-100",
                   location.pathname === item.href || 
                   (location.pathname === "/" && item.href.startsWith("/#"))
-                    ? "text-zenblue after:scale-x-100"
-                    : "text-zinc-800"
+                    ? "text-green-500 after:scale-x-100"
+                    : "text-zinc-800 dark:text-zinc-200"
                 )}
               >
                 {item.name}
               </Link>
             ))}
+            
+            <div className="pl-2">
+              <DarkModeToggle />
+            </div>
+            
+            <Link
+              to="/login"
+              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-white rounded-md text-sm font-medium transition-colors"
+            >
+              Login
+            </Link>
           </nav>
 
           {/* Mobile menu button */}
-          <button
-            className="flex md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6 text-zinc-800" />
-            ) : (
-              <Menu className="h-6 w-6 text-zinc-800" />
-            )}
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <DarkModeToggle />
+            <button
+              className="p-2 rounded-md text-zinc-800 dark:text-zinc-200"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile Navigation */}
       <div
         className={cn(
-          "fixed inset-0 z-40 bg-white pt-24 px-6 flex flex-col transition-transform duration-300 ease-in-out md:hidden",
+          "fixed inset-0 z-40 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-lg pt-24 px-6 flex flex-col transition-transform duration-300 ease-in-out md:hidden",
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -100,15 +119,22 @@ const Header = () => {
               key={item.name}
               to={item.href}
               className={cn(
-                "text-lg font-medium py-2 border-b border-zinc-100 transition-colors duration-200",
+                "text-lg font-medium py-2 border-b border-zinc-100 dark:border-zinc-800 transition-colors duration-200",
                 location.pathname === item.href
-                  ? "text-zenblue border-zenblue"
-                  : "text-zinc-800"
+                  ? "text-green-500 border-green-500"
+                  : "text-zinc-800 dark:text-zinc-200"
               )}
             >
               {item.name}
             </Link>
           ))}
+          
+          <Link
+            to="/login"
+            className="mt-4 w-full py-3 bg-zinc-800 hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-white rounded-md text-center font-medium transition-colors"
+          >
+            Login
+          </Link>
         </nav>
       </div>
     </header>

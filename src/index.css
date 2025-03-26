@@ -1,5 +1,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -69,6 +70,9 @@
     
     --info: 221 83% 53%;
     --info-foreground: 0 0% 98%;
+    
+    --green-glow: 135 100% 38%;
+    --red-glow: 0 100% 50%;
   }
 
   .dark {
@@ -108,6 +112,9 @@
     
     --info: 221 83% 53%;
     --info-foreground: 0 0% 98%;
+    
+    --green-glow: 135 100% 38%;
+    --red-glow: 0 100% 50%;
   }
 
   * {
@@ -130,6 +137,10 @@
 
   .dark-glass {
     @apply backdrop-blur-md bg-zinc-900/70 border border-zinc-800/50;
+  }
+  
+  .bento-card {
+    @apply rounded-xl border border-zinc-200/50 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-zinc-800/50 dark:bg-zinc-900/50 dark:backdrop-blur-sm;
   }
 
   .flex-center {
@@ -159,6 +170,30 @@
 
   .text-shadow-sm {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Foggy grainy texture */
+  .foggy-grain {
+    position: relative;
+  }
+  
+  .foggy-grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.15;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* Glow effects */
+  .glow-green {
+    box-shadow: 0 0 15px 2px rgba(var(--green-glow), 0.3);
+  }
+  
+  .glow-red {
+    box-shadow: 0 0 15px 2px rgba(var(--red-glow), 0.3);
   }
 
   /* Animation delays */

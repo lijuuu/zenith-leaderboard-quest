@@ -157,15 +157,15 @@ const leaderboardData = [
 const getLevelColor = (level: string) => {
   switch(level) {
     case 'Diamond':
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-100';
     case 'Platinum':
-      return 'bg-teal-100 text-teal-800';
+      return 'bg-teal-100 text-teal-800 dark:bg-teal-900/50 dark:text-teal-100';
     case 'Gold':
-      return 'bg-amber-100 text-amber-800';
+      return 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-100';
     case 'Silver':
-      return 'bg-zinc-100 text-zinc-800';
+      return 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-100';
     default:
-      return 'bg-zinc-100 text-zinc-800';
+      return 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-100';
   }
 };
 
@@ -177,7 +177,7 @@ const RankBadge = ({ rank }: { rank: number }) => {
   } else if (rank === 3) {
     return <Medal className="w-5 h-5 text-amber-700" />;
   } else {
-    return <span className="text-sm font-medium text-zinc-700">{rank}</span>;
+    return <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{rank}</span>;
   }
 };
 
@@ -246,7 +246,7 @@ const Leaderboard = () => {
   };
 
   return (
-    <div className="animate-page-in min-h-screen flex flex-col">
+    <div className="animate-page-in min-h-screen flex flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-300/20 via-white to-white dark:from-zinc-800/20 dark:via-zinc-900 dark:to-zinc-900 foggy-grain">
       <Header />
       
       <main className="flex-grow pt-24 pb-16">
@@ -256,38 +256,38 @@ const Leaderboard = () => {
               <h1 className="text-3xl md:text-4xl font-bold font-display tracking-tight mb-4">
                 Leaderboard
               </h1>
-              <p className="text-lg text-zinc-600">
+              <p className="text-lg text-zinc-600 dark:text-zinc-400">
                 Track performance metrics and see where you stand among other users.
               </p>
             </div>
             
-            <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-sm mb-8">
-              <div className="p-4 border-b border-zinc-200 flex flex-col sm:flex-row justify-between gap-4">
-                <div className="flex items-center gap-2 bg-zinc-100 rounded-lg px-3 py-2 w-full sm:w-auto">
-                  <Search className="w-4 h-4 text-zinc-500" />
+            <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg rounded-xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden shadow-sm mb-8">
+              <div className="p-4 border-b border-zinc-200/50 dark:border-zinc-800/50 flex flex-col sm:flex-row justify-between gap-4">
+                <div className="flex items-center gap-2 bg-zinc-100/80 dark:bg-zinc-800/80 rounded-lg px-3 py-2 w-full sm:w-auto">
+                  <Search className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
                   <input
                     type="text"
                     placeholder="Search users..."
-                    className="bg-transparent border-none outline-none text-sm w-full"
+                    className="bg-transparent border-none outline-none text-sm w-full dark:text-zinc-300"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
                 
                 <div className="flex gap-2">
-                  <button className="bg-zinc-100 hover:bg-zinc-200 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1 transition-colors">
+                  <button className="bg-zinc-100/80 dark:bg-zinc-800/80 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/80 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1 transition-colors">
                     <Filter className="w-4 h-4" />
                     Filters
                   </button>
                   
-                  <div className="inline-flex bg-zinc-100 p-1 rounded-lg">
+                  <div className="inline-flex bg-zinc-100/80 dark:bg-zinc-800/80 p-1 rounded-lg">
                     <button
                       onClick={() => setTimeRange('daily')}
                       className={cn(
                         "px-3 py-1 text-sm font-medium rounded-md transition-all duration-200",
                         timeRange === 'daily' 
-                          ? "bg-white shadow-sm text-zinc-900" 
-                          : "text-zinc-600 hover:text-zinc-900"
+                          ? "bg-white dark:bg-zinc-900 shadow-sm text-zinc-900 dark:text-zinc-100" 
+                          : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
                       )}
                     >
                       Daily
@@ -297,8 +297,8 @@ const Leaderboard = () => {
                       className={cn(
                         "px-3 py-1 text-sm font-medium rounded-md transition-all duration-200",
                         timeRange === 'weekly' 
-                          ? "bg-white shadow-sm text-zinc-900" 
-                          : "text-zinc-600 hover:text-zinc-900"
+                          ? "bg-white dark:bg-zinc-900 shadow-sm text-zinc-900 dark:text-zinc-100" 
+                          : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
                       )}
                     >
                       Weekly
@@ -308,8 +308,8 @@ const Leaderboard = () => {
                       className={cn(
                         "px-3 py-1 text-sm font-medium rounded-md transition-all duration-200",
                         timeRange === 'monthly' 
-                          ? "bg-white shadow-sm text-zinc-900" 
-                          : "text-zinc-600 hover:text-zinc-900"
+                          ? "bg-white dark:bg-zinc-900 shadow-sm text-zinc-900 dark:text-zinc-100" 
+                          : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
                       )}
                     >
                       Monthly
@@ -321,8 +321,8 @@ const Leaderboard = () => {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-zinc-200 bg-zinc-50">
-                      <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                    <tr className="border-b border-zinc-200/50 dark:border-zinc-800/50 bg-zinc-50/80 dark:bg-zinc-800/30">
+                      <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                         <button 
                           className="flex items-center gap-1"
                           onClick={() => handleSort('rank')}
@@ -335,7 +335,7 @@ const Leaderboard = () => {
                           )}
                         </button>
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                         <button 
                           className="flex items-center gap-1"
                           onClick={() => handleSort('name')}
@@ -348,7 +348,7 @@ const Leaderboard = () => {
                           )}
                         </button>
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                         <button 
                           className="flex items-center gap-1"
                           onClick={() => handleSort('level')}
@@ -361,7 +361,7 @@ const Leaderboard = () => {
                           )}
                         </button>
                       </th>
-                      <th className="px-6 py-4 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-right text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                         <button 
                           className="flex items-center gap-1 ml-auto"
                           onClick={() => handleSort('points')}
@@ -374,7 +374,7 @@ const Leaderboard = () => {
                           )}
                         </button>
                       </th>
-                      <th className="px-6 py-4 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-right text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                         <button 
                           className="flex items-center gap-1 ml-auto"
                           onClick={() => handleSort('score')}
@@ -387,14 +387,14 @@ const Leaderboard = () => {
                           )}
                         </button>
                       </th>
-                      <th className="px-6 py-4 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-right text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                         Change
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200">
+                  <tbody className="divide-y divide-zinc-200/50 dark:divide-zinc-800/50">
                     {filteredData.map((user) => (
-                      <tr key={user.id} className="transition-colors hover:bg-zinc-50">
+                      <tr key={user.id} className="transition-colors hover:bg-zinc-50/80 dark:hover:bg-zinc-800/50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <RankBadge rank={user.rank} />
@@ -402,12 +402,12 @@ const Leaderboard = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className="h-10 w-10 rounded-full overflow-hidden border border-zinc-200">
+                            <div className="h-10 w-10 rounded-full overflow-hidden border border-zinc-200/50 dark:border-zinc-700/50">
                               <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-zinc-900">{user.name}</div>
-                              <div className="text-xs text-zinc-500 flex items-center gap-1">
+                              <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{user.name}</div>
+                              <div className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
                                 <Users className="w-3 h-3" />
                                 {user.achievements} achievements
                               </div>
@@ -423,16 +423,16 @@ const Leaderboard = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <div className="text-sm font-semibold text-zinc-900">{user.points.toLocaleString()}</div>
-                          <div className="text-xs text-zinc-500">{user.streak} day streak</div>
+                          <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{user.points.toLocaleString()}</div>
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">{user.streak} day streak</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <div className="text-sm font-semibold text-zinc-900">{user.score}</div>
+                          <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{user.score}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           <div className={cn(
                             "text-sm font-medium",
-                            user.change.startsWith("+") ? "text-emerald-600" : "text-red-600"
+                            user.change.startsWith("+") ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
                           )}>
                             {user.change}
                           </div>
@@ -443,16 +443,16 @@ const Leaderboard = () => {
                 </table>
               </div>
               
-              <div className="py-4 px-6 border-t border-zinc-200 bg-zinc-50 flex justify-between items-center">
-                <div className="text-sm text-zinc-500">
+              <div className="py-4 px-6 border-t border-zinc-200/50 dark:border-zinc-800/50 bg-zinc-50/80 dark:bg-zinc-800/30 flex justify-between items-center">
+                <div className="text-sm text-zinc-500 dark:text-zinc-400">
                   Showing <span className="font-medium">{filteredData.length}</span> of <span className="font-medium">{leaderboardData.length}</span> users
                 </div>
                 
                 <div className="flex gap-2">
-                  <button className="bg-white border border-zinc-200 hover:bg-zinc-50 px-3 py-1 rounded text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none" disabled>
+                  <button className="bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-700/50 hover:bg-zinc-50 dark:hover:bg-zinc-800 px-3 py-1 rounded text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none" disabled>
                     Previous
                   </button>
-                  <button className="bg-white border border-zinc-200 hover:bg-zinc-50 px-3 py-1 rounded text-sm font-medium transition-colors">
+                  <button className="bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-700/50 hover:bg-zinc-50 dark:hover:bg-zinc-800 px-3 py-1 rounded text-sm font-medium transition-colors">
                     Next
                   </button>
                 </div>
