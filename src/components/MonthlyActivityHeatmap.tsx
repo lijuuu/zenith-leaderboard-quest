@@ -82,8 +82,8 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
   // Determine the size of circles based on compact mode
-  const circleSize = compact ? 'w-8 h-8' : 'w-10 h-10';
-  const gap = compact ? 'gap-0.5' : 'gap-1';
+  const circleSize = 'w-12 h-12';
+  const gap = 'gap-0';
   
   return (
     <Card className={`bg-zinc-950 border-zinc-800/50 ${className}`}>

@@ -95,13 +95,13 @@ const Index = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <StatsCard 
                   title="Problems Solved" 
-                  value={userProfileData?.problemsSolved || 124} 
+                  value={userProfileData?.problemsSolved || 147} 
                   change="+3 this week"
                   icon={<Code className="h-4 w-4 text-green-400" />}
                 />
                 <StatsCard 
                   title="Current Streak" 
-                  value={`${userProfileData?.dayStreak || 7} days`}
+                  value={`${userProfileData?.dayStreak || 26} days`}
                   icon={<Zap className="h-4 w-4 text-amber-400" />}
                 />
                 <StatsCard 
@@ -112,7 +112,7 @@ const Index = () => {
                 />
                 <StatsCard 
                   title="Current Rating" 
-                  value={userProfileData?.ranking || 1750} 
+                  value={userProfileData?.ranking || 354} 
                   change="+15"
                   icon={<Award className="h-4 w-4 text-blue-400" />}
                 />
@@ -170,8 +170,8 @@ const Index = () => {
             
             {/* Right Column - Activity & Leaderboard */}
             <div className="space-y-6">
-              {/* Monthly Activity Heatmap - Show on all screen sizes but make it compact */}
-              <MonthlyActivityHeatmap compact={true} />
+              {/* Monthly Activity Heatmap */}
+              <MonthlyActivityHeatmap />
               
               {/* Leaderboard Preview */}
               <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
