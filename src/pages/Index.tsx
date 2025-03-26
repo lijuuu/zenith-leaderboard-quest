@@ -1,208 +1,231 @@
 
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Code, Trophy, Zap, Terminal, Users, CheckCircle2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { useAppDispatch, useAppSelector } from '@/hooks';
+import { fetchUserProfile } from '@/store/slices/userSlice';
+import { Trophy, Users, Code, Zap, Plus, Play, User, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import { Link } from 'react-router-dom';
+import MainNavigation from '@/components/MainNavigation';
+import ReferralBanner from '@/components/ReferralBanner';
+import StatsCard from '@/components/StatsCard';
+import ContributionActivity from '@/components/ContributionActivity';
+import { getUserProfile } from '@/api/userApi';
+import { getProblemStats } from '@/api/problemApi';
+import { getChallenges } from '@/api/challengeApi';
+import { getLeaderboard } from '@/api/leaderboardApi';
 
 const Index = () => {
   const { toast } = useToast();
+  const dispatch = useAppDispatch();
+  const userProfile = useAppSelector((state) => state.user.profile);
   
   useEffect(() => {
     // Scroll to top on component mount
     window.scrollTo(0, 0);
-  }, []);
+    
+    // Load user profile on mount
+    dispatch(fetchUserProfile('1'));
+  }, [dispatch]);
 
-  const features = [
-    {
-      icon: <Code className="w-10 h-10 text-accent-color" />,
-      title: "Diverse Problem Set",
-      description: "Tackle a wide range of coding challenges across different difficulty levels and categories."
-    },
-    {
-      icon: <Trophy className="w-10 h-10 text-accent-color" />,
-      title: "Competitive Leaderboard",
-      description: "Compare your progress with peers and climb the ranks as you solve more problems."
-    },
-    {
-      icon: <Terminal className="w-10 h-10 text-accent-color" />,
-      title: "Integrated Compiler",
-      description: "Write, test, and debug your code in our powerful online compiler environment."
-    },
-    {
-      icon: <Zap className="w-10 h-10 text-accent-color" />,
-      title: "Daily Challenges",
-      description: "Sharpen your skills with our daily coding challenges and earn bonus points."
-    },
-    {
-      icon: <Users className="w-10 h-10 text-accent-color" />,
-      title: "Community Learning",
-      description: "Share solutions, discuss approaches, and learn from the community."
-    },
-    {
-      icon: <CheckCircle2 className="w-10 h-10 text-accent-color" />,
-      title: "Track Progress",
-      description: "Monitor your improvement over time with detailed performance analytics."
-    }
-  ];
+  // Fetch problem stats with React Query
+  const { data: problemStats } = useQuery({
+    queryKey: ['problemStats'],
+    queryFn: () => getProblemStats(),
+  });
+  
+  // Fetch recent challenges with React Query
+  const { data: recentChallenges } = useQuery({
+    queryKey: ['recentChallenges'],
+    queryFn: () => getChallenges({ limit: 3 }),
+  });
+  
+  // Fetch top performers with React Query
+  const { data: topPerformers } = useQuery({
+    queryKey: ['topPerformers'],
+    queryFn: () => getLeaderboard({ limit: 5, period: 'weekly' }),
+  });
 
+  // Fetch user profile with React Query (separate from Redux for demonstration)
+  const { data: userProfileData } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: () => getUserProfile('1'),
+  });
+  
   return (
-    <div className="animate-page-in min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-800/40 via-zinc-900 to-zinc-900 text-white foggy-grain">
-      <Navbar isAuthenticated={false} />
+    <div className="min-h-screen bg-zinc-900 text-white">
+      <MainNavigation />
       
       <main className="pt-20 pb-16">
-        {/* Hero Section */}
-        <section className="py-20">
-          <div className="page-container">
-            <div className="flex flex-col lg:flex-row items-center gap-12">
-              <div className="lg:w-1/2 space-y-6">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display leading-tight">
-                  Master Coding Skills<br />
-                  <span className="text-accent-color">One Challenge</span> at a Time
+        <div className="page-container">
+          {/* Welcome Section */}
+          <section className="pt-6 pb-10">
+            <div className="flex flex-col md:flex-row items-start justify-between gap-6">
+              <div>
+                <h1 className="text-3xl font-bold">
+                  Welcome back, {userProfile?.username || 'Coder'}
                 </h1>
-                
-                <p className="text-lg text-zinc-300 max-w-xl">
-                  Join thousands of developers improving their coding skills through practical problem-solving, competitive challenges, and an engaged community.
+                <p className="text-zinc-400 mt-1">
+                  Continue improving your coding skills and climb the ranks
                 </p>
+              </div>
+              
+              <div className="flex gap-3">
+                <Button className="bg-green-500 hover:bg-green-600 gap-2">
+                  <Plus className="h-4 w-4" />
+                  Create Challenge
+                </Button>
                 
-                <div className="flex flex-wrap gap-4 pt-4">
-                  <Button className="accent-color text-lg px-6 py-6" size="lg" asChild>
-                    <Link to="/problems">
-                      Start Coding <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
+                <Link to="/problems">
+                  <Button variant="outline" className="border-zinc-700 hover:bg-zinc-800 gap-2">
+                    <Code className="h-4 w-4" />
+                    Practice Problems
                   </Button>
-                  
-                  <Button variant="outline" className="text-white border-zinc-700 hover:bg-zinc-800 text-lg px-6 py-6" size="lg" asChild>
-                    <Link to="/challenges">
-                      Explore Challenges
-                    </Link>
-                  </Button>
-                </div>
-                
-                <div className="flex items-center gap-4 pt-4">
-                  <div className="flex -space-x-2">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="w-8 h-8 rounded-full border-2 border-zinc-900 overflow-hidden">
-                        <img 
-                          src={`https://i.pravatar.cc/100?img=${i + 10}`} 
-                          alt="User avatar" 
-                          className="w-full h-full object-cover"
-                        />
+                </Link>
+              </div>
+            </div>
+          </section>
+          
+          {/* Main Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column - Stats & Activity */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <StatsCard 
+                  title="Problems Solved" 
+                  value={userProfileData?.problemsSolved || 124} 
+                  change="+3 this week"
+                  icon={<Code className="h-4 w-4 text-green-400" />}
+                />
+                <StatsCard 
+                  title="Current Streak" 
+                  value={`${userProfileData?.currentStreak || 7} days`}
+                  icon={<Zap className="h-4 w-4 text-amber-400" />}
+                />
+                <StatsCard 
+                  title="Global Rank" 
+                  value={`#${userProfileData?.globalRank || 354}`} 
+                  change="+12"
+                  icon={<Trophy className="h-4 w-4 text-amber-500" />}
+                />
+                <StatsCard 
+                  title="Current Rating" 
+                  value={userProfileData?.currentRating || 1750} 
+                  change="+15"
+                  icon={<Award className="h-4 w-4 text-blue-400" />}
+                />
+              </div>
+              
+              {/* 1v1 Challenges */}
+              <Card className="bg-zinc-800/50 border-zinc-700/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-green-400" />
+                    1v1 Challenges
+                  </CardTitle>
+                  <CardDescription>
+                    Challenge friends or random opponents
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="bg-green-500/10 p-2 rounded-lg">
+                          <Play className="h-5 w-5 text-green-400" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Quick Match</div>
+                          <div className="text-sm text-zinc-400">Find an opponent with similar skill</div>
+                        </div>
+                      </div>
+                      <Button size="sm" className="bg-green-500 hover:bg-green-600">
+                        Start
+                      </Button>
+                    </div>
+                    
+                    <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="bg-blue-500/10 p-2 rounded-lg">
+                          <User className="h-5 w-5 text-blue-400" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Challenge a Friend</div>
+                          <div className="text-sm text-zinc-400">Send a challenge to a specific user</div>
+                        </div>
+                      </div>
+                      <Button size="sm" variant="outline" className="border-zinc-700 hover:bg-zinc-700">
+                        Select
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Referral Banner */}
+              <ReferralBanner />
+            </div>
+            
+            {/* Right Column - Activity & Leaderboard */}
+            <div className="space-y-6">
+              {/* Contribution Activity */}
+              <ContributionActivity />
+              
+              {/* Leaderboard Preview */}
+              <Card className="bg-zinc-800/50 border-zinc-700/50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Trophy className="h-5 w-5 text-amber-500" />
+                    Top Performers
+                  </CardTitle>
+                  <CardDescription>
+                    This week's leading coders
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {(topPerformers?.leaderboard || []).slice(0, 5).map((entry, index) => (
+                      <div key={entry.user.id} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-zinc-900 w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium">
+                            {index === 0 ? (
+                              <Trophy className="h-3.5 w-3.5 text-amber-500" />
+                            ) : (
+                              <span className="text-zinc-400">{index + 1}</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full overflow-hidden">
+                              <img 
+                                src={entry.user.profileImage} 
+                                alt={entry.user.username} 
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div>
+                              <div className="font-medium text-sm">{entry.user.fullName}</div>
+                              <div className="text-xs text-zinc-500">@{entry.user.username}</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="font-semibold text-sm">{entry.score.toLocaleString()}</div>
                       </div>
                     ))}
                   </div>
-                  <p className="text-sm text-zinc-400">
-                    Join <span className="font-bold text-white">10,000+</span> developers worldwide
-                  </p>
-                </div>
-              </div>
-              
-              <div className="lg:w-1/2">
-                <div className="relative">
-                  <div className="aspect-[4/3] w-full max-w-2xl rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950/50 backdrop-blur-sm shadow-xl">
-                    <div className="absolute top-0 w-full h-10 bg-zinc-800/50 flex items-center px-4">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      </div>
-                    </div>
-                    <div className="pt-10 p-6 h-full font-mono text-sm text-green-400 overflow-hidden">
-                      <div className="space-y-2">
-                        <p><span className="text-blue-400">function</span> <span className="text-yellow-400">findMaxSum</span>(arr) {`{`}</p>
-                        <p className="pl-4"><span className="text-purple-400">let</span> maxSoFar = arr[<span className="text-orange-400">0</span>];</p>
-                        <p className="pl-4"><span className="text-purple-400">let</span> maxEndingHere = arr[<span className="text-orange-400">0</span>];</p>
-                        <p className="pl-4"></p>
-                        <p className="pl-4"><span className="text-blue-400">for</span> (<span className="text-purple-400">let</span> i = <span className="text-orange-400">1</span>; i {'<'} arr.length; i++) {`{`}</p>
-                        <p className="pl-8">maxEndingHere = Math.<span className="text-yellow-400">max</span>(arr[i], maxEndingHere + arr[i]);</p>
-                        <p className="pl-8">maxSoFar = Math.<span className="text-yellow-400">max</span>(maxSoFar, maxEndingHere);</p>
-                        <p className="pl-4">{`}`}</p>
-                        <p className="pl-4"></p>
-                        <p className="pl-4"><span className="text-blue-400">return</span> maxSoFar;</p>
-                        <p>{`}`}</p>
-                        <p className="pt-4"><span className="text-zinc-500">// Test the function</span></p>
-                        <p><span className="text-purple-400">const</span> arr = [<span className="text-orange-400">-2, 1, -3, 4, -1, 2, 1, -5, 4</span>];</p>
-                        <p>console.<span className="text-yellow-400">log</span>(findMaxSum(arr)); <span className="text-zinc-500">// Output: 6</span></p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-accent-color/20 rounded-full blur-3xl"></div>
-                  <div className="absolute -top-4 -left-4 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
-                </div>
-              </div>
+                  
+                  <Link to="/leaderboard" className="mt-4 flex items-center text-sm text-green-400 hover:text-green-300 transition-colors group">
+                    View full leaderboard
+                    <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </CardContent>
+              </Card>
             </div>
           </div>
-        </section>
-        
-        {/* Features Section */}
-        <section className="py-20 bg-zinc-900/50">
-          <div className="page-container">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold font-display mb-4">
-                Everything You Need to <span className="text-accent-color">Excel</span>
-              </h2>
-              <p className="text-zinc-300">
-                Our platform provides all the tools and resources you need to become a better programmer.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {features.map((feature, index) => (
-                <div 
-                  key={index} 
-                  className="bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50 rounded-xl p-6 hover:border-accent-color/50 transition-all duration-300 hover:shadow-lg hover:shadow-accent-color/5 h-full"
-                >
-                  <div className="mb-4">{feature.icon}</div>
-                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                  <p className="text-zinc-400">{feature.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        
-        {/* Stats Section */}
-        <section className="py-20">
-          <div className="page-container">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[
-                { value: "10,000+", label: "Active Users" },
-                { value: "500+", label: "Problems" },
-                { value: "50+", label: "Daily Challenges" },
-                { value: "100K+", label: "Submissions" }
-              ].map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-accent-color mb-2">{stat.value}</div>
-                  <div className="text-zinc-400">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        
-        {/* CTA Section */}
-        <section className="py-20 bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900">
-          <div className="page-container">
-            <div className="text-center max-w-3xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold font-display mb-6">
-                Ready to Improve Your <span className="text-accent-color">Coding Skills</span>?
-              </h2>
-              <p className="text-zinc-300 mb-8">
-                Join our platform today and start your journey towards becoming a better programmer.
-              </p>
-              <Button className="accent-color text-lg px-8 py-6" size="lg" asChild>
-                <Link to="/problems">
-                  Get Started Now <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
+        </div>
       </main>
-      
-      <Footer />
     </div>
   );
 };

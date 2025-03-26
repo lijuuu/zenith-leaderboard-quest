@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Share, Copy, Check, AlertCircle } from 'lucide-react';
+import { Share, Copy, Check, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import {
@@ -30,7 +30,7 @@ const ReferralBanner = () => {
   };
   
   return (
-    <Card className="border-green-500/20 bg-green-50/50 dark:bg-green-950/10 backdrop-blur-sm dark:border-green-500/10 overflow-hidden relative">
+    <Card className="border-green-500/20 bg-green-950/10 backdrop-blur-sm dark:border-green-500/10 overflow-hidden relative border-zinc-700/50">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,197,94,0.15),transparent_50%)] pointer-events-none" />
       
       <CardHeader className="pb-2">
@@ -40,7 +40,7 @@ const ReferralBanner = () => {
           </div>
           Clear Recent Inactivity
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-zinc-400">
           Refer a friend to instantly clean up your activity heatmap and earn bonus points
         </CardDescription>
       </CardHeader>
@@ -48,8 +48,8 @@ const ReferralBanner = () => {
       <CardContent>
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-sm">
-            <AlertCircle className="h-4 w-4 text-green-500" />
-            <span className="opacity-90">
+            <Timer className="h-4 w-4 text-green-400" />
+            <span className="text-zinc-300">
               Each successful referral will replace 5 inactive days with activity
             </span>
           </div>
@@ -60,11 +60,11 @@ const ReferralBanner = () => {
                 type="text"
                 value={referralLink}
                 readOnly
-                className="w-full px-3 py-2 rounded-lg border border-zinc-200 bg-white text-sm text-zinc-700 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 focus:ring-2 focus:ring-green-500 dark:focus:ring-green-600 focus:outline-none pr-10"
+                className="w-full px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-800 text-sm text-zinc-300 focus:ring-2 focus:ring-green-500 focus:outline-none pr-10"
               />
               <button 
                 onClick={copyToClipboard}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
                 aria-label="Copy referral link"
               >
                 {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
