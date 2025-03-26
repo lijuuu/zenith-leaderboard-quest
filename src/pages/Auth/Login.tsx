@@ -25,13 +25,15 @@ const formSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -39,10 +41,14 @@ const Login = () => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: FormValues) => {
     try {
       setIsLoading(true);
-      const response = await login(values);
+      // Explicitly pass the values as LoginCredentials with required fields
+      const response = await login({
+        email: values.email,
+        password: values.password,
+      });
       
       // Store tokens in localStorage
       localStorage.setItem("authToken", response.token);
