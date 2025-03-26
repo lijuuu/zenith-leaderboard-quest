@@ -68,9 +68,9 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({ data, c
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-1">
           <div className="grid grid-cols-7 gap-1 mb-1">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
               <div key={day} className="text-xs text-zinc-500 text-center">
                 {day}
               </div>
@@ -85,7 +85,7 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({ data, c
                     <Tooltip key={day.date}>
                       <TooltipTrigger asChild>
                         <div 
-                          className={`aspect-square rounded-full transition-all cursor-pointer ${
+                          className={`aspect-square w-5 h-5 rounded-sm transition-all cursor-pointer ${
                             day.isActive 
                               ? 'bg-green-500 hover:scale-110' 
                               : 'bg-red-500 hover:scale-110'
@@ -111,7 +111,7 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({ data, c
           </TooltipProvider>
           
           {hoveredDay && (
-            <div className="mt-3 text-sm font-medium animate-fade-in">
+            <div className="mt-2 text-sm font-medium animate-fade-in">
               <span className="mr-2 text-zinc-400">{format(parseISO(hoveredDay.date), 'MMMM d, yyyy')}:</span>
               {hoveredDay.isActive ? (
                 <span className="text-green-400">{hoveredDay.count} {hoveredDay.count === 1 ? 'contribution' : 'contributions'}</span>
@@ -121,13 +121,13 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({ data, c
             </div>
           )}
           
-          <div className="flex items-center justify-between pt-2 text-xs text-zinc-500">
+          <div className="flex items-center justify-between pt-1 text-xs text-zinc-500">
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-2 h-2 rounded-sm bg-red-500"></div>
               <span>Inactive</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <div className="w-2 h-2 rounded-sm bg-green-500"></div>
               <span>Active</span>
             </div>
           </div>

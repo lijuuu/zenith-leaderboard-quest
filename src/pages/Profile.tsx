@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -242,9 +241,9 @@ const Profile = () => {
               </CardContent>
             </Card>
             
-            {/* Activity Section */}
+            {/* Activity Section - Made more compact */}
             <Card className="mb-6 bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
-              <CardContent className="p-6">
+              <CardContent className="p-4">
                 <YearlyActivityHeatmap data={transformActivityData()} />
               </CardContent>
             </Card>
@@ -285,6 +284,7 @@ const Profile = () => {
                   </TabsContent>
                 </Tabs>
                 
+                {/* Monthly Heatmap - Made more compact */}
                 <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
                   <CardContent className="p-4">
                     <MonthlyActivityHeatmap data={transformMonthlyData()} />

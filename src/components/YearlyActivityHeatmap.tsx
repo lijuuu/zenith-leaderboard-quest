@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { format, parseISO, eachDayOfInterval, subMonths, getMonth, getDay, startOfYear, endOfYear, subYears, isToday } from 'date-fns';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -149,14 +148,11 @@ const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, cla
   
   // Group days for the yearly calendar view
   const getYearlyCalendarData = () => {
-    // Month names for column headers
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
-    // Create a 7×53 matrix to represent the calendar (7 days, 53 weeks)
-    const calendar: Array<Array<HeatmapDataPoint | null>> = Array(7).fill(null).map(() => Array(53).fill(null));
-    
-    // Days of week (0 = Sunday, 6 = Saturday)
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const { calendar, monthNames, dayNames } = {
+      calendar: Array(7).fill(null).map(() => Array(53).fill(null)),
+      monthNames: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      dayNames: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    };
     
     // Organize data into the calendar grid
     yearlyView.forEach(day => {
@@ -166,7 +162,6 @@ const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, cla
       const dayOfWeek = getDay(date);
       
       // Approximate the week of the year
-      // We calculate from the start of the year
       const startOfYearDate = startOfYear(date);
       const dayOfYear = Math.floor((date.getTime() - startOfYearDate.getTime()) / (24 * 60 * 60 * 1000));
       const weekOfYear = Math.floor(dayOfYear / 7);
@@ -242,10 +237,10 @@ const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, cla
             <TabsTrigger value="yearly" className="data-[state=active]:bg-green-500">Yearly</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="monthly" className="mt-4">
-            <div className="flex flex-col space-y-2">
+          <TabsContent value="monthly" className="mt-3">
+            <div className="flex flex-col space-y-1">
               <div className="grid grid-cols-7 gap-1 mb-1">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
                   <div key={day} className="text-xs text-zinc-500 text-center">
                     {day}
                   </div>
@@ -260,7 +255,7 @@ const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, cla
                         <Tooltip key={day.date}>
                           <TooltipTrigger asChild>
                             <div 
-                              className={`aspect-square rounded-full transition-all cursor-pointer ${
+                              className={`aspect-square w-5 h-5 rounded-sm transition-all cursor-pointer ${
                                 day.isActive 
                                   ? 'bg-green-500 hover:scale-110' 
                                   : 'bg-red-500 hover:scale-110'
@@ -286,7 +281,7 @@ const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, cla
               </TooltipProvider>
               
               {hoveredDay && (
-                <div className="mt-3 text-sm font-medium animate-fade-in">
+                <div className="mt-2 text-sm font-medium animate-fade-in">
                   <span className="mr-2 text-zinc-400">{format(parseISO(hoveredDay.date), 'MMMM d, yyyy')}:</span>
                   {hoveredDay.isActive ? (
                     <span className="text-green-400">{hoveredDay.count} {hoveredDay.count === 1 ? 'contribution' : 'contributions'}</span>
@@ -296,44 +291,37 @@ const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, cla
                 </div>
               )}
               
-              <div className="flex items-center justify-between pt-2 text-xs text-zinc-500">
+              <div className="flex items-center justify-between pt-1 text-xs text-zinc-500">
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-2 h-2 rounded-sm bg-red-500"></div>
                   <span>Inactive</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <div className="w-2 h-2 rounded-sm bg-green-500"></div>
                   <span>Active</span>
                 </div>
               </div>
             </div>
           </TabsContent>
           
-          <TabsContent value="yearly" className="mt-4">
-            <div className="overflow-x-auto">
-              <div className="min-w-[900px]">
+          <TabsContent value="yearly" className="mt-3">
+            <div className="overflow-x-auto pb-2">
+              <div className="flex flex-col">
                 {/* Month labels */}
-                <div className="flex mb-1">
-                  <div className="w-8" /> {/* Space for day labels */}
-                  <div className="flex-1 flex">
-                    {monthNames.map((month, i) => (
-                      <div 
-                        key={month} 
-                        className="flex-1 text-xs text-zinc-500"
-                        style={{ gridColumn: `span ${i === 0 ? 5 : i === 11 ? 4 : 4.33}` }}
-                      >
-                        {month}
-                      </div>
-                    ))}
-                  </div>
+                <div className="flex mb-1 pl-6">
+                  {monthNames.map((month, i) => (
+                    <div key={month} className="text-xs text-zinc-500 w-11 md:w-10">
+                      {month}
+                    </div>
+                  ))}
                 </div>
                 
                 <div className="flex">
                   {/* Day of week labels */}
-                  <div className="w-8 pt-2">
-                    {dayNames.map((day, i) => (
-                      <div key={day} className="h-4 text-xs text-zinc-500 mb-1">
-                        {i % 2 === 0 ? day[0] : ''}
+                  <div className="flex flex-col justify-around mr-1 h-32">
+                    {['', 'Mon', '', 'Wed', '', 'Fri', ''].map((day, i) => (
+                      <div key={i} className="text-xs text-zinc-500 h-4">
+                        {day}
                       </div>
                     ))}
                   </div>
@@ -341,11 +329,11 @@ const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, cla
                   {/* Calendar grid */}
                   <div className="flex-1">
                     <TooltipProvider>
-                      <div className="grid grid-cols-52 gap-x-0.5 gap-y-1">
+                      <div className="grid grid-cols-53 gap-[2px]">
                         {calendar.map((row, rowIndex) => (
                           <React.Fragment key={rowIndex}>
                             {row.map((day, colIndex) => {
-                              if (!day) return <div key={`empty-${rowIndex}-${colIndex}`} className="w-3 h-3" />;
+                              if (!day) return <div key={`empty-${rowIndex}-${colIndex}`} className="w-2 h-2" />;
                               
                               const date = parseISO(day.date);
                               const isTodays = isToday(date);
@@ -354,9 +342,10 @@ const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, cla
                                 <Tooltip key={`${rowIndex}-${colIndex}`}>
                                   <TooltipTrigger asChild>
                                     <div 
-                                      className={`w-3 h-3 rounded-sm transition-all cursor-pointer ${getLevelColor(day.level, day.isActive)} ${
+                                      className={`w-2 h-2 rounded-sm transition-all cursor-pointer ${getLevelColor(day.level, day.isActive)} ${
                                         isTodays ? 'ring-1 ring-white' : ''
                                       }`}
+                                      style={{ gridRow: rowIndex + 1, gridColumn: colIndex + 1 }}
                                       onMouseEnter={() => setHoveredDay(day)}
                                       onMouseLeave={() => setHoveredDay(null)}
                                     />
@@ -383,7 +372,7 @@ const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, cla
             </div>
             
             {hoveredDay && (
-              <div className="mt-3 text-sm font-medium animate-fade-in">
+              <div className="mt-2 text-sm font-medium animate-fade-in">
                 <span className="mr-2 text-zinc-400">{format(parseISO(hoveredDay.date), 'MMMM d, yyyy')}:</span>
                 {hoveredDay.isActive ? (
                   <span className="text-green-400">{hoveredDay.count} {hoveredDay.count === 1 ? 'contribution' : 'contributions'}</span>
@@ -393,20 +382,16 @@ const YearlyActivityHeatmap: React.FC<YearlyActivityHeatmapProps> = ({ data, cla
               </div>
             )}
             
-            <div className="flex items-center justify-between pt-2 text-xs text-zinc-500">
+            <div className="flex items-center justify-between pt-1 text-xs text-zinc-500">
               <span>Less</span>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-sm bg-zinc-800"></div>
-                <div className="w-3 h-3 rounded-sm bg-green-900"></div>
-                <div className="w-3 h-3 rounded-sm bg-green-700"></div>
-                <div className="w-3 h-3 rounded-sm bg-green-600"></div>
-                <div className="w-3 h-3 rounded-sm bg-green-500"></div>
+                <div className="w-2 h-2 rounded-sm bg-zinc-800"></div>
+                <div className="w-2 h-2 rounded-sm bg-green-900"></div>
+                <div className="w-2 h-2 rounded-sm bg-green-700"></div>
+                <div className="w-2 h-2 rounded-sm bg-green-600"></div>
+                <div className="w-2 h-2 rounded-sm bg-green-500"></div>
               </div>
               <span>More</span>
-              <div className="flex items-center gap-1 ml-4">
-                <div className="w-3 h-3 rounded-sm bg-red-500"></div>
-                <span>Inactive</span>
-              </div>
             </div>
           </TabsContent>
         </Tabs>

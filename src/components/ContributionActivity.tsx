@@ -127,18 +127,18 @@ const ContributionActivity = ({ className }: ContributionProps) => {
             </div>
             
             <TooltipProvider>
-              <div className="flex gap-1">
+              <div className="flex gap-[2px]">
                 {weeks.map((week, weekIndex) => (
-                  <div key={weekIndex} className="flex flex-col gap-1">
+                  <div key={weekIndex} className="flex flex-col gap-[2px]">
                     {Array(7).fill(0).map((_, dayIndex) => {
                       const day = week[dayIndex];
-                      if (!day) return <div key={dayIndex} className="w-3 h-3 opacity-0" />;
+                      if (!day) return <div key={dayIndex} className="w-2 h-2 opacity-0" />;
                       
                       return (
                         <Tooltip key={dayIndex}>
                           <TooltipTrigger asChild>
                             <div 
-                              className={`w-3 h-3 rounded-sm ${getColor(day.level)} cursor-pointer transition-all duration-200 hover:scale-110`}
+                              className={`w-2 h-2 rounded-sm ${getColor(day.level)} cursor-pointer transition-all duration-200 hover:scale-110`}
                               onMouseEnter={() => setHoveredDay(day)}
                               onMouseLeave={() => setHoveredDay(null)}
                             />
@@ -158,7 +158,7 @@ const ContributionActivity = ({ className }: ContributionProps) => {
         </div>
         
         {hoveredDay && (
-          <div className="mt-3 text-sm font-medium animate-fade-in">
+          <div className="mt-2 text-sm font-medium animate-fade-in">
             <span className="mr-2 text-zinc-400">{format(parseISO(hoveredDay.date), 'MMMM d, yyyy')}:</span>
             <span className="text-green-400">{hoveredDay.count} {hoveredDay.count === 1 ? 'contribution' : 'contributions'}</span>
           </div>
