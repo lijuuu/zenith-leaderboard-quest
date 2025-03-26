@@ -192,7 +192,7 @@ const Profile = () => {
               <CardTitle className="text-lg font-medium">Error</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Failed to load profile: {profileError.message}</p>
+              <p>Failed to load profile</p>
             </CardContent>
           </Card>
         </main>
@@ -359,7 +359,7 @@ const Profile = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ActivityHeatmapRounded heatmapData={profile?.activityHeatmap} />
+                  <ActivityHeatmapRounded data={profile?.activityHeatmap} />
                 </CardContent>
               </Card>
               
