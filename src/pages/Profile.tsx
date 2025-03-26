@@ -63,6 +63,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   
+  
   const { 
     data: profile, 
     isLoading: profileLoading, 
@@ -119,7 +120,28 @@ const Profile = () => {
     });
   };
   
+  // Transform the activity data to include the required 'level' property
+  const transformActivityData = () => {
+    if (!profile?.activityHeatmap?.data) return [];
+    
+    return profile.activityHeatmap.data.map(item => {
+      // Determine level based on count (similar logic to what's in ActivityHeatmapRounded)
+      let level = 0;
+      if (item.count > 0 && item.count <= 2) level = 1;
+      else if (item.count > 2 && item.count <= 5) level = 2;
+      else if (item.count > 5 && item.count <= 8) level = 3;
+      else if (item.count > 8) level = 4;
+      
+      return {
+        date: item.date,
+        count: item.count,
+        level: level as 0 | 1 | 2 | 3 | 4
+      };
+    });
+  };
+  
   if (profileLoading) {
+    
     return (
       <div className="min-h-screen bg-background text-foreground pt-16 pb-8">
         <MainNavbar />
@@ -183,6 +205,7 @@ const Profile = () => {
   }
   
   if (profileError) {
+    
     return (
       <div className="min-h-screen bg-background text-foreground pt-16 pb-8">
         <MainNavbar />
@@ -359,7 +382,7 @@ const Profile = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ActivityHeatmapRounded data={profile?.activityHeatmap?.data} />
+                  <ActivityHeatmapRounded data={transformActivityData()} />
                 </CardContent>
               </Card>
               
