@@ -1,301 +1,389 @@
-
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { 
-  User, 
-  MapPin, 
-  Calendar, 
-  Award, 
-  Code, 
-  Zap, 
   Trophy, 
+  Flame, 
+  Puzzle, 
+  Calendar, 
   Github, 
-  Twitter, 
-  Linkedin, 
-  ExternalLink 
+  Link, 
+  MapPin, 
+  CheckCircle,
+  ShieldAlert,
+  Mail,
+  Copy,
+  Edit,
+  Loader2,
+  UserPlus,
+  UserMinus,
+  MessageSquare,
+  Bell,
+  MoreHorizontal
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { getUserProfile } from "@/api/userApi";
-import { getUserSubmissions } from "@/api/submissionApi";
-import { getChallenges } from "@/api/challengeApi";
-import ActivityHeatmap from "@/components/ActivityHeatmap";
-import SubmissionHistory from "@/components/SubmissionHistory";
 import MainNavbar from "@/components/MainNavbar";
-import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Progress } from "@/components/ui/progress";
+import { getAllChallenges, getUserChallenges } from "@/api/challengeApi";
+import { getUserProfile } from "@/api/userApi";
+import { UserProfile, Challenge } from "@/api/types";
+import ActivityHeatmapRounded from "@/components/ActivityHeatmapRounded";
 
 const Profile = () => {
-  const { userId } = useParams<{ userId: string }>();
+  const { username } = useParams<{ username: string }>();
+  const { toast } = useToast();
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   
-  const { data: profile, isLoading: isLoadingProfile } = useQuery({
-    queryKey: ["profile", userId],
-    queryFn: () => getUserProfile(userId || "1"),
-  });
-  
-  const { data: submissions, isLoading: isLoadingSubmissions } = useQuery({
-    queryKey: ["submissions", userId],
-    queryFn: () => getUserSubmissions(userId || "1"),
-  });
-  
-  const { data: challenges, isLoading: isLoadingChallenges } = useQuery({
-    queryKey: ["challenges", userId],
-    queryFn: () => getChallenges({ participated: true }),
+  const { 
+    data: profile, 
+    isLoading: profileLoading, 
+    isError: profileError 
+  } = useQuery<UserProfile>({
+    queryKey: ["profile", username],
+    queryFn: () => getUserProfile(username!),
+    retry: false,
   });
   
   useEffect(() => {
-    // Scroll to top when component mounts
-    window.scrollTo(0, 0);
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-zinc-900 text-white pt-14">
-      <MainNavbar />
+    const loadChallenges = async () => {
+      if (profile) {
+        try {
+          const userChallenges = await getUserChallenges(profile.id);
+          setChallenges(userChallenges);
+        } catch (error) {
+          console.error("Failed to load user challenges:", error);
+          toast({
+            title: "Error",
+            description: "Failed to load user challenges. Please try again.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+    
+    loadChallenges();
+  }, [profile, toast]);
+  
+  const handleFollow = async () => {
+    setLoading(true);
+    
+    // Simulate follow/unfollow action
+    setTimeout(() => {
+      setIsFollowing(!isFollowing);
+      setLoading(false);
       
+      toast({
+        title: isFollowing ? "Unfollowed" : "Followed",
+        description: isFollowing 
+          ? `You have unfollowed @${username}`
+          : `You are now following @${username}`,
+      });
+    }, 500);
+  };
+  
+  const copyProfileLink = () => {
+    const profileLink = window.location.href;
+    navigator.clipboard.writeText(profileLink);
+    toast({
+      title: "Copied!",
+      description: "Profile link copied to clipboard",
+    });
+  };
+  
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground pt-16 pb-8">
+        <MainNavbar />
+        <main className="page-container py-8">
+          <Card className="w-full max-w-4xl mx-auto">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-2xl font-bold">
+                <Skeleton className="h-8 w-[200px]" />
+              </CardTitle>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open dropdown menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuItem>
+                    <Mail className="mr-2 h-4 w-4" /> Message
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Bell className="mr-2 h-4 w-4" /> Follow
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <ShieldAlert className="mr-2 h-4 w-4" /> Report
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center space-x-4">
+                <Skeleton className="h-24 w-24 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                  <Skeleton className="h-4 w-[150px]" />
+                </div>
+              </div>
+              <Separator className="my-4" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <Skeleton className="h-4 w-[150px]" />
+                  <Skeleton className="h-4 w-[100px] mt-2" />
+                </div>
+                <div>
+                  <Skeleton className="h-4 w-[150px]" />
+                  <Skeleton className="h-4 w-[100px] mt-2" />
+                </div>
+                <div>
+                  <Skeleton className="h-4 w-[150px]" />
+                  <Skeleton className="h-4 w-[100px] mt-2" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
+  
+  if (profileError) {
+    return (
+      <div className="min-h-screen bg-background text-foreground pt-16 pb-8">
+        <MainNavbar />
+        <main className="page-container py-8">
+          <Card className="w-full max-w-4xl mx-auto">
+            <CardHeader>
+              <CardTitle className="text-lg font-medium">Error</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Failed to load profile: {profileError.message}</p>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="min-h-screen bg-background text-foreground pt-16 pb-8">
+      <MainNavbar />
       <main className="page-container py-8">
-        {isLoadingProfile ? (
-          <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
-            <div className="bg-zinc-800/50 rounded-lg h-[400px] animate-pulse" />
-            <div className="space-y-4">
-              <div className="bg-zinc-800/50 rounded-lg h-12 animate-pulse" />
-              <div className="bg-zinc-800/50 rounded-lg h-32 animate-pulse" />
-              <div className="bg-zinc-800/50 rounded-lg h-[200px] animate-pulse" />
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
-            {/* Profile Sidebar */}
-            <div className="space-y-6">
-              <div className="bg-zinc-800/40 border border-zinc-700/40 rounded-lg p-6 space-y-6">
-                <div className="flex flex-col items-center text-center">
-                  <div className="relative">
-                    <div className="w-24 h-24 rounded-full border-4 border-zinc-700 overflow-hidden">
-                      <img 
-                        src={profile?.profileImage || "https://randomuser.me/api/portraits/men/32.jpg"} 
-                        alt={profile?.username}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="absolute bottom-0 right-0 bg-green-500 w-4 h-4 rounded-full border-2 border-zinc-800"></div>
-                  </div>
-                  
-                  <div className="mt-4">
-                    <h1 className="text-xl font-bold">{profile?.fullName}</h1>
-                    <p className="text-zinc-400">@{profile?.username}</p>
-                  </div>
-                  
-                  <div className="mt-4 flex gap-3">
-                    <Button variant="outline" size="icon" className="rounded-full h-8 w-8 bg-zinc-800 border-zinc-700">
-                      <Github className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="rounded-full h-8 w-8 bg-zinc-800 border-zinc-700">
-                      <Twitter className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="rounded-full h-8 w-8 bg-zinc-800 border-zinc-700">
-                      <Linkedin className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                
-                <Separator className="bg-zinc-700/50" />
-                
-                <div className="space-y-3">
-                  {profile?.location && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <MapPin className="h-4 w-4 text-zinc-500" />
-                      <span>{profile.location}</span>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center gap-3 text-sm">
-                    <Calendar className="h-4 w-4 text-zinc-500" />
-                    <span>Joined {profile?.joinedDate ? format(new Date(profile.joinedDate), 'MMMM yyyy') : 'January 2023'}</span>
-                  </div>
-                </div>
-                
-                <Separator className="bg-zinc-700/50" />
-                
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Trophy className="h-4 w-4 text-amber-500" />
-                      <span className="text-sm text-zinc-400">Global Rank</span>
-                    </div>
-                    <span className="font-medium">#{profile?.ranking || 354}</span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Award className="h-4 w-4 text-blue-400" />
-                      <span className="text-sm text-zinc-400">Rating</span>
-                    </div>
-                    <span className="font-medium">{profile?.ranking || 1750}</span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Code className="h-4 w-4 text-green-400" />
-                      <span className="text-sm text-zinc-400">Problems Solved</span>
-                    </div>
-                    <span className="font-medium">{profile?.problemsSolved || 124}</span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Zap className="h-4 w-4 text-amber-400" />
-                      <span className="text-sm text-zinc-400">Current Streak</span>
-                    </div>
-                    <span className="font-medium">{profile?.dayStreak || 7} days</span>
-                  </div>
-                </div>
-                
-                <Button className="w-full bg-green-500 hover:bg-green-600">
-                  <User className="h-4 w-4 mr-2" />
-                  Follow
+        <Card className="w-full max-w-4xl mx-auto">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-2xl font-bold">{profile?.fullName}</CardTitle>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open dropdown menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
                 </Button>
-              </div>
-              
-              <div className="bg-zinc-800/40 border border-zinc-700/40 rounded-lg p-6">
-                <h2 className="text-lg font-medium mb-4">About</h2>
-                <p className="text-zinc-400 text-sm">
-                  {profile?.bio || 
-                    "Software engineer passionate about algorithms and data structures. I love solving complex problems and participating in coding competitions."}
-                </p>
-              </div>
-              
-              <div className="bg-zinc-800/40 border border-zinc-700/40 rounded-lg p-6">
-                <h2 className="text-lg font-medium mb-4">Skills & Interests</h2>
-                <div className="flex flex-wrap gap-2">
-                  <div className="px-3 py-1 bg-zinc-700/50 rounded-full text-xs">JavaScript</div>
-                  <div className="px-3 py-1 bg-zinc-700/50 rounded-full text-xs">Python</div>
-                  <div className="px-3 py-1 bg-zinc-700/50 rounded-full text-xs">React</div>
-                  <div className="px-3 py-1 bg-zinc-700/50 rounded-full text-xs">Node.js</div>
-                  <div className="px-3 py-1 bg-zinc-700/50 rounded-full text-xs">Algorithms</div>
-                  <div className="px-3 py-1 bg-zinc-700/50 rounded-full text-xs">Data Structures</div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Main Content */}
-            <div className="space-y-6">
-              <ActivityHeatmap loading={isLoadingProfile} />
-              
-              <Tabs defaultValue="submissions" className="w-full">
-                <TabsList className="bg-zinc-800/40 border border-zinc-700/40 w-full">
-                  <TabsTrigger 
-                    value="submissions" 
-                    className="data-[state=active]:bg-green-500 data-[state=active]:text-white"
-                  >
-                    Submissions
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="challenges" 
-                    className="data-[state=active]:bg-green-500 data-[state=active]:text-white"
-                  >
-                    Challenges
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="achievements" 
-                    className="data-[state=active]:bg-green-500 data-[state=active]:text-white"
-                  >
-                    Achievements
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="submissions" className="mt-4">
-                  <SubmissionHistory isLoading={isLoadingSubmissions} submissions={submissions} />
-                </TabsContent>
-                
-                <TabsContent value="challenges" className="mt-4">
-                  <div className="bg-zinc-800/40 border border-zinc-700/40 rounded-lg p-6">
-                    <h2 className="text-lg font-medium mb-4">Recent Challenges</h2>
-                    
-                    {isLoadingChallenges ? (
-                      <div className="space-y-4">
-                        {Array(3).fill(0).map((_, i) => (
-                          <div key={i} className="bg-zinc-700/30 h-20 rounded-lg animate-pulse" />
-                        ))}
-                      </div>
-                    ) : challenges && challenges.length > 0 ? (
-                      <div className="space-y-4">
-                        {challenges.map((challenge) => (
-                          <div 
-                            key={challenge.id} 
-                            className="bg-zinc-800/60 border border-zinc-700/40 rounded-lg p-4 hover:bg-zinc-800/80 transition-colors cursor-pointer"
-                          >
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h3 className="font-medium">{challenge.title}</h3>
-                                <p className="text-sm text-zinc-400 mt-1">{challenge.description}</p>
-                              </div>
-                              <div className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">
-                                {challenge.type}
-                              </div>
-                            </div>
-                            <div className="mt-3 flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <div className="flex -space-x-2">
-                                  {challenge.participantUsers && challenge.participantUsers.map((participant, i) => (
-                                    <div key={i} className="w-6 h-6 rounded-full overflow-hidden border-2 border-zinc-800">
-                                      <img src={participant.avatar} alt={participant.name} className="w-full h-full object-cover" />
-                                    </div>
-                                  ))}
-                                </div>
-                                <span className="text-xs text-zinc-400">
-                                  {challenge.participantCount || challenge.participants || (challenge.participantUsers ? challenge.participantUsers.length : 0)} participants
-                                </span>
-                              </div>
-                              <div className="text-xs text-zinc-400">
-                                {challenge.date || '3 days ago'}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-10">
-                        <p className="text-zinc-400">No challenges found</p>
-                        <Button className="mt-4 bg-green-500 hover:bg-green-600">Find Challenges</Button>
-                      </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem>
+                  <Mail className="mr-2 h-4 w-4" /> Message
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleFollow} disabled={loading}>
+                  {isFollowing ? (
+                    <>
+                      <UserMinus className="mr-2 h-4 w-4" /> Unfollow
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="mr-2 h-4 w-4" /> Follow
+                    </>
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <ShieldAlert className="mr-2 h-4 w-4" /> Report
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-4">
+              <Avatar className="h-24 w-24">
+                <AvatarImage src={profile?.profileImage || `https://avatar.vercel.sh/${username}.png`} alt={profile?.fullName} />
+                <AvatarFallback>{profile?.fullName.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="space-y-2">
+                <div>
+                  <h3 className="text-lg font-semibold">{profile?.username}</h3>
+                  <div className="flex items-center space-x-2">
+                    {profile?.isVerified && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <CheckCircle className="h-4 w-4 text-blue-500" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Verified Account</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+                    {profile?.isBanned && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <ShieldAlert className="h-4 w-4 text-red-500" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Banned Account</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     )}
                   </div>
-                </TabsContent>
-                
-                <TabsContent value="achievements" className="mt-4">
-                  <div className="bg-zinc-800/40 border border-zinc-700/40 rounded-lg p-6">
-                    <h2 className="text-lg font-medium mb-4">Achievements</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      <div className="bg-zinc-800/60 border border-zinc-700/40 rounded-lg p-4 text-center flex flex-col items-center">
-                        <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center mb-3">
-                          <Trophy className="h-8 w-8 text-amber-500" />
-                        </div>
-                        <h3 className="font-medium">Problem Solver</h3>
-                        <p className="text-xs text-zinc-400 mt-1">Solved 100+ problems</p>
-                      </div>
-                      
-                      <div className="bg-zinc-800/60 border border-zinc-700/40 rounded-lg p-4 text-center flex flex-col items-center">
-                        <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-3">
-                          <Zap className="h-8 w-8 text-green-500" />
-                        </div>
-                        <h3 className="font-medium">Streak Master</h3>
-                        <p className="text-xs text-zinc-400 mt-1">Maintained a 7+ day streak</p>
-                      </div>
-                      
-                      <div className="bg-zinc-800/60 border border-zinc-700/40 rounded-lg p-4 text-center flex flex-col items-center opacity-60">
-                        <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mb-3">
-                          <Award className="h-8 w-8 text-blue-400" />
-                        </div>
-                        <h3 className="font-medium">Top Contributor</h3>
-                        <p className="text-xs text-zinc-400 mt-1">Reached top 100 global rank</p>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
+                </div>
+                <p className="text-sm text-muted-foreground">{profile?.bio || "No bio available"}</p>
+                <div className="flex items-center space-x-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" onClick={copyProfileLink}>
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Copy profile link</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <Button variant="outline" size="sm">
+                    <Edit className="mr-2 h-4 w-4" /> Edit Profile
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+            <Separator className="my-4" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <h4 className="text-sm font-medium">Problems Solved</h4>
+                <p className="text-2xl font-bold">{profile?.problemsSolved}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium">Current Streak</h4>
+                <p className="text-2xl font-bold">{profile?.dayStreak} days</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium">Ranking</h4>
+                <p className="text-2xl font-bold">#{profile?.ranking}</p>
+              </div>
+            </div>
+            <Separator className="my-4" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-sm font-medium flex items-center gap-1">
+                  <Trophy className="h-4 w-4 text-amber-500" /> Achievements
+                </h4>
+                <ul className="list-none space-y-2 mt-2">
+                  <li className="flex items-center justify-between">
+                    <span>Weekly Contests</span>
+                    <span>{profile?.achievements.weeklyContests}</span>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span>Monthly Contests</span>
+                    <span>{profile?.achievements.monthlyContests}</span>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span>Special Events</span>
+                    <span>{profile?.achievements.specialEvents}</span>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium flex items-center gap-1">
+                  <Flame className="h-4 w-4 text-red-500" /> Stats
+                </h4>
+                <ul className="list-none space-y-2 mt-2">
+                  <li className="flex items-center justify-between">
+                    <span>Easy</span>
+                    <span>{profile?.stats.easy.solved} / {profile?.stats.easy.total}</span>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span>Medium</span>
+                    <span>{profile?.stats.medium.solved} / {profile?.stats.medium.total}</span>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span>Hard</span>
+                    <span>{profile?.stats.hard.solved} / {profile?.stats.hard.total}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <div className="w-full flex flex-col md:flex-row gap-4">
+              <Card className="w-full">
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium flex items-center gap-1">
+                    <Calendar className="h-4 w-4 text-green-500" /> Activity Heatmap
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ActivityHeatmapRounded heatmapData={profile?.activityHeatmap} />
+                </CardContent>
+              </Card>
+              
+              <Card className="w-full">
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium flex items-center gap-1">
+                    <Puzzle className="h-4 w-4 text-blue-500" /> Challenges
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {challenges.map((challenge) => (
+                    <div key={challenge.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Trophy className="h-4 w-4 text-amber-500" />
+                        <span className="text-sm font-medium">{challenge.title}</span>
+                      </div>
+                      <span className="text-xs text-zinc-500">{challenge.participants} participants</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+          </CardFooter>
+        </Card>
       </main>
     </div>
   );

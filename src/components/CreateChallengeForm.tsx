@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -92,8 +92,8 @@ const CreateChallengeForm: React.FC<CreateChallengeFormProps> = ({ isOpen, onClo
   const watchDifficulty = form.watch("difficulty");
   const watchProblemCount = form.watch("problemCount");
   
-  // Load problems when the form opens
-  useState(() => {
+  // Fixed this: changed useState to useEffect
+  useEffect(() => {
     const loadProblems = async () => {
       setProblemsLoading(true);
       try {
@@ -114,10 +114,10 @@ const CreateChallengeForm: React.FC<CreateChallengeFormProps> = ({ isOpen, onClo
     if (isOpen) {
       loadProblems();
     }
-  });
+  }, [isOpen, watchDifficulty, toast]);
   
-  // Generate random problems when selection type changes
-  useState(() => {
+  // Fixed this: changed useState to useEffect
+  useEffect(() => {
     if (watchSelectionType === "random" && problems.length > 0) {
       generateRandomProblems();
     }
