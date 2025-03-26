@@ -45,7 +45,7 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
+    --background: 0 0% 9%;
     --foreground: 0 0% 98%;
     
     --card: 240 10% 3.9%;
@@ -80,7 +80,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-zinc-900 text-white;
+    @apply bg-zinc-950 text-white;
   }
 }
 
@@ -89,9 +89,18 @@
   @apply px-4 md:px-6 lg:px-8 mx-auto max-w-7xl;
 }
 
+/* Glassmorphism effects */
+.glassmorphic {
+  @apply backdrop-blur-md bg-zinc-900/60 border-zinc-800/50;
+}
+
+.glassmorphic-dark {
+  @apply backdrop-blur-md bg-zinc-950/80 border-zinc-900/50;
+}
+
 /* Card styles for dark theme */
 .dark-card {
-  @apply bg-zinc-800/50 border-zinc-700/50 text-white;
+  @apply bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50 text-white;
 }
 
 .dark-card-header {
@@ -126,6 +135,25 @@
 
 .stat-change-neutral {
   @apply text-xs text-zinc-500;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* Custom Class for accent colors */
@@ -253,7 +281,7 @@
 }
 
 .bg-dark-card {
-  @apply bg-zinc-800/50 border-zinc-700/50;
+  @apply bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50;
 }
 
 .bg-dark-card-solid {

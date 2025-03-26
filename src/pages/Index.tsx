@@ -8,10 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
-import MainNavigation from '@/components/MainNavigation';
-import ReferralBanner from '@/components/ReferralBanner';
 import StatsCard from '@/components/StatsCard';
-import ContributionActivity from '@/components/ContributionActivity';
+import MonthlyActivityHeatmap from '@/components/MonthlyActivityHeatmap';
+import ClearInactivityCard from '@/components/ClearInactivityCard';
 import { getUserProfile } from '@/api/userApi';
 import { getProblems } from '@/api/problemApi';
 import { getChallenges } from '@/api/challengeApi';
@@ -55,10 +54,8 @@ const Index = () => {
   });
   
   return (
-    <div className="min-h-screen bg-zinc-900 text-white">
-      <MainNavigation />
-      
-      <main className="pt-20 pb-16">
+    <div className="min-h-screen bg-zinc-950">
+      <main className="pt-10 pb-16">
         <div className="page-container">
           {/* Welcome Section */}
           <section className="pt-6 pb-10">
@@ -72,7 +69,7 @@ const Index = () => {
                 </p>
               </div>
               
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 <Button className="bg-green-500 hover:bg-green-600 gap-2">
                   <Plus className="h-4 w-4" />
                   Create Challenge
@@ -120,7 +117,7 @@ const Index = () => {
               </div>
               
               {/* 1v1 Challenges */}
-              <Card className="bg-zinc-800/50 border-zinc-700/50">
+              <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5 text-green-400" />
@@ -132,7 +129,7 @@ const Index = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 flex items-center justify-between">
+                    <div className="bg-zinc-800/70 backdrop-blur-sm border border-zinc-700/50 rounded-lg p-4 flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="bg-green-500/10 p-2 rounded-lg">
                           <Play className="h-5 w-5 text-green-400" />
@@ -147,7 +144,7 @@ const Index = () => {
                       </Button>
                     </div>
                     
-                    <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 flex items-center justify-between">
+                    <div className="bg-zinc-800/70 backdrop-blur-sm border border-zinc-700/50 rounded-lg p-4 flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="bg-blue-500/10 p-2 rounded-lg">
                           <User className="h-5 w-5 text-blue-400" />
@@ -165,17 +162,17 @@ const Index = () => {
                 </CardContent>
               </Card>
               
-              {/* Referral Banner */}
-              <ReferralBanner />
+              {/* Clear Recent Inactivity */}
+              <ClearInactivityCard />
             </div>
             
             {/* Right Column - Activity & Leaderboard */}
             <div className="space-y-6">
-              {/* Contribution Activity */}
-              <ContributionActivity />
+              {/* Monthly Activity */}
+              <MonthlyActivityHeatmap />
               
               {/* Leaderboard Preview */}
-              <Card className="bg-zinc-800/50 border-zinc-700/50">
+              <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Trophy className="h-5 w-5 text-amber-500" />
