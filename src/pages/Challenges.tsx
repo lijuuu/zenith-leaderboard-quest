@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { 
-  PlusCircle, 
-  Users, 
-  Activity, 
-  Zap, 
-  Trophy, 
-  ChevronRight, 
-  Calendar, 
-  Clock, 
-  User, 
+import {
+  PlusCircle,
+  Users,
+  Activity,
+  Zap,
+  Trophy,
+  ChevronRight,
+  Calendar,
+  Clock,
+  User,
   Cpu,
   Shuffle,
   Lock,
@@ -42,7 +42,7 @@ import SubmissionHistory from "@/components/SubmissionHistory";
 import ChallengeInterface from "@/components/ChallengeInterface";
 import CreateChallengeForm from "@/components/CreateChallengeForm";
 import JoinPrivateChallenge from "@/components/JoinPrivateChallenge";
-import UserSearch from "@/components/UserSearch";
+// import UserSearch from "@/components/UserSearch";
 import { getChallenges, getChallenge, getChallengeInvites } from "@/api/challengeApi";
 import { Challenge } from "@/api/types";
 
@@ -51,27 +51,27 @@ const Challenges = () => {
   const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
-  
+
   const { data: challenges, isLoading: challengesLoading, refetch: refetchChallenges } = useQuery({
     queryKey: ["challenges"],
     queryFn: () => getChallenges(),
   });
-  
+
   const { data: publicChallenges, isLoading: publicChallengesLoading } = useQuery({
     queryKey: ["public-challenges"],
     queryFn: () => getChallenges({ private: false }),
   });
-  
+
   const { data: privateChallenges, isLoading: privateChallengesLoading } = useQuery({
     queryKey: ["private-challenges"],
     queryFn: () => getChallenges({ private: true }),
   });
-  
+
   const { data: invites, isLoading: invitesLoading } = useQuery({
     queryKey: ["challenge-invites"],
     queryFn: getChallengeInvites,
   });
-  
+
   const loadChallenge = async (id: string) => {
     try {
       const challenge = await getChallenge(id);
@@ -83,28 +83,28 @@ const Challenges = () => {
       console.error("Failed to load challenge:", error);
     }
   };
-  
+
   const handleChallengeCreated = (newChallenge: Challenge) => {
     refetchChallenges();
   };
-  
+
   const handleJoinSuccess = (challenge: Challenge) => {
     setActiveChallenge(challenge);
     setActiveChallengeId(challenge.id);
   };
-  
+
   return (
-    <div className="min-h-screen bg-background text-foreground pt-16 pb-8">
-      <MainNavbar />
-      
+   <div className="min-h-screen bg-green-500/10 backdrop-blur-md border-[0.5px] border-green-500/20 rounded-lg shadow-lg text-foreground pt-5 pb-8">
+      {/* <MainNavbar /> */}
+
       {activeChallengeId ? (
         <main className="page-container py-8">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold">
               {activeChallenge?.title || "Active Challenge"}
             </h1>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setActiveChallengeId(null);
                 setActiveChallenge(null);
@@ -114,11 +114,11 @@ const Challenges = () => {
               Exit Challenge
             </Button>
           </div>
-          
+
           <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg rounded-xl border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden shadow-sm h-[calc(100vh-180px)] min-h-[600px]">
-            <ChallengeInterface 
-              challenge={activeChallenge} 
-              isPrivate={activeChallenge?.isPrivate} 
+            <ChallengeInterface
+              challenge={activeChallenge}
+              isPrivate={activeChallenge?.isPrivate}
               accessCode={activeChallenge?.accessCode}
             />
           </div>
@@ -130,14 +130,14 @@ const Challenges = () => {
               <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Challenges</h1>
                 <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => setIsJoinModalOpen(true)}
                   >
                     <Lock className="h-4 w-4 mr-2" />
                     Join Private
                   </Button>
-                  <Button 
+                  <Button
                     className="bg-green-500 hover:bg-green-600"
                     onClick={() => setIsCreateModalOpen(true)}
                   >
@@ -146,7 +146,7 @@ const Challenges = () => {
                   </Button>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="bento-card shadow-green-500/5 hover:shadow-green-500/10">
                   <CardHeader className="pb-2">
@@ -171,7 +171,7 @@ const Challenges = () => {
                         Start
                       </Button>
                     </div>
-                    
+
                     <div className="rounded-lg bg-zinc-100/80 dark:bg-zinc-800/80 p-3 flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center">
                         <User className="h-5 w-5" />
@@ -186,7 +186,7 @@ const Challenges = () => {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="bento-card shadow-blue-500/5 hover:shadow-blue-500/10">
                   <CardHeader className="pb-2">
                     <CardTitle className="flex items-center gap-2 text-lg">
@@ -213,7 +213,7 @@ const Challenges = () => {
                         Register
                       </Button>
                     </div>
-                    
+
                     <div className="rounded-lg bg-zinc-100/80 dark:bg-zinc-800/80 p-3 flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center">
                         <Cpu className="h-5 w-5" />
@@ -232,11 +232,11 @@ const Challenges = () => {
                   </CardContent>
                 </Card>
               </div>
-              
-              <UserSearch className="w-full" />
-              
-              <ReferralBanner />
-              
+
+              {/* <UserSearch className="w-full" /> */}
+
+              {/* <ReferralBanner /> */}
+
               <Tabs defaultValue="active" className="w-full">
                 <TabsList className="grid grid-cols-4 mb-4">
                   <TabsTrigger value="active">Active</TabsTrigger>
@@ -244,12 +244,12 @@ const Challenges = () => {
                   <TabsTrigger value="private">Private</TabsTrigger>
                   <TabsTrigger value="invites">Invites</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="active" className="space-y-4">
                   {!challengesLoading && challenges?.filter(c => c.isActive).map((challenge) => (
-                    <Card 
-                      key={challenge.id} 
-                      className="cursor-pointer hover:shadow-md transition-shadow" 
+                    <Card
+                      key={challenge.id}
+                      className="cursor-pointer hover:shadow-md transition-shadow"
                       onClick={() => loadChallenge(challenge.id)}
                     >
                       <CardHeader className="pb-2">
@@ -291,7 +291,7 @@ const Challenges = () => {
                       </CardFooter>
                     </Card>
                   ))}
-                  
+
                   {(challengesLoading || !challenges?.filter(c => c.isActive).length) && (
                     <div className="text-center py-10">
                       <p className="text-zinc-500 dark:text-zinc-400">No active challenges</p>
@@ -305,11 +305,11 @@ const Challenges = () => {
                     </div>
                   )}
                 </TabsContent>
-                
+
                 <TabsContent value="public" className="space-y-4">
                   {!publicChallengesLoading && publicChallenges?.filter(c => c.isActive).map((challenge) => (
-                    <Card 
-                      key={challenge.id} 
+                    <Card
+                      key={challenge.id}
                       className="cursor-pointer hover:shadow-md transition-shadow"
                       onClick={() => loadChallenge(challenge.id)}
                     >
@@ -353,7 +353,7 @@ const Challenges = () => {
                       </CardFooter>
                     </Card>
                   ))}
-                  
+
                   {(publicChallengesLoading || !publicChallenges?.filter(c => c.isActive).length) && (
                     <div className="text-center py-10">
                       <p className="text-zinc-500 dark:text-zinc-400">No public challenges found</p>
@@ -367,11 +367,11 @@ const Challenges = () => {
                     </div>
                   )}
                 </TabsContent>
-                
+
                 <TabsContent value="private" className="space-y-4">
                   {!privateChallengesLoading && privateChallenges?.filter(c => c.isActive).map((challenge) => (
-                    <Card 
-                      key={challenge.id} 
+                    <Card
+                      key={challenge.id}
                       className="cursor-pointer hover:shadow-md transition-shadow border-amber-200/30 dark:border-amber-800/30"
                       onClick={() => loadChallenge(challenge.id)}
                     >
@@ -418,12 +418,12 @@ const Challenges = () => {
                       </CardFooter>
                     </Card>
                   ))}
-                  
+
                   {(privateChallengesLoading || !privateChallenges?.filter(c => c.isActive).length) && (
                     <div className="text-center py-10">
                       <p className="text-zinc-500 dark:text-zinc-400">No private challenges found</p>
                       <div className="flex items-center justify-center gap-3 mt-4">
-                        <Button 
+                        <Button
                           variant="outline"
                           onClick={() => setIsJoinModalOpen(true)}
                         >
@@ -441,11 +441,11 @@ const Challenges = () => {
                     </div>
                   )}
                 </TabsContent>
-                
+
                 <TabsContent value="invites" className="space-y-4">
                   {!invitesLoading && invites?.map((invite) => (
-                    <Card 
-                      key={invite.challengeId} 
+                    <Card
+                      key={invite.challengeId}
                       className="hover:shadow-md transition-shadow"
                     >
                       <CardHeader className="pb-2">
@@ -461,8 +461,8 @@ const Challenges = () => {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm">
-                          {invite.isPrivate 
-                            ? "You've been invited to join a private challenge." 
+                          {invite.isPrivate
+                            ? "You've been invited to join a private challenge."
                             : "You've been invited to participate in this challenge."
                           }
                         </p>
@@ -476,14 +476,14 @@ const Challenges = () => {
                         )}
                       </CardContent>
                       <CardFooter className="flex justify-end gap-2">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                         >
                           Decline
                         </Button>
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           className={invite.isPrivate ? "bg-amber-500 hover:bg-amber-600" : "bg-green-500 hover:bg-green-600"}
                           onClick={() => loadChallenge(invite.challengeId)}
                         >
@@ -493,7 +493,7 @@ const Challenges = () => {
                       </CardFooter>
                     </Card>
                   ))}
-                  
+
                   {(invitesLoading || !invites?.length) && (
                     <div className="text-center py-10">
                       <p className="text-zinc-500 dark:text-zinc-400">No challenge invites</p>
@@ -504,26 +504,13 @@ const Challenges = () => {
                   )}
                 </TabsContent>
               </Tabs>
-              
+
               <SubmissionHistory />
             </div>
-            
+
             <div className="space-y-8">
-              <Card className="bento-card">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Activity className="h-5 w-5 text-green-500" />
-                    Contribution Activity
-                  </CardTitle>
-                  <CardDescription>
-                    Your coding activity in the past year
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ActivityHeatmapRounded data={[]} />
-                </CardContent>
-              </Card>
-              
+
+
               <Card className="bento-card">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-lg">
@@ -564,7 +551,7 @@ const Challenges = () => {
                   </div>
                 </CardContent>
               </Card>
-              
+
               <Card className="bento-card">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-lg">
@@ -585,7 +572,7 @@ const Challenges = () => {
                       Challenge
                     </Button>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="relative">
@@ -598,7 +585,7 @@ const Challenges = () => {
                       Challenge
                     </Button>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="relative">
@@ -612,7 +599,7 @@ const Challenges = () => {
                       Message
                     </Button>
                   </div>
-                  
+
                   <Link to="/profile" className="flex items-center justify-center gap-1 text-sm font-medium text-zenblue mt-2 hover:underline">
                     View All Friends
                     <ChevronRight className="h-4 w-4" />
@@ -623,13 +610,13 @@ const Challenges = () => {
           </div>
         </main>
       )}
-      
-      <CreateChallengeForm 
+
+      <CreateChallengeForm
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSuccess={handleChallengeCreated}
       />
-      
+
       <JoinPrivateChallenge
         isOpen={isJoinModalOpen}
         onClose={() => setIsJoinModalOpen(false)}

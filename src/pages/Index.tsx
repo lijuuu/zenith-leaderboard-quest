@@ -56,7 +56,7 @@ const Index = () => {
   });
   
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen bg-zinc-900">
       <main className="pt-10 pb-16">
         <div className="page-container">
           {/* Welcome Section */}

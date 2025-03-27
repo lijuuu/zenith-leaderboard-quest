@@ -130,7 +130,7 @@ const Problems = () => {
     : [];
   
   return (
-    <div className="min-h-screen bg-zinc-900 text-white pt-14">
+    <div className="min-h-screen bg-zinc-900 text-white pt-5">
       <MainNavbar />
       
       <main className="page-container py-8">

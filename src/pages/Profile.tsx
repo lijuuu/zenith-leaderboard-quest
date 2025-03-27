@@ -64,7 +64,7 @@ const Profile = () => {
   
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-white pt-20 pb-8">
+      <div className="min-h-screen bg-zinc-900 text-white pt-5 pb-8">
         <div className="page-container">
           <Card className="w-full max-w-6xl mx-auto">
             <CardHeader>
@@ -94,7 +94,7 @@ const Profile = () => {
   
   if (profileError) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-white pt-20 pb-8">
+      <div className="min-h-screen bg-zinc-900 text-white pt-5 pb-8">
         <div className="page-container">
           <Card className="w-full max-w-6xl mx-auto">
             <CardHeader>
@@ -110,8 +110,8 @@ const Profile = () => {
   }
   
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
-      <main className="pt-20 pb-8">
+    <div className="min-h-screen bg-zinc-900 text-white">
+      <main className="pt-5 pb-8">
         <div className="page-container">
           <div className="w-full max-w-6xl mx-auto">
             {/* Profile Overview */}
