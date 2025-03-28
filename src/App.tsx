@@ -9,6 +9,7 @@ import { AccentColorProvider } from "@/contexts/AccentColorContext";
 import { Provider } from "react-redux";
 import { store } from "@/store";
 import Index from "./pages/Index";
+import Home from "./pages/Home";
 import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 import Problems from "./pages/Problems";
@@ -42,10 +43,10 @@ const App = () => {
           <AccentColorProvider defaultColor="green" storageKey="zenx-accent-color">
             <TooltipProvider>
               <div className="min-h-screen bg-zinc-950 text-white">
-                <MainNavbar />
                 <div>
                   <Routes>
-                    <Route path="/" element={<Index />} />
+                    <Route path="/" element={<Home />} />
+                    <Route path="/dashboard" element={<Index />} />
                     <Route path="/leaderboard" element={<Leaderboard />} />
                     <Route path="/problems" element={<Problems />} />
                     <Route path="/problems/:id" element={<ProblemDetail />} />
