@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Bell, Calendar, Code, Trophy, MessageSquare, UserPlus, X, Check, Info } from 'lucide-react';
+import { Bell, Calendar, Code, Trophy, MessageSquare, UserPlus, X, Check, Info, Sword } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -10,8 +10,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import ChatBattleNotification from './chat/ChatBattleNotification';
 
-type NotificationType = 'message' | 'challenge' | 'follow' | 'contest' | 'achievement' | 'system';
+type NotificationType = 'message' | 'challenge' | 'follow' | 'contest' | 'achievement' | 'system' | 'battle';
 
 interface Notification {
   id: string;
@@ -30,11 +31,44 @@ interface Notification {
     title: string;
     isPrivate: boolean;
   };
+  battle?: {
+    id: string;
+    title: string;
+    isPrivate: boolean;
+    difficulty: 'easy' | 'medium' | 'hard';
+    expiresIn: string;
+    sender: {
+      name: string;
+      avatar: string;
+    };
+    timestamp: string;
+  };
 }
 
 const NotificationsPopover = () => {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: 'n6',
+      type: 'battle',
+      title: 'Coding Battle Challenge',
+      message: 'Alex has challenged you to a coding battle!',
+      time: 'Just now',
+      read: false,
+      actionUrl: '#',
+      battle: {
+        id: 'b1',
+        title: 'Algorithm Masters Duel',
+        isPrivate: true,
+        difficulty: 'medium',
+        expiresIn: '1 hour',
+        sender: {
+          name: 'Alex Johnson',
+          avatar: 'https://i.pravatar.cc/300?img=11'
+        },
+        timestamp: new Date().toISOString()
+      }
+    },
     {
       id: 'n1',
       type: 'challenge',
@@ -129,6 +163,8 @@ const NotificationsPopover = () => {
         return <Trophy className="h-4 w-4 text-amber-500" />;
       case 'system':
         return <Info className="h-4 w-4 text-zinc-500" />;
+      case 'battle':
+        return <Sword className="h-4 w-4 text-green-500" />;
     }
   };
 
@@ -144,7 +180,7 @@ const NotificationsPopover = () => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[350px] p-0" align="end">
+      <PopoverContent className="w-[400px] p-0" align="end">
         <div className="flex items-center justify-between p-4">
           <h3 className="font-semibold">Notifications</h3>
           <Button variant="ghost" size="sm" onClick={markAllAsRead} disabled={unreadCount === 0}>
@@ -158,62 +194,90 @@ const NotificationsPopover = () => {
             <p>No notifications</p>
           </div>
         ) : (
-          <ScrollArea className="h-[400px]">
+          <ScrollArea className="h-[500px]">
             <div className="divide-y">
               {notifications.map((notification) => (
                 <div 
                   key={notification.id} 
                   className={`p-4 relative ${notification.read ? '' : 'bg-accent/5'}`}
                 >
-                  <div className="flex">
-                    <div className="mr-3 mt-0.5">
-                      {getNotificationIcon(notification.type)}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-medium text-sm">{notification.title}</h4>
-                        <span className="text-xs text-muted-foreground">{notification.time}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
-                      
-                      {notification.type === 'challenge' && notification.challenge && (
-                        <div className="mt-2">
+                  {notification.type === 'battle' && notification.battle ? (
+                    <div className="mb-2">
+                      <ChatBattleNotification 
+                        challenge={notification.battle}
+                      />
+                      <div className="absolute top-2 right-2 flex space-x-1">
+                        {!notification.read && (
                           <Button 
-                            variant="outline"
-                            size="sm"
-                            className="w-full justify-between accent-color border-accent-color/20"
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6"
+                            onClick={() => markAsRead(notification.id)}
                           >
-                            <span className="flex items-center">
-                              <Trophy className="mr-1 h-3 w-3" />
-                              {notification.challenge.title}
-                            </span>
-                            <span>Join</span>
+                            <Check className="h-3 w-3" />
                           </Button>
-                        </div>
-                      )}
+                        )}
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => deleteNotification(notification.id)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="absolute top-2 right-2 flex space-x-1">
-                    {!notification.read && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-6 w-6"
-                        onClick={() => markAsRead(notification.id)}
-                      >
-                        <Check className="h-3 w-3" />
-                      </Button>
-                    )}
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-6 w-6"
-                      onClick={() => deleteNotification(notification.id)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
+                  ) : (
+                    <div className="flex">
+                      <div className="mr-3 mt-0.5">
+                        {getNotificationIcon(notification.type)}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-sm">{notification.title}</h4>
+                          <span className="text-xs text-muted-foreground">{notification.time}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
+                        
+                        {notification.type === 'challenge' && notification.challenge && (
+                          <div className="mt-2">
+                            <Button 
+                              variant="outline"
+                              size="sm"
+                              className="w-full justify-between accent-color border-accent-color/20"
+                            >
+                              <span className="flex items-center">
+                                <Trophy className="mr-1 h-3 w-3" />
+                                {notification.challenge.title}
+                              </span>
+                              <span>Join</span>
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="absolute top-2 right-2 flex space-x-1">
+                        {!notification.read && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6"
+                            onClick={() => markAsRead(notification.id)}
+                          >
+                            <Check className="h-3 w-3" />
+                          </Button>
+                        )}
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => deleteNotification(notification.id)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

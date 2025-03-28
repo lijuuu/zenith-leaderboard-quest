@@ -21,9 +21,15 @@ interface ChatBattleNotificationProps {
     };
     timestamp: string;
   };
+  onAccept?: () => void;
+  onDecline?: () => void;
 }
 
-const ChatBattleNotification: React.FC<ChatBattleNotificationProps> = ({ challenge }) => {
+const ChatBattleNotification: React.FC<ChatBattleNotificationProps> = ({ 
+  challenge,
+  onAccept,
+  onDecline
+}) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { accentColor } = useAccentColor();
@@ -35,7 +41,11 @@ const ChatBattleNotification: React.FC<ChatBattleNotificationProps> = ({ challen
     });
     
     // In a real app, this would make an API call to accept the challenge
-    navigate(`/challenges?id=${challenge.id}`);
+    if (onAccept) {
+      onAccept();
+    } else {
+      navigate(`/challenges?id=${challenge.id}`);
+    }
   };
   
   const handleDecline = () => {
@@ -44,6 +54,9 @@ const ChatBattleNotification: React.FC<ChatBattleNotificationProps> = ({ challen
     });
     
     // In a real app, this would make an API call to decline the challenge
+    if (onDecline) {
+      onDecline();
+    }
   };
   
   return (
