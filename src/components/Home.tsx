@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { GitCompare, Sword, Trophy, Code, Flame, ArrowRight, Users, Github } from 'lucide-react';
-import Header from './Header';
+import Navbar from './Navbar';
 import Footer from './Footer';
+import ChatBattleNotification from './chat/ChatBattleNotification';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -25,6 +26,19 @@ const Home = () => {
     navigate('/challenges');
   };
   
+  const mockBattleChallenge = {
+    id: 'battle-1',
+    title: 'Algorithm Masters Duel',
+    isPrivate: true,
+    difficulty: 'medium' as 'easy' | 'medium' | 'hard',
+    expiresIn: '30 minutes',
+    sender: {
+      name: 'Alex Johnson',
+      avatar: 'https://i.pravatar.cc/300?img=11'
+    },
+    timestamp: '5 minutes ago'
+  };
+  
   useEffect(() => {
     // Show a welcome toast when the component mounts
     toast({
@@ -35,7 +49,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
+      <Navbar isAuthenticated={false} />
       
       <main className="flex-1 bg-gradient-to-b from-white to-green-50 dark:from-zinc-900 dark:to-zinc-950">
         {/* Hero Section */}
@@ -67,6 +81,31 @@ const Home = () => {
                   Browse Challenges
                 </Button>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Mock Battle Interface */}
+        <section className="py-8 bg-zinc-50 dark:bg-zinc-900/50">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="text-center mb-8">
+              <Badge className="mb-2 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-100 hover:dark:bg-green-900/30">
+                New Feature
+              </Badge>
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">
+                Exciting 1v1 <span className="text-green-600 dark:text-green-500">Code Battles</span>
+              </h2>
+              <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
+                Challenge your friends or find random opponents to test your skills in real-time coding battles.
+              </p>
+            </div>
+            
+            <div className="max-w-2xl mx-auto">
+              <ChatBattleNotification 
+                challenge={mockBattleChallenge}
+                onAccept={handleChallengeAccept}
+                onDecline={() => toast({ description: "Challenge declined" })}
+              />
             </div>
           </div>
         </section>
