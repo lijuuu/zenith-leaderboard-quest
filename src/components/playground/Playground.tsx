@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Play, RefreshCw, Clock, CheckCircle, XCircle, ArrowLeft, Plus, Terminal, Server } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Play, RefreshCw, Clock, CheckCircle, XCircle, ArrowLeft, Plus, Terminal, Server, Menu, Maximize2, Minimize2, Download, Settings, Code as CodeIcon } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import { Button } from '@/components/ui/button';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
@@ -12,6 +12,15 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import MainNavbar from '@/components/MainNavbar';
 import { TestCase, TestCaseRunOnly, ProblemMetadata, TestResult, ExecutionResult, ApiResponsePayload, GenericResponse } from '@/api/types/problem-execution';
+import { useTheme } from '@/hooks/theme-provider';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 const API_BASE_URL = 'http://localhost:7000/api/v1';
 
@@ -107,13 +116,13 @@ const ProblemDescription: React.FC<{ problem: ProblemMetadata }> = ({ problem })
   const navigate = useNavigate();
   return (
     <motion.div 
-      className="p-4 overflow-y-auto h-full bg-zinc-900 border-r border-zinc-800 relative" 
+      className="p-4 overflow-y-auto h-full bg-background border-r border-border/50 relative"
       initial={{ opacity: 0, x: -20 }} 
       animate={{ opacity: 1, x: 0 }} 
       transition={{ duration: 0.3, ease: 'easeOut' }}
     >
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold text-white">{problem.title}</h2>
+        <h2 className="text-2xl font-semibold text-foreground">{problem.title}</h2>
         <div className="flex gap-2 flex-wrap">
           <span className={`text-xs px-2 py-0.5 rounded-full ${
             problem.difficulty === 'Easy' ? 'bg-green-500/20 text-green-400' :
@@ -123,22 +132,22 @@ const ProblemDescription: React.FC<{ problem: ProblemMetadata }> = ({ problem })
             {problem.difficulty}
           </span>
           {problem.tags.map((tag, i) => (
-            <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300">
+            <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-muted text-foreground">
               {tag}
             </span>
           ))}
         </div>
-        <div className="text-sm text-zinc-300">
+        <div className="text-sm text-muted-foreground">
           <ReactMarkdown
             components={{
-              h1: ({ node, ...props }) => <h1 className="text-xl font-bold text-white mt-5 mb-3" {...props} />,
-              h2: ({ node, ...props }) => <h2 className="text-lg font-semibold text-white mt-4 mb-2" {...props} />,
-              h3: ({ node, ...props }) => <h3 className="text-md font-medium text-white mt-3 mb-1" {...props} />,
-              p: ({ node, ...props }) => <p className="text-zinc-300 mb-3" {...props} />,
-              ul: ({ node, ...props }) => <ul className="list-disc list-outside ml-4 text-zinc-300 space-y-1 mb-3" {...props} />,
-              li: ({ node, ...props }) => <li className="text-zinc-300" {...props} />,
-              code: ({ node, ...props }) => <code className="px-1.5 py-0.5 bg-zinc-800 rounded text-sm text-green-400" {...props} />,
-              pre: ({ node, ...props }) => <pre className="p-3 bg-zinc-800/80 rounded-md my-3 overflow-x-auto" {...props} />,
+              h1: ({ node, ...props }) => <h1 className="text-xl font-bold text-foreground mt-5 mb-3" {...props} />,
+              h2: ({ node, ...props }) => <h2 className="text-lg font-semibold text-foreground mt-4 mb-2" {...props} />,
+              h3: ({ node, ...props }) => <h3 className="text-md font-medium text-foreground mt-3 mb-1" {...props} />,
+              p: ({ node, ...props }) => <p className="text-muted-foreground mb-3" {...props} />,
+              ul: ({ node, ...props }) => <ul className="list-disc list-outside ml-4 text-muted-foreground space-y-1 mb-3" {...props} />,
+              li: ({ node, ...props }) => <li className="text-muted-foreground" {...props} />,
+              code: ({ node, ...props }) => <code className="px-1.5 py-0.5 bg-muted rounded text-sm text-primary" {...props} />,
+              pre: ({ node, ...props }) => <pre className="p-3 bg-muted/80 rounded-md my-3 overflow-x-auto" {...props} />,
             }}
           >
             {problem.description}
@@ -149,7 +158,7 @@ const ProblemDescription: React.FC<{ problem: ProblemMetadata }> = ({ problem })
         variant="outline" 
         size="sm" 
         onClick={() => navigate('/problems')} 
-        className="absolute bottom-4 left-4 border-zinc-700 hover:bg-zinc-800 hover:text-white"
+        className="absolute bottom-4 left-4 border-border/50 hover:bg-muted hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4 mr-2" /> View All Problems
       </Button>
@@ -159,37 +168,12 @@ const ProblemDescription: React.FC<{ problem: ProblemMetadata }> = ({ problem })
 
 const CodeEditor: React.FC<{ value: string; onChange: (value: string) => void; language: string }> = ({ value, onChange, language }) => {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const { theme } = useTheme();
+  const [fontSize, setFontSize] = useState(14);
   
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
     editorRef.current = editor;
     editor.focus();
-    
-    // Add custom theme styling for better aesthetics
-    monaco.editor.defineTheme('zenx-dark', {
-      base: 'vs-dark',
-      inherit: true,
-      rules: [
-        { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
-        { token: 'keyword', foreground: 'C678DD' },
-        { token: 'string', foreground: '98C379' },
-        { token: 'number', foreground: 'D19A66' },
-        { token: 'function', foreground: '61AFEF' },
-        { token: 'variable', foreground: 'E06C75' },
-        { token: 'type', foreground: '56B6C2' }
-      ],
-      colors: {
-        'editor.background': '#1A1D23',
-        'editor.foreground': '#ABB2BF',
-        'editor.lineHighlightBackground': '#2C313C',
-        'editor.selectionBackground': '#3E4452',
-        'editor.inactiveSelectionBackground': '#3A3D41',
-        'editorCursor.foreground': '#528BFF',
-        'editorWhitespace.foreground': '#3B4048',
-        'editorIndentGuide.background': '#3B4048',
-        'editor.selectionHighlightBorder': '#3B4048'
-      }
-    });
-    monaco.editor.setTheme('zenx-dark');
   };
 
   useEffect(() => {
@@ -206,7 +190,7 @@ const CodeEditor: React.FC<{ value: string; onChange: (value: string) => void; l
   return (
     <motion.div 
       id="editor-container" 
-      className="w-full h-full overflow-hidden rounded-md bg-[#1A1D23] border border-zinc-800 shadow-lg"
+      className="w-full h-full overflow-hidden rounded-md bg-background border border-border/50 shadow-lg"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -217,11 +201,11 @@ const CodeEditor: React.FC<{ value: string; onChange: (value: string) => void; l
         value={value}
         onChange={(v) => onChange(v || '')}
         onMount={handleEditorDidMount}
-        theme="zenx-dark"
+        theme={theme === 'dark' ? 'vs-dark' : 'vs'}
         options={{
           minimap: { enabled: false },
           scrollBeyondLastLine: false,
-          fontSize: 14,
+          fontSize: fontSize,
           lineHeight: 22,
           fontFamily: '"JetBrains Mono", monospace, Consolas, "Courier New"',
           tabSize: 2,
@@ -318,21 +302,21 @@ const Console: React.FC<{
 
   return (
     <motion.div 
-      className="h-full overflow-hidden flex flex-col bg-zinc-900 border-t border-zinc-800"
+      className="h-full overflow-hidden flex flex-col bg-background border-t border-border/50"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
     >
-      <div className="flex items-center justify-between border-b border-zinc-800 px-3 py-2 bg-zinc-900/60 backdrop-blur-sm">
+      <div className="flex items-center justify-between border-b border-border/50 px-3 py-2 bg-muted/20 backdrop-blur-sm">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
-          <h3 className="text-sm font-medium text-white">Console</h3>
+          <h3 className="text-sm font-medium text-foreground">Console</h3>
           <div className="flex text-xs ml-2">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => setActiveTab('output')} 
-              className={`px-2 py-1 h-7 rounded-l-md ${activeTab === 'output' ? 'bg-green-600 text-white hover:bg-green-700' : 'text-zinc-400 hover:text-zinc-200'}`}
+              className={`px-2 py-1 h-7 rounded-l-md ${activeTab === 'output' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'text-muted-foreground hover:text-foreground'}`}
             >
               <Terminal className="h-3.5 w-3.5 mr-1" />
               Output
@@ -341,7 +325,7 @@ const Console: React.FC<{
               variant="ghost" 
               size="sm"
               onClick={() => setActiveTab('tests')} 
-              className={`px-2 py-1 h-7 ${activeTab === 'tests' ? 'bg-green-600 text-white hover:bg-green-700' : 'text-zinc-400 hover:text-zinc-200'}`}
+              className={`px-2 py-1 h-7 ${activeTab === 'tests' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'text-muted-foreground hover:text-foreground'}`}
             >
               <Server className="h-3.5 w-3.5 mr-1" />
               Test Cases
@@ -350,7 +334,7 @@ const Console: React.FC<{
               variant="ghost" 
               size="sm"
               onClick={() => setActiveTab('custom')} 
-              className={`px-2 py-1 h-7 rounded-r-md ${activeTab === 'custom' ? 'bg-green-600 text-white hover:bg-green-700' : 'text-zinc-400 hover:text-zinc-200'}`}
+              className={`px-2 py-1 h-7 rounded-r-md ${activeTab === 'custom' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'text-muted-foreground hover:text-foreground'}`}
             >
               <Plus className="h-3.5 w-3.5 mr-1" />
               Custom Tests
@@ -359,7 +343,7 @@ const Console: React.FC<{
         </div>
         <motion.button 
           onClick={onReset} 
-          className="px-2 py-1 rounded-md flex items-center gap-1 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+          className="px-2 py-1 rounded-md flex items-center gap-1 text-muted-foreground hover:bg-muted hover:text-foreground"
           whileTap={{ scale: 0.97 }}
           whileHover={{ scale: 1.02 }}
         >
@@ -367,7 +351,7 @@ const Console: React.FC<{
         </motion.button>
       </div>
       
-      <div className="overflow-y-auto p-3 font-mono text-sm flex-grow bg-[#1A1D23]">
+      <div className="overflow-y-auto p-3 font-mono text-sm flex-grow bg-muted/20">
         {activeTab === 'output' ? (
           output.length > 0 ? (
             <div className="space-y-1">
@@ -377,24 +361,24 @@ const Console: React.FC<{
                     <span className="text-red-400">{line}</span> : 
                     line.match(/Array|Object|ProblemID|Language|IsRunTestcase|ExecutionResult/) ? 
                     <span className="text-green-500">{line}</span> : 
-                    <span className="text-zinc-300">{line}</span>
+                    <span className="text-foreground/80">{line}</span>
                   }
                 </div>
               ))}
               <div ref={consoleEndRef} />
             </div>
           ) : (
-            <div className="text-zinc-500 italic">Run your code to see output here...</div>
+            <div className="text-muted-foreground italic">Run your code to see output here...</div>
           )
         ) : activeTab === 'tests' ? (
           <div>
-            <h4 className="text-white font-medium mb-2">Run Test Cases</h4>
+            <h4 className="text-foreground font-medium mb-2">Run Test Cases</h4>
             {testCases.length > 0 ? (
               <div className="space-y-2">
                 {testCases.map((tc, i) => (
-                  <div key={tc.id || i} className="p-2.5 rounded-md bg-zinc-900/70 border border-zinc-800/80 hover:border-zinc-700/80 transition-colors">
+                  <div key={tc.id || i} className="p-2.5 rounded-md bg-muted/50 border border-border/50 hover:border-border transition-colors">
                     <div className="flex items-center gap-2">
-                      <span className="text-zinc-300 font-medium">Test Case {i + 1}</span>
+                      <span className="text-foreground/80 font-medium">Test Case {i + 1}</span>
                       {executionResult && executionResult.failedTestCase && executionResult.failedTestCase.testCaseIndex === i ? (
                         <XCircle className="h-4 w-4 text-red-500" />
                       ) : executionResult && executionResult.passedTestCases > i ? (
@@ -403,25 +387,25 @@ const Console: React.FC<{
                     </div>
                     <div className="ml-4 mt-1.5 text-xs space-y-1.5">
                       <div className="flex flex-col">
-                        <span className="text-zinc-500 mb-1">Input:</span>
-                        <pre className="text-green-500 font-mono bg-black/30 p-2 rounded overflow-x-auto">{formatTestCase(tc.input)}</pre>
+                        <span className="text-muted-foreground mb-1">Input:</span>
+                        <pre className="text-green-500 font-mono bg-muted p-2 rounded overflow-x-auto">{formatTestCase(tc.input)}</pre>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-zinc-500 mb-1">Expected:</span>
-                        <pre className="text-green-500 font-mono bg-black/30 p-2 rounded overflow-x-auto">{formatTestCase(tc.expected)}</pre>
+                        <span className="text-muted-foreground mb-1">Expected:</span>
+                        <pre className="text-green-500 font-mono bg-muted p-2 rounded overflow-x-auto">{formatTestCase(tc.expected)}</pre>
                       </div>
                       {executionResult && executionResult.failedTestCase && executionResult.failedTestCase.testCaseIndex === i && (
                         <>
                           {JSON.stringify(executionResult.failedTestCase.received) && 
                             <div className="flex flex-col">
-                              <span className="text-zinc-500 mb-1">Received:</span>
-                              <pre className="text-red-400 font-mono bg-black/30 p-2 rounded overflow-x-auto">{JSON.stringify(executionResult.failedTestCase.received, null, 2)}</pre>
+                              <span className="text-muted-foreground mb-1">Received:</span>
+                              <pre className="text-red-400 font-mono bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(executionResult.failedTestCase.received, null, 2)}</pre>
                             </div>
                           }
                           {executionResult.failedTestCase.error && 
                             <div className="flex flex-col">
-                              <span className="text-zinc-500 mb-1">Error:</span>
-                              <pre className="text-red-400 font-mono bg-black/30 p-2 rounded overflow-x-auto">{executionResult.failedTestCase.error}</pre>
+                              <span className="text-muted-foreground mb-1">Error:</span>
+                              <pre className="text-red-400 font-mono bg-muted p-2 rounded overflow-x-auto">{executionResult.failedTestCase.error}</pre>
                             </div>
                           }
                         </>
@@ -431,28 +415,28 @@ const Console: React.FC<{
                 ))}
               </div>
             ) : (
-              <div className="text-zinc-500 italic">No run test cases available.</div>
+              <div className="text-muted-foreground italic">No run test cases available.</div>
             )}
             
             {executionResult && (
-              <div className="mt-4 p-3 bg-zinc-900/70 border border-zinc-800/80 rounded-md">
+              <div className="mt-4 p-3 bg-muted/50 border border-border/50 rounded-md">
                 <div className="mb-2">
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-zinc-300 font-medium">Test Results Summary</span>
+                    <span className="text-foreground font-medium">Test Results Summary</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${executionResult.overallPass ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                       {executionResult.overallPass ? 'Passed' : 'Failed'}
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-sm">
-                    <div className="p-2 rounded bg-zinc-800/50">
-                      <div className="text-zinc-500 text-xs">Total</div>
-                      <div className="text-white font-medium">{executionResult.totalTestCases}</div>
+                    <div className="p-2 rounded bg-muted">
+                      <div className="text-muted-foreground text-xs">Total</div>
+                      <div className="text-foreground font-medium">{executionResult.totalTestCases}</div>
                     </div>
-                    <div className="p-2 rounded bg-green-900/20">
+                    <div className="p-2 rounded bg-green-500/10">
                       <div className="text-green-400 text-xs">Passed</div>
                       <div className="text-green-300 font-medium">{executionResult.passedTestCases}</div>
                     </div>
-                    <div className="p-2 rounded bg-red-900/20">
+                    <div className="p-2 rounded bg-red-500/10">
                       <div className="text-red-400 text-xs">Failed</div>
                       <div className="text-red-300 font-medium">{executionResult.failedTestCases}</div>
                     </div>
@@ -460,29 +444,29 @@ const Console: React.FC<{
                 </div>
                 
                 {executionResult.failedTestCase?.testCaseIndex !== undefined && executionResult.failedTestCase?.testCaseIndex !== -1 && (
-                  <div className="p-3 rounded-md bg-red-900/20 border border-red-900/30 mt-3">
+                  <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20 mt-3">
                     <h4 className="text-red-400 font-medium mb-2">Failed Test Case Details</h4>
                     <div className="space-y-2 text-xs">
                       <div className="flex">
-                        <span className="text-zinc-400 w-24 inline-block">Test Case:</span>
-                        <span className="text-zinc-300">{executionResult.failedTestCase?.testCaseIndex + 1}</span>
+                        <span className="text-muted-foreground w-24 inline-block">Test Case:</span>
+                        <span className="text-foreground/80">{executionResult.failedTestCase?.testCaseIndex + 1}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-zinc-400 mb-1">Input:</span>
-                        <pre className="text-green-500 font-mono bg-black/30 p-2 rounded overflow-x-auto">{JSON.stringify(executionResult.failedTestCase?.input, null, 2)}</pre>
+                        <span className="text-muted-foreground mb-1">Input:</span>
+                        <pre className="text-green-500 font-mono bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(executionResult.failedTestCase?.input, null, 2)}</pre>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-zinc-400 mb-1">Expected:</span>
-                        <pre className="text-green-500 font-mono bg-black/30 p-2 rounded overflow-x-auto">{JSON.stringify(executionResult.failedTestCase?.expected, null, 2)}</pre>
+                        <span className="text-muted-foreground mb-1">Expected:</span>
+                        <pre className="text-green-500 font-mono bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(executionResult.failedTestCase?.expected, null, 2)}</pre>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-zinc-400 mb-1">Received:</span>
-                        <pre className="text-red-400 font-mono bg-black/30 p-2 rounded overflow-x-auto">{JSON.stringify(executionResult.failedTestCase?.received, null, 2)}</pre>
+                        <span className="text-muted-foreground mb-1">Received:</span>
+                        <pre className="text-red-400 font-mono bg-muted p-2 rounded overflow-x-auto">{JSON.stringify(executionResult.failedTestCase?.received, null, 2)}</pre>
                       </div>
                       {executionResult.failedTestCase?.error && 
                         <div className="flex flex-col">
-                          <span className="text-zinc-400 mb-1">Error:</span>
-                          <pre className="text-red-400 font-mono bg-black/30 p-2 rounded overflow-x-auto">{executionResult.failedTestCase?.error}</pre>
+                          <span className="text-muted-foreground mb-1">Error:</span>
+                          <pre className="text-red-400 font-mono bg-muted p-2 rounded overflow-x-auto">{executionResult.failedTestCase?.error}</pre>
                         </div>
                       }
                     </div>
@@ -493,33 +477,33 @@ const Console: React.FC<{
           </div>
         ) : (
           <div>
-            <div className="mb-5 p-3 rounded-md border border-zinc-800/80 bg-zinc-900/40">
-              <h4 className="text-white font-medium mb-3">Add Custom Test Case</h4>
+            <div className="mb-5 p-3 rounded-md border border-border/50 bg-muted/40">
+              <h4 className="text-foreground font-medium mb-3">Add Custom Test Case</h4>
               <Input
                 placeholder='e.g., { "nums": [2,7,11,15], "target": 9 }'
                 value={customInput}
                 onChange={(e) => setCustomInput(e.target.value)}
-                className="mb-2 bg-zinc-900/80 text-zinc-300 border-zinc-800/80 focus:border-green-500/50 focus:ring-1 focus:ring-green-500/20"
+                className="mb-2 bg-muted/80 text-foreground border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
               />
               <Input
                 placeholder="e.g., [0,1]"
                 value={customExpected}
                 onChange={(e) => setCustomExpected(e.target.value)}
-                className="mb-3 bg-zinc-900/80 text-zinc-300 border-zinc-800/80 focus:border-green-500/50 focus:ring-1 focus:ring-green-500/20"
+                className="mb-3 bg-muted/80 text-foreground border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
               />
               <Button 
                 onClick={handleAddCustomTestCase} 
-                className="w-full bg-green-600 hover:bg-green-700 text-white transition-colors"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
               >
                 <Plus className="h-4 w-4 mr-2" /> Add Test Case
               </Button>
             </div>
             
             <div>
-              <h4 className="text-white font-medium mb-2 flex items-center">
+              <h4 className="text-foreground font-medium mb-2 flex items-center">
                 <span>Custom Test Cases</span>
                 {customTestCases.length > 0 && 
-                  <span className="ml-2 text-xs px-1.5 py-0.5 rounded-full bg-zinc-800 text-zinc-400">
+                  <span className="ml-2 text-xs px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
                     {customTestCases.length}
                   </span>
                 }
@@ -528,23 +512,23 @@ const Console: React.FC<{
               {customTestCases.length > 0 ? (
                 <div className="space-y-2">
                   {customTestCases.map((tc, i) => (
-                    <div key={i} className="p-2.5 rounded-md bg-zinc-900/70 border border-zinc-800/80 hover:border-zinc-700/80 transition-colors">
-                      <div className="text-xs font-medium text-zinc-400 mb-1.5">Custom Test #{i+1}</div>
+                    <div key={i} className="p-2.5 rounded-md bg-muted/50 border border-border/50 hover:border-border transition-colors">
+                      <div className="text-xs font-medium text-muted-foreground mb-1.5">Custom Test #{i+1}</div>
                       <div className="space-y-2">
                         <div className="flex flex-col">
-                          <span className="text-zinc-500 text-xs mb-1">Input:</span>
-                          <pre className="text-green-500 font-mono bg-black/30 p-2 rounded text-xs overflow-x-auto">{formatTestCase(tc.input)}</pre>
+                          <span className="text-muted-foreground text-xs mb-1">Input:</span>
+                          <pre className="text-green-500 font-mono bg-muted p-2 rounded text-xs overflow-x-auto">{formatTestCase(tc.input)}</pre>
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-zinc-500 text-xs mb-1">Expected:</span>
-                          <pre className="text-green-500 font-mono bg-black/30 p-2 rounded text-xs overflow-x-auto">{formatTestCase(tc.expected)}</pre>
+                          <span className="text-muted-foreground text-xs mb-1">Expected:</span>
+                          <pre className="text-green-500 font-mono bg-muted p-2 rounded text-xs overflow-x-auto">{formatTestCase(tc.expected)}</pre>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-zinc-500 italic py-4 text-center bg-zinc-900/20 rounded-md border border-dashed border-zinc-800/50">
+                <div className="text-muted-foreground italic py-4 text-center bg-muted/20 rounded-md border border-dashed border-border/50">
                   No custom test cases added yet...
                 </div>
               )}
@@ -568,6 +552,35 @@ const Playground: React.FC = () => {
   const [customTestCases, setCustomTestCases] = useState<TestCase[]>([]);
   const [consoleTab, setConsoleTab] = useState<'output' | 'tests' | 'custom'>('tests');
   const isMobile = useIsMobile();
+  const [outputExpanded, setOutputExpanded] = useState<boolean>(false);
+  const [showToolTip, setShowToolTip] = useState(false);
+  const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
+
+  const languageOptions = [
+    {
+      value: 'javascript',
+      label: 'JavaScript',
+    },
+    {
+      value: 'python',
+      label: 'Python',
+    },
+    {
+      value: 'go',
+      label: 'Go',
+    },
+    {
+      value: 'cpp',
+      label: 'C++',
+    }
+  ];
+
+  const toggleOutputPanel = () => {
+    if (isMobile) {
+      setOutputExpanded(!outputExpanded);
+    }
+  };
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -750,78 +763,243 @@ const Playground: React.FC = () => {
     toast.success('Custom Test Case Added', { description: 'Added to your test cases.' });
   };
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center text-zinc-300">Loading...</div>;
-  if (!problem) return <div className="min-h-screen flex items-center justify-center text-zinc-300">No problem specified or failed to load.</div>;
+  const handleDownloadCode = () => {
+    const extension = language;
+    const filename = `${problem?.title || 'code'}.${extension}`;
+
+    const blob = new Blob([code], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center text-foreground">Loading...</div>;
+  if (!problem) return <div className="min-h-screen flex items-center justify-center text-foreground">No problem specified or failed to load.</div>;
 
   return (
-    <motion.div className="min-h-screen flex flex-col bg-zinc-950 overflow-hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-      <ResizablePanelGroup direction={isMobile ? 'vertical' : 'horizontal'} className="flex-grow">
-        <ResizablePanel defaultSize={isMobile ? 40 : 35} minSize={20} className="relative">
-          <ProblemDescription problem={problem} />
-        </ResizablePanel>
-        <ResizableHandle withHandle className="bg-zinc-800" />
-        <ResizablePanel defaultSize={isMobile ? 60 : 65} minSize={30}>
-          <ResizablePanelGroup direction="vertical">
-            <ResizablePanel defaultSize={70} minSize={30}>
-              <motion.div className="p-3 space-y-3 h-full flex flex-col bg-zinc-900" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, ease: 'easeOut' }}>
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-3">
-                    <motion.button 
-                      onClick={() => handleCodeExecution("run")} 
-                      disabled={isExecuting} 
-                      className="px-3 py-1.5 rounded-md flex items-center gap-2 bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      whileTap={{ scale: 0.97 }}
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      {isExecuting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-                      <span className="text-sm font-medium">Run</span>
-                    </motion.button>
-                    <motion.button 
-                      onClick={() => handleCodeExecution("submit")} 
-                      disabled={isExecuting} 
-                      className="px-3 py-1.5 rounded-md flex items-center gap-2 bg-zinc-800 text-white hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      whileTap={{ scale: 0.97 }}
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      {isExecuting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-                      <span className="text-sm font-medium">Submit</span>
-                    </motion.button>
-                  </div>
-                  <Timer />
-                  <select 
-                    value={language} 
-                    onChange={(e) => setLanguage(e.target.value)} 
-                    className="bg-zinc-800 text-zinc-300 px-2.5 py-1.5 rounded-md border border-zinc-700 focus:border-green-500/50 focus:outline-none text-sm"
+    <SidebarProvider>
+      <div className="bg-background transition-colors duration-300 h-screen w-full flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between border-b border-border/50 p-2 h-12 bg-muted/20">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="h-8 w-8 p-0 hover:bg-muted rounded-md">
+              <Menu className="h-4 w-4" />
+            </SidebarTrigger>
+            <div
+              className="relative flex items-center cursor-pointer"
+              onMouseEnter={() => setShowToolTip(true)}
+              onMouseLeave={() => setShowToolTip(false)}
+              onClick={() => navigate("/")}
+            >
+              <span className="font-medium text-foreground relative">xcode</span>
+              {showToolTip && (
+                <div className="absolute w-40 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded-md shadow-md mt-1">
+                  Want to go back to home? Click here
+                </div>
+              )}
+              <span className="text-xs text-muted-foreground ml-1 hidden sm:inline">
+                compiler
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1 md:gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 px-2 md:px-3 border-border/50 hover:bg-muted">
+                  <span className="flex items-center">
+                    <span className="hidden sm:inline ml-2">
+                      {languageOptions.find(l => l.value === language)?.label || 'Select Language'}
+                    </span>
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-background border-border/50">
+                {languageOptions.map((lang) => (
+                  <DropdownMenuItem
+                    key={lang.value}
+                    onClick={() => setLanguage(lang.value)}
+                    className="hover:bg-muted flex items-center"
                   >
-                    {problem.supported_languages.map(lang => (
-                      <option key={lang} value={lang} className="bg-zinc-800 text-zinc-300">
-                        {lang.charAt(0).toUpperCase() + lang.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex-grow">
-                  <CodeEditor value={code} onChange={setCode} language={language} />
-                </div>
-              </motion.div>
-            </ResizablePanel>
-            <ResizableHandle withHandle className="bg-zinc-800" />
-            <ResizablePanel defaultSize={30} minSize={5}>
-              <Console
-                output={output}
-                executionResult={executionResult}
-                onReset={handleResetCode}
-                testCases={problem.testcase_run.run || []} 
-                customTestCases={customTestCases}
-                onAddCustomTestCase={handleAddCustomTestCase}
-                activeTab={consoleTab}
-                setActiveTab={setConsoleTab}
-              />
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </motion.div>
+                    {lang.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 hover:bg-muted"
+                onClick={toggleOutputPanel}
+                title={outputExpanded ? "Show Editor" : "Show Output"}
+              >
+                {outputExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              </Button>
+            )}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-background border-border/50">
+                <DropdownMenuItem onClick={() => setTheme("light")} className="hover:bg-muted">
+                  Light Mode
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")} className="hover:bg-muted">
+                  Dark Mode
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDownloadCode} className="hover:bg-muted">
+                  <Download className="h-4 w-4 mr-2" />
+                  Download Code
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        <div className="flex-grow overflow-hidden bg-background">
+          {isMobile ? (
+            <div className="h-full">
+              <div
+                className="h-full transition-all duration-300"
+                style={{ display: outputExpanded ? 'none' : 'block' }}
+              >
+                <ResizablePanelGroup direction="vertical" className="h-full">
+                  <ResizablePanel defaultSize={60} minSize={30}>
+                    <ProblemDescription problem={problem} />
+                  </ResizablePanel>
+                  <ResizableHandle withHandle className="bg-border/50" />
+                  <ResizablePanel defaultSize={40} minSize={20}>
+                    <div className="p-4 h-full flex flex-col">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-foreground font-medium">Code Editor</h3>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleDownloadCode}
+                            className="border-border/50 hover:bg-muted"
+                          >
+                            <Download className="h-3.5 w-3.5 mr-1" />
+                            Download
+                          </Button>
+                          <Button
+                            onClick={() => handleCodeExecution("run")}
+                            disabled={!code.trim() || isExecuting}
+                            size="sm"
+                            className="gap-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+                          >
+                            {isExecuting ? (
+                              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <Play className="h-3.5 w-3.5" />
+                            )}
+                            <span>Run</span>
+                          </Button>
+                        </div>
+                      </div>
+                      <CodeEditor value={code} onChange={setCode} language={language} />
+                    </div>
+                  </ResizablePanel>
+                </ResizablePanelGroup>
+              </div>
+              <div
+                className="h-full transition-all duration-300"
+                style={{ display: outputExpanded ? 'block' : 'none' }}
+              >
+                <Console
+                  output={output}
+                  executionResult={executionResult}
+                  onReset={handleResetCode}
+                  testCases={problem.testcase_run.run || []} 
+                  customTestCases={customTestCases}
+                  onAddCustomTestCase={handleAddCustomTestCase}
+                  activeTab={consoleTab}
+                  setActiveTab={setConsoleTab}
+                />
+              </div>
+            </div>
+          ) : (
+            <ResizablePanelGroup direction="horizontal" className="bg-background">
+              <ResizablePanel defaultSize={35} minSize={20} className="relative">
+                <ProblemDescription problem={problem} />
+              </ResizablePanel>
+              <ResizableHandle withHandle className="bg-border/50" />
+              <ResizablePanel defaultSize={65} minSize={30}>
+                <ResizablePanelGroup direction="vertical">
+                  <ResizablePanel defaultSize={70} minSize={30}>
+                    <motion.div className="p-3 space-y-3 h-full flex flex-col bg-background" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, ease: 'easeOut' }}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-3">
+                          <motion.button 
+                            onClick={() => handleCodeExecution("run")} 
+                            disabled={isExecuting} 
+                            className="px-3 py-1.5 rounded-md flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                            whileTap={{ scale: 0.97 }}
+                            whileHover={{ scale: 1.02 }}
+                          >
+                            {isExecuting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                            <span className="text-sm font-medium">Run</span>
+                          </motion.button>
+                          <motion.button 
+                            onClick={() => handleCodeExecution("submit")} 
+                            disabled={isExecuting} 
+                            className="px-3 py-1.5 rounded-md flex items-center gap-2 bg-muted text-foreground hover:bg-muted/80 disabled:opacity-50 disabled:cursor-not-allowed"
+                            whileTap={{ scale: 0.97 }}
+                            whileHover={{ scale: 1.02 }}
+                          >
+                            {isExecuting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                            <span className="text-sm font-medium">Submit</span>
+                          </motion.button>
+                        </div>
+                        <Timer />
+                        <select 
+                          value={language} 
+                          onChange={(e) => setLanguage(e.target.value)} 
+                          className="bg-muted text-foreground px-2.5 py-1.5 rounded-md border border-border/50 focus:border-primary/50 focus:outline-none text-sm"
+                        >
+                          {problem.supported_languages.map(lang => (
+                            <option key={lang} value={lang} className="bg-muted text-foreground">
+                              {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex-grow">
+                        <CodeEditor value={code} onChange={setCode} language={language} />
+                      </div>
+                    </motion.div>
+                  </ResizablePanel>
+                  <ResizableHandle withHandle className="bg-border/50" />
+                  <ResizablePanel defaultSize={30} minSize={5}>
+                    <Console
+                      output={output}
+                      executionResult={executionResult}
+                      onReset={handleResetCode}
+                      testCases={problem.testcase_run.run || []} 
+                      customTestCases={customTestCases}
+                      onAddCustomTestCase={handleAddCustomTestCase}
+                      activeTab={consoleTab}
+                      setActiveTab={setConsoleTab}
+                    />
+                  </ResizablePanel>
+                </ResizablePanelGroup>
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          )}
+        </div>
+      </div>
+    </SidebarProvider>
   );
 };
 
