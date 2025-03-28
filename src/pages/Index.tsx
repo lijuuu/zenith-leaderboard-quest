@@ -17,13 +17,14 @@ import { getChallenges } from '@/api/challengeApi';
 import { getLeaderboard } from '@/api/leaderboardApi';
 import { useIsMobile } from '@/hooks/use-mobile';
 import MainNavbar from '@/components/MainNavbar';
-// import {Cover} from "@/components/ui/cover"
+import { useAccentColor } from '@/contexts/AccentColorContext';
 
 const Index = () => {
   const { toast } = useToast();
   const dispatch = useAppDispatch();
   const userProfile = useAppSelector((state) => state.user.profile);
   const isMobile = useIsMobile();
+  const { accentColor } = useAccentColor();
 
   useEffect(() => {
     // Scroll to top on component mount
@@ -78,7 +79,7 @@ const Index = () => {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <Button className="bg-green-500 hover:bg-green-600 gap-2" onClick={() => navigate("/challenges")}>
+                <Button className="accent-color gap-2" onClick={() => navigate("/challenges")}>
                   <Plus className="h-4 w-4" />
                   Create Challenge
                 </Button>
@@ -104,7 +105,7 @@ const Index = () => {
                   title="Problems Solved"
                   value={userProfileData?.problemsSolved || 147}
                   change="+3 this week"
-                  icon={<Code className="h-4 w-4 text-green-400" />}
+                  icon={<Code className="h-4 w-4 text-accent" />}
                 />
                 <StatsCard
                   className="hover:scale-105 transition-transform duration-200 ease-in-out"
@@ -132,7 +133,7 @@ const Index = () => {
               <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-green-400" />
+                    <Users className="h-5 w-5 text-accent" />
                     1v1 Challenges
                   </CardTitle>
                   <CardDescription>
@@ -143,15 +144,15 @@ const Index = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-zinc-800/70 backdrop-blur-sm border border-zinc-700/50 rounded-lg p-4 flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="bg-green-500/10 p-2 rounded-lg">
-                          <Play className="h-5 w-5 text-green-400" />
+                        <div className="bg-accent-5 p-2 rounded-lg">
+                          <Play className="h-5 w-5 text-accent" />
                         </div>
                         <div>
                           <div className="font-medium">Quick Match</div>
                           <div className="text-sm text-zinc-400">Find an opponent with similar skill</div>
                         </div>
                       </div>
-                      <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => navigate("/challenges")}>
+                      <Button size="sm" className="accent-color" onClick={() => navigate("/challenges")}>
                         Start
                       </Button>
                     </div>
@@ -225,7 +226,7 @@ const Index = () => {
                     ))}
                   </div>
 
-                  <Link to="/leaderboard" className="mt-4 flex items-center text-sm text-green-400 hover:text-green-300 transition-colors group">
+                  <Link to="/leaderboard" className="mt-4 flex items-center text-sm text-accent hover:text-accent/80 transition-colors group">
                     View full leaderboard
                     <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
