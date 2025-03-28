@@ -39,8 +39,8 @@ function Output({ className }: OutputProps) {
     if (!text) return false;
     
     // Safely convert to string before using split
-    const textString = String(text);
-    return textString.split('\n').length > 5;
+    const textStr = String(text);
+    return textStr.split('\n').length > 5;
   };
 
   return (
