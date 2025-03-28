@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { RefreshCw, CheckCircle, XCircle, Plus, Terminal, Server } from "lucide-react";
@@ -47,7 +48,7 @@ export const Console = ({
   // Function to prettify JSON but keep formatting
   const formatTestCase = (jsonString: string) => {
     try {
-      // We're not actually reformatting, just displaying the raw string
+      // We're displaying the raw JSON string as requested
       return jsonString;
     } catch (e) {
       return jsonString;
