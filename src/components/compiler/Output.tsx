@@ -1,13 +1,15 @@
 
-import React, { useState } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import React, { useState, useEffect } from 'react';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Copy, CheckCheck, ChevronDown, ChevronUp } from 'lucide-react';
+import { Copy, CheckCheck, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { RootState } from '@/store';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 interface OutputProps {
   className?: string;
@@ -15,8 +17,12 @@ interface OutputProps {
 
 function Output({ className }: OutputProps) {
   const { loading, result } = useSelector((state: RootState) => state.xCodeCompiler);
+  const { code, language } = useSelector((state: RootState) => state.xCodeCompiler);
   const [copied, setCopied] = useState(false);
   const [isErrorExpanded, setIsErrorExpanded] = useState(false);
+  const [hints, setHints] = useState<string | null>("");
+  const [loadingHints, setLoadingHints] = useState(false);
+  const [isHintsModalOpen, setIsHintsModalOpen] = useState(false);
 
   const handleCopy = async () => {
     if (!result) return;
@@ -33,8 +39,70 @@ function Output({ className }: OutputProps) {
     }
   };
 
+  const fetchHints = async () => {
+    setLoadingHints(true);
+    try {
+      const errorContext = result?.error || result?.status_message || '';
+      const response = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyATP4kvlgboNEPOz60PtvgeqrLurYO6AoM',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [
+                  {
+                    text: `As a coding assistant, provide 3 concise hints to improve or fix this ${language} code:
+                    \`\`\`${language}
+                    ${code}
+                    \`\`\`
+                    ${errorContext ? `The code has the following error: ${errorContext}` : ''}
+                    Provide logical answers and exact code to fix or replace within a few lines. Format in markdown with code blocks within 2500 tokens`,
+                  },
+                ],
+              },
+            ],
+            generationConfig: { temperature: 0.4, maxOutputTokens: 3000 },
+            safetySettings: [],
+          }),
+        }
+      );
+
+      const data = await response.json();
+      setHints(
+        data.candidates?.[0]?.content?.parts?.[0]?.text ||
+        'Could not generate hints at this time. Please try again later.'
+      );
+    } catch (error) {
+      setHints('Error fetching hints. Please check your API key and try again.');
+      console.error('Error fetching hints:', error);
+    } finally {
+      setLoadingHints(false);
+    }
+  };
+
+  const handleShowHints = () => {
+    if (!hints) fetchHints();
+    setIsHintsModalOpen(true);
+  };
+
+  const handleRefreshHints = () => {
+    setHints(null);
+    fetchHints();
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isHintsModalOpen) setIsHintsModalOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isHintsModalOpen]);
+
   // Fixed version of isLongContent function with proper type handling
-  const isLongContent = (text: string | undefined | null): boolean => {
+  const isLongContent = (text: string | undefined): boolean => {
     // If text is null, undefined, or empty, it's not "long"
     if (!text) return false;
     
@@ -49,6 +117,58 @@ function Output({ className }: OutputProps) {
         <div className="flex justify-between items-center mb-4 p-2 bg-muted/20 rounded-md border border-border/50">
           <h2 className="text-base font-semibold text-foreground">Output</h2>
           <div className="flex items-center gap-2">
+            <Sheet>
+              <SheetTrigger asChild>
+                <button
+                  onClick={handleShowHints}
+                  disabled={loadingHints || !code}
+                  className={cn(
+                    'px-3 py-1 rounded-md text-sm border flex items-center gap-1 transition-colors',
+                    loadingHints
+                      ? 'bg-yellow-200/10 text-yellow-600/50 border-yellow-600/10'
+                      : 'bg-blue-500/20 text-blue-600 border-blue-600/20 hover:bg-blue-500/30'
+                  )}
+                  title="Get code suggestions"
+                >
+                  {loadingHints ? 'Loading...' : 'Suggest Hints'}
+                </button>
+              </SheetTrigger>
+              <SheetContent className="w-[90vw] sm:max-w-md overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle className="flex items-center gap-2">
+                    <span>Code Hints</span>
+                    <button
+                      onClick={handleRefreshHints}
+                      disabled={loadingHints}
+                      className="p-2 hover:bg-blue-500/20 rounded-md transition-colors"
+                      title="Refresh Hints"
+                    >
+                      <RefreshCw className="h-4 w-4 text-blue-600" />
+                    </button>
+                  </SheetTitle>
+                </SheetHeader>
+                <ScrollArea className="h-[calc(100vh-10rem)]">
+                  {loadingHints ? (
+                    <div className="space-y-2 p-4">
+                      <Skeleton className="w-full h-4 rounded-full bg-blue-200/30 animate-pulse" />
+                      <Skeleton className="w-3/4 h-4 rounded-full bg-blue-200/30 animate-pulse" />
+                      <Skeleton className="w-1/2 h-4 rounded-full bg-blue-200/30 animate-pulse" />
+                    </div>
+                  ) : (
+                    <motion.div
+                      key={hints}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="text-sm p-4 whitespace-pre-wrap"
+                    >
+                      {hints}
+                    </motion.div>
+                  )}
+                </ScrollArea>
+              </SheetContent>
+            </Sheet>
+
             {result && (result.output || result.status_message || result.error) && (
               <button
                 onClick={handleCopy}
