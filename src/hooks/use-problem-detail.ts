@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { fetchProblemByIdAPI, executeCode } from '@/api/problemApi';
-import { ProblemMetadata, TestCase, ExecutionResult } from '@/api/types/problem-execution';
+import { ProblemMetadata, TestCase, ExecutionResult, GenericResponse } from '@/api/types/problem-execution';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export const useProblemDetail = () => {
@@ -99,14 +99,21 @@ export const useProblemDetail = () => {
         type === 'run'
       );
       
-      if (!response.success) {
+      // Add type assertion to handle the response properly
+      const typedResponse = response as GenericResponse;
+      
+      if (!typedResponse.success) {
         // Handle error case
-        const errorMsg = response.error ? 
-          `${response.error.errorType}: ${response.error.message}` : 
-          response.payload.rawoutput.syntaxError || 'Execution error';
+        let errorMsg = 'Execution error';
+        
+        if (typedResponse.error) {
+          errorMsg = `${typedResponse.error.errorType}: ${typedResponse.error.message}`;
+        } else if (typedResponse.payload.rawoutput.syntaxError) {
+          errorMsg = typedResponse.payload.rawoutput.syntaxError;
+        }
         
         setOutput([`[Error] ${errorMsg}`]);
-        setExecutionResult(response.payload.rawoutput);
+        setExecutionResult(typedResponse.payload.rawoutput);
         setConsoleTab('output');
         
         toast.error(`${type === 'run' ? 'Run' : 'Submit'} failed`, {
@@ -114,7 +121,7 @@ export const useProblemDetail = () => {
         });
       } else {
         // Handle success case
-        const result = response.payload.rawoutput;
+        const result = typedResponse.payload.rawoutput;
         
         setExecutionResult(result);
         

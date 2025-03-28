@@ -52,11 +52,11 @@ export const Console = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
     >
-      <div className="flex items-center justify-between border-b border-zinc-800 px-3 py-2">
+      <div className="flex items-center justify-between border-b border-zinc-800 px-3 py-2 bg-zinc-900/60 backdrop-blur-sm">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
           <h3 className="text-sm font-medium text-white">Console</h3>
-          <div className="flex text-xs">
+          <div className="flex text-xs ml-2">
             <Button 
               variant="ghost" 
               size="sm" 
@@ -96,7 +96,7 @@ export const Console = ({
         </motion.button>
       </div>
       
-      <div className="overflow-y-auto p-3 font-mono text-sm flex-grow bg-zinc-950">
+      <div className="overflow-y-auto p-3 font-mono text-sm flex-grow bg-[#1A1D23]">
         {activeTab === 'output' ? (
           output.length > 0 ? (
             <div className="space-y-1">
@@ -121,22 +121,38 @@ export const Console = ({
             {testCases.length > 0 ? (
               <div className="space-y-2">
                 {testCases.map((tc, i) => (
-                  <div key={tc.id || i} className="p-2 rounded-md bg-zinc-900 border border-zinc-800">
+                  <div key={tc.id || i} className="p-2.5 rounded-md bg-zinc-900/70 border border-zinc-800/80 hover:border-zinc-700/80 transition-colors">
                     <div className="flex items-center gap-2">
-                      <span className="text-zinc-300">Test Case {i + 1}</span>
+                      <span className="text-zinc-300 font-medium">Test Case {i + 1}</span>
                       {executionResult && executionResult.failedTestCase && executionResult.failedTestCase.testCaseIndex === i ? (
                         <XCircle className="h-4 w-4 text-red-500" />
                       ) : executionResult && executionResult.passedTestCases > i ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : null}
                     </div>
-                    <div className="ml-4 mt-1 text-xs space-y-1">
-                      <div>Input: <span className="text-green-500">{tc.input}</span></div>
-                      <div>Expected: <span className="text-green-500">{tc.expected}</span></div>
+                    <div className="ml-4 mt-1.5 text-xs space-y-1.5">
+                      <div className="flex">
+                        <span className="text-zinc-500 w-20 inline-block">Input:</span>
+                        <span className="text-green-500 font-mono">{tc.input}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="text-zinc-500 w-20 inline-block">Expected:</span>
+                        <span className="text-green-500 font-mono">{tc.expected}</span>
+                      </div>
                       {executionResult && executionResult.failedTestCase && executionResult.failedTestCase.testCaseIndex === i && (
                         <>
-                          {JSON.stringify(executionResult.failedTestCase.received) && <div>Received: <span className="text-red-400">{JSON.stringify(executionResult.failedTestCase.received)}</span></div>}
-                          {executionResult.failedTestCase.error && <div>Error: <span className="text-red-400">{executionResult.failedTestCase.error}</span></div>}
+                          {JSON.stringify(executionResult.failedTestCase.received) && 
+                            <div className="flex">
+                              <span className="text-zinc-500 w-20 inline-block">Received:</span>
+                              <span className="text-red-400 font-mono">{JSON.stringify(executionResult.failedTestCase.received)}</span>
+                            </div>
+                          }
+                          {executionResult.failedTestCase.error && 
+                            <div className="flex">
+                              <span className="text-zinc-500 w-20 inline-block">Error:</span>
+                              <span className="text-red-400 font-mono">{executionResult.failedTestCase.error}</span>
+                            </div>
+                          }
                         </>
                       )}
                     </div>
@@ -148,21 +164,56 @@ export const Console = ({
             )}
             
             {executionResult && (
-              <div className="mt-4 p-3 bg-zinc-900 border border-zinc-800 rounded-md">
+              <div className="mt-4 p-3 bg-zinc-900/70 border border-zinc-800/80 rounded-md">
                 <div className="mb-2">
-                  <span className="text-zinc-300">Total Test Cases: {executionResult.totalTestCases}</span><br />
-                  <span className="text-green-500">Passed: {executionResult.passedTestCases}</span><br />
-                  <span className="text-red-500">Failed: {executionResult.failedTestCases}</span>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-zinc-300 font-medium">Test Results Summary</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${executionResult.overallPass ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                      {executionResult.overallPass ? 'Passed' : 'Failed'}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-sm">
+                    <div className="p-2 rounded bg-zinc-800/50">
+                      <div className="text-zinc-500 text-xs">Total</div>
+                      <div className="text-white font-medium">{executionResult.totalTestCases}</div>
+                    </div>
+                    <div className="p-2 rounded bg-green-900/20">
+                      <div className="text-green-400 text-xs">Passed</div>
+                      <div className="text-green-300 font-medium">{executionResult.passedTestCases}</div>
+                    </div>
+                    <div className="p-2 rounded bg-red-900/20">
+                      <div className="text-red-400 text-xs">Failed</div>
+                      <div className="text-red-300 font-medium">{executionResult.failedTestCases}</div>
+                    </div>
+                  </div>
                 </div>
-                {executionResult.failedTestCase?.testCaseIndex !== -1 && (
-                  <div className="p-2 rounded-md bg-red-900/20">
-                    <h4 className="text-red-400 font-medium">Failed Test Case Details</h4>
-                    <div className="ml-2 mt-1 text-xs space-y-1">
-                      <div>Test Case Index: <span className="text-zinc-300">{executionResult.failedTestCase?.testCaseIndex}</span></div>
-                      <div>Input: <span className="text-green-500">{JSON.stringify(executionResult.failedTestCase?.input)}</span></div>
-                      <div>Expected: <span className="text-green-500">{JSON.stringify(executionResult.failedTestCase?.expected)}</span></div>
-                      <div>Received: <span className="text-red-400">{JSON.stringify(executionResult.failedTestCase?.received)}</span></div>
-                      {executionResult.failedTestCase?.error && <div>Error: <span className="text-red-400">{executionResult.failedTestCase?.error}</span></div>}
+                
+                {executionResult.failedTestCase?.testCaseIndex !== undefined && executionResult.failedTestCase?.testCaseIndex !== -1 && (
+                  <div className="p-3 rounded-md bg-red-900/20 border border-red-900/30 mt-3">
+                    <h4 className="text-red-400 font-medium mb-2">Failed Test Case Details</h4>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex">
+                        <span className="text-zinc-400 w-24 inline-block">Test Case:</span>
+                        <span className="text-zinc-300">{executionResult.failedTestCase?.testCaseIndex + 1}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="text-zinc-400 w-24 inline-block">Input:</span>
+                        <span className="text-green-500 font-mono">{JSON.stringify(executionResult.failedTestCase?.input)}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="text-zinc-400 w-24 inline-block">Expected:</span>
+                        <span className="text-green-500 font-mono">{JSON.stringify(executionResult.failedTestCase?.expected)}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="text-zinc-400 w-24 inline-block">Received:</span>
+                        <span className="text-red-400 font-mono">{JSON.stringify(executionResult.failedTestCase?.received)}</span>
+                      </div>
+                      {executionResult.failedTestCase?.error && 
+                        <div className="flex">
+                          <span className="text-zinc-400 w-24 inline-block">Error:</span>
+                          <span className="text-red-400 font-mono">{executionResult.failedTestCase?.error}</span>
+                        </div>
+                      }
                     </div>
                   </div>
                 )}
@@ -171,40 +222,60 @@ export const Console = ({
           </div>
         ) : (
           <div>
-            <div className="mb-4">
-              <h4 className="text-white font-medium mb-2">Add Custom Test Case</h4>
+            <div className="mb-5 p-3 rounded-md border border-zinc-800/80 bg-zinc-900/40">
+              <h4 className="text-white font-medium mb-3">Add Custom Test Case</h4>
               <Input
                 placeholder='e.g., { "nums": [2,7,11,15], "target": 9 }'
                 value={customInput}
                 onChange={(e) => setCustomInput(e.target.value)}
-                className="mb-2 bg-zinc-900 text-zinc-300 border-zinc-800"
+                className="mb-2 bg-zinc-900/80 text-zinc-300 border-zinc-800/80 focus:border-green-500/50 focus:ring-1 focus:ring-green-500/20"
               />
               <Input
                 placeholder="e.g., [0,1]"
                 value={customExpected}
                 onChange={(e) => setCustomExpected(e.target.value)}
-                className="mb-2 bg-zinc-900 text-zinc-300 border-zinc-800"
+                className="mb-3 bg-zinc-900/80 text-zinc-300 border-zinc-800/80 focus:border-green-500/50 focus:ring-1 focus:ring-green-500/20"
               />
               <Button 
                 onClick={handleAddCustomTestCase} 
-                className="w-full bg-green-600 text-white hover:bg-green-700"
+                className="w-full bg-green-600 hover:bg-green-700 text-white transition-colors"
               >
                 <Plus className="h-4 w-4 mr-2" /> Add Test Case
               </Button>
             </div>
+            
             <div>
-              <h4 className="text-white font-medium mb-2">Custom Test Cases</h4>
+              <h4 className="text-white font-medium mb-2 flex items-center">
+                <span>Custom Test Cases</span>
+                {customTestCases.length > 0 && 
+                  <span className="ml-2 text-xs px-1.5 py-0.5 rounded-full bg-zinc-800 text-zinc-400">
+                    {customTestCases.length}
+                  </span>
+                }
+              </h4>
+              
               {customTestCases.length > 0 ? (
                 <div className="space-y-2">
                   {customTestCases.map((tc, i) => (
-                    <div key={i} className="p-2 rounded-md bg-zinc-900 border border-zinc-800">
-                      <div>Input: <span className="text-green-500">{tc.input}</span></div>
-                      <div>Expected: <span className="text-green-500">{tc.expected}</span></div>
+                    <div key={i} className="p-2.5 rounded-md bg-zinc-900/70 border border-zinc-800/80 hover:border-zinc-700/80 transition-colors">
+                      <div className="text-xs font-medium text-zinc-400 mb-1.5">Custom Test #{i+1}</div>
+                      <div className="ml-2 space-y-1.5 text-xs">
+                        <div className="flex">
+                          <span className="text-zinc-500 w-20 inline-block">Input:</span>
+                          <span className="text-green-500 font-mono">{tc.input}</span>
+                        </div>
+                        <div className="flex">
+                          <span className="text-zinc-500 w-20 inline-block">Expected:</span>
+                          <span className="text-green-500 font-mono">{tc.expected}</span>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-zinc-500 italic">No custom test cases added yet...</div>
+                <div className="text-zinc-500 italic py-4 text-center bg-zinc-900/20 rounded-md border border-dashed border-zinc-800/50">
+                  No custom test cases added yet...
+                </div>
               )}
             </div>
           </div>

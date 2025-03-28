@@ -22,26 +22,26 @@ const ProblemDescription = ({ problem }: { problem: any }) => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
     >
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold text-green-500">{problem.title}</h2>
-        <div className="flex gap-2 flex-wrap">
-          <span className={`text-xs px-2 py-0.5 rounded-full text-white ${
-            problem.difficulty === "Easy" 
-              ? "bg-green-600" 
-              : problem.difficulty === "Medium" 
-              ? "bg-yellow-600" 
-              : "bg-red-600"
+      <div className="space-y-4 pb-16">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <h2 className="text-2xl font-semibold text-green-500">{problem.title}</h2>
+          <div className={`text-xs px-2.5 py-1 rounded-full text-white inline-flex items-center w-fit ${
+            problem.difficulty === "Easy" ? "bg-green-600" : 
+            problem.difficulty === "Medium" ? "bg-yellow-600" : "bg-red-600"
           }`}>
             {problem.difficulty}
-          </span>
+          </div>
+        </div>
+        
+        <div className="flex gap-2 flex-wrap">
           {problem.tags.map((tag: string, i: number) => (
-            <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-zinc-700 text-zinc-300">
+            <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700/50">
               {tag}
             </span>
           ))}
         </div>
         
-        <div className="text-sm text-zinc-300/90">
+        <div className="text-sm text-zinc-300/90 pt-2">
           <ReactMarkdown
             components={{
               h1: ({ node, ...props }) => <h1 className="text-lg font-bold text-green-500 mt-4 mb-2" {...props} />,
@@ -129,7 +129,7 @@ const ProblemDetail = () => {
       <main className="h-[calc(100vh-4rem)] pt-4 px-4">
         <ResizablePanelGroup
           direction={isMobile ? "vertical" : "horizontal"}
-          className="h-full rounded-lg overflow-hidden border border-zinc-800 bg-zinc-900/30"
+          className="h-full rounded-lg overflow-hidden border border-zinc-800 bg-[#141519] shadow-xl"
         >
           <ResizablePanel defaultSize={40} minSize={20}>
             <ProblemDescription problem={problem} />
@@ -141,17 +141,17 @@ const ProblemDetail = () => {
             <ResizablePanelGroup direction="vertical">
               <ResizablePanel defaultSize={70} minSize={30}>
                 <motion.div 
-                  className="p-4 space-y-4 h-full flex flex-col bg-zinc-900"
+                  className="p-4 space-y-4 h-full flex flex-col bg-[#141519]"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex gap-2">
                       <motion.button
                         onClick={() => handleCodeExecution('run')}
                         disabled={isExecuting}
-                        className="px-3 py-1.5 rounded-md flex items-center gap-2 text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                        className="px-3 py-1.5 rounded-md flex items-center gap-2 text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 border border-green-500/20 shadow-sm shadow-green-900/20 transition-colors"
                         whileTap={{ scale: 0.97 }}
                         whileHover={{ scale: 1.02 }}
                       >
@@ -160,13 +160,13 @@ const ProblemDetail = () => {
                         ) : (
                           <Play className="h-4 w-4" />
                         )}
-                        <span className="text-sm">Run</span>
+                        <span className="text-sm font-medium">Run</span>
                       </motion.button>
                       
                       <motion.button
                         onClick={() => handleCodeExecution('submit')}
                         disabled={isExecuting}
-                        className="px-3 py-1.5 rounded-md flex items-center gap-2 text-white bg-zinc-700 hover:bg-zinc-600 disabled:opacity-50"
+                        className="px-3 py-1.5 rounded-md flex items-center gap-2 text-white bg-zinc-700 hover:bg-zinc-600 disabled:opacity-50 border border-zinc-600/20 shadow-sm"
                         whileTap={{ scale: 0.97 }}
                         whileHover={{ scale: 1.02 }}
                       >
@@ -175,21 +175,23 @@ const ProblemDetail = () => {
                         ) : (
                           <Code className="h-4 w-4" />
                         )}
-                        <span className="text-sm">Submit</span>
+                        <span className="text-sm font-medium">Submit</span>
                       </motion.button>
                     </div>
                     
-                    <Timer />
-                    
-                    <select
-                      value={language}
-                      onChange={(e) => setLanguage(e.target.value)}
-                      className="bg-zinc-800 text-zinc-200 px-3 py-1.5 rounded-md border border-zinc-700 focus:border-green-500 focus:outline-none text-sm"
-                    >
-                      {problem.supported_languages.map((lang: string) => (
-                        <option key={lang} value={lang} className="capitalize">{lang}</option>
-                      ))}
-                    </select>
+                    <div className="flex items-center justify-between gap-3">
+                      <Timer />
+                      
+                      <select
+                        value={language}
+                        onChange={(e) => setLanguage(e.target.value)}
+                        className="bg-zinc-800 text-zinc-200 px-3 py-1.5 rounded-md border border-zinc-700 focus:border-green-500 focus:outline-none text-sm"
+                      >
+                        {problem.supported_languages.map((lang: string) => (
+                          <option key={lang} value={lang} className="capitalize">{lang}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   
                   <div className="flex-grow">

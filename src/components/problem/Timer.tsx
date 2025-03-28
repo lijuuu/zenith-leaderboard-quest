@@ -22,32 +22,35 @@ export const Timer = () => {
 
   return (
     <motion.div 
-      className="flex items-center gap-3 px-4 py-2 bg-zinc-900 rounded-md shadow-md" 
+      className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800/80 backdrop-blur-sm rounded-md shadow-md border border-zinc-700/40" 
       initial={{ opacity: 0 }} 
       animate={{ opacity: 1 }} 
       transition={{ duration: 0.3 }}
     >
-      <div className="flex items-center gap-2 text-sm text-zinc-300">
-        <Clock className="h-4 w-4 text-green-500" />
-        <span className="font-medium">{formatTime(time)}</span>
+      <div className="flex items-center gap-1.5 text-sm text-zinc-300">
+        <Clock className="h-3.5 w-3.5 text-green-500" />
+        <span className="font-medium tracking-wide">{formatTime(time)}</span>
       </div>
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={() => setIsActive(true)} 
-        disabled={isActive} 
-        className="h-7 px-3 text-xs font-medium"
-      >
-        Start
-      </Button>
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={() => { setIsActive(false); setTime(0); }} 
-        className="h-7 px-3 text-xs font-medium"
-      >
-        Reset
-      </Button>
+      <div className="h-3.5 w-px bg-zinc-700/50 mx-0.5"></div>
+      <div className="flex space-x-1">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => setIsActive(true)} 
+          disabled={isActive} 
+          className="h-6 px-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-700"
+        >
+          Start
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => { setIsActive(false); setTime(0); }} 
+          className="h-6 px-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-700"
+        >
+          Reset
+        </Button>
+      </div>
     </motion.div>
   );
 };
