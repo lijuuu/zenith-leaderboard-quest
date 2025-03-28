@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Play, RefreshCw, Clock, CheckCircle, XCircle, ArrowLeft, Plus, Terminal, Server } from 'lucide-react';
@@ -680,4 +681,148 @@ const Playground: React.FC = () => {
         setOutput([
           `ProblemID: ${payload.problem_id}`,
           `Language: ${payload.language}`,
-          `IsRunTestcase: ${
+          `IsRunTestcase: ${payload.is_run_testcase}`,
+          `ExecutionResult: ${JSON.stringify(executionResult, null, 2)}`,
+        ]);
+        setExecutionResult(executionResult);
+
+        if (type === 'run') {
+          if (executionResult.overallPass) {
+            toast.success('Run Successful', {
+              description: `All ${executionResult.totalTestCases} test cases passed!`,
+            });
+            setConsoleTab('output');
+          } else {
+            toast.warning('Run Partially Successful', {
+              description: `${executionResult.passedTestCases} of ${executionResult.totalTestCases} test cases passed.`,
+            });
+            setConsoleTab('tests');
+          }
+        } else if (type === 'submit') {
+          if (executionResult.overallPass) {
+            toast.success('Submission Accepted', {
+              description: 'All test cases passed! Great job!',
+            });
+            setConsoleTab('output');
+          } else {
+            toast.error('Submission Failed', {
+              description: `${executionResult.failedTestCases} test case(s) failed. Check the details.`,
+            });
+            setConsoleTab('tests');
+          }
+        }
+      }
+    } catch (error) {
+      const errorMsg = (error as Error).message || 'Network error occurred';
+      setOutput([`[Error] ${errorMsg}`]);
+      setExecutionResult({
+        totalTestCases: allTestCases.length,
+        passedTestCases: 0,
+        failedTestCases: 0,
+        overallPass: false,
+        failedTestCase: { testCaseIndex: -1, input: null, expected: null, received: null, passed: false, error: errorMsg },
+      });
+      setConsoleTab('output');
+
+      toast.error(`${type === 'run' ? 'Run' : 'Submit'} Failed`, {
+        description: errorMsg,
+      });
+    } finally {
+      setIsExecuting(false);
+    }
+  }, [code, problem, language, customTestCases]);
+
+  const handleResetCode = () => {
+    if (problem && language) {
+      const codeKey = `${problem.problem_id}_${language}`;
+      localStorage.removeItem(codeKey);
+      setCode(problem.placeholder_maps[language] || '');
+      setOutput([]);
+      setExecutionResult(null);
+      setCustomTestCases([]);
+      setConsoleTab('tests');
+      toast.info('Code Reset', { description: 'Editor reset to default code.' });
+    }
+  };
+
+  const handleAddCustomTestCase = (input: string, expected: string) => {
+    setCustomTestCases(prev => [...prev, { input, expected }]);
+    toast.success('Custom Test Case Added', { description: 'Added to your test cases.' });
+  };
+
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center text-zinc-300">Loading...</div>;
+  if (!problem) return <div className="min-h-screen flex items-center justify-center text-zinc-300">No problem specified or failed to load.</div>;
+
+  return (
+    <motion.div className="min-h-screen flex flex-col bg-zinc-950 overflow-hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+      <ResizablePanelGroup direction={isMobile ? 'vertical' : 'horizontal'} className="flex-grow">
+        <ResizablePanel defaultSize={isMobile ? 40 : 35} minSize={20} className="relative">
+          <ProblemDescription problem={problem} />
+        </ResizablePanel>
+        <ResizableHandle withHandle className="bg-zinc-800" />
+        <ResizablePanel defaultSize={isMobile ? 60 : 65} minSize={30}>
+          <ResizablePanelGroup direction="vertical">
+            <ResizablePanel defaultSize={70} minSize={30}>
+              <motion.div className="p-3 space-y-3 h-full flex flex-col bg-zinc-900" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, ease: 'easeOut' }}>
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-3">
+                    <motion.button 
+                      onClick={() => handleCodeExecution("run")} 
+                      disabled={isExecuting} 
+                      className="px-3 py-1.5 rounded-md flex items-center gap-2 bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      whileTap={{ scale: 0.97 }}
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      {isExecuting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                      <span className="text-sm font-medium">Run</span>
+                    </motion.button>
+                    <motion.button 
+                      onClick={() => handleCodeExecution("submit")} 
+                      disabled={isExecuting} 
+                      className="px-3 py-1.5 rounded-md flex items-center gap-2 bg-zinc-800 text-white hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      whileTap={{ scale: 0.97 }}
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      {isExecuting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                      <span className="text-sm font-medium">Submit</span>
+                    </motion.button>
+                  </div>
+                  <Timer />
+                  <select 
+                    value={language} 
+                    onChange={(e) => setLanguage(e.target.value)} 
+                    className="bg-zinc-800 text-zinc-300 px-2.5 py-1.5 rounded-md border border-zinc-700 focus:border-green-500/50 focus:outline-none text-sm"
+                  >
+                    {problem.supported_languages.map(lang => (
+                      <option key={lang} value={lang} className="bg-zinc-800 text-zinc-300">
+                        {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-grow">
+                  <CodeEditor value={code} onChange={setCode} language={language} />
+                </div>
+              </motion.div>
+            </ResizablePanel>
+            <ResizableHandle withHandle className="bg-zinc-800" />
+            <ResizablePanel defaultSize={30} minSize={5}>
+              <Console
+                output={output}
+                executionResult={executionResult}
+                onReset={handleResetCode}
+                testCases={problem.testcase_run.run || []} 
+                customTestCases={customTestCases}
+                onAddCustomTestCase={handleAddCustomTestCase}
+                activeTab={consoleTab}
+                setActiveTab={setConsoleTab}
+              />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </motion.div>
+  );
+};
+
+export default Playground;
