@@ -33,10 +33,13 @@ function Output({ className }: OutputProps) {
     }
   };
 
-  // Fix the error by adding type safety to the isLongContent function
+  // Fix the error by explicitly handling string types in isLongContent
   const isLongContent = (text: string | undefined): boolean => {
     if (!text) return false;
-    return (text.split('\n').length || 0) > 5;
+    
+    // Ensure text is treated as string and not 'never' type
+    const textStr = String(text);
+    return textStr.split('\n').length > 5;
   };
 
   return (
