@@ -23,6 +23,7 @@ import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
 import MainNavbar from "@/components/MainNavbar";
+import QuickMatch from "./components/challenges/QuickMatch";
 
 // Create the query client instance
 const queryClient = new QueryClient({
@@ -53,6 +54,7 @@ const App = () => {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/profile/:userId" element={<Profile />} />
                     <Route path="/challenges" element={<Challenges />} />
+                    <Route path="/quick-match" element={<QuickMatch />} />
                     <Route path="/chat" element={<Chat />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/compiler" element={<Compiler />} />
