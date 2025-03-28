@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import { GitCompare, Sword, Trophy, Code, Flame, ArrowRight, Users, Github } from 'lucide-react';
+import { GitCompare, Sword, Trophy, Code, Flame, ArrowRight, Users, Github, Zap, Shield, Star } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import ChatBattleNotification from './chat/ChatBattleNotification';
@@ -13,6 +13,7 @@ import ChatBattleNotification from './chat/ChatBattleNotification';
 const Home = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [showAnimation, setShowAnimation] = useState(false);
   
   const handleQuickMatch = () => {
     navigate('/quick-match');
@@ -45,6 +46,13 @@ const Home = () => {
       title: "Welcome to CodeBattle!",
       description: "Ready to improve your coding skills?",
     });
+    
+    // Trigger animation after a short delay
+    const timer = setTimeout(() => {
+      setShowAnimation(true);
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -53,9 +61,21 @@ const Home = () => {
       
       <main className="flex-1 bg-gradient-to-b from-white to-green-50 dark:from-zinc-900 dark:to-zinc-950">
         {/* Hero Section */}
-        <section className="py-16 md:py-24">
+        <section className="py-16 md:py-24 relative overflow-hidden">
+          {/* Background Effects */}
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl" />
+          </div>
+          
           <div className="container mx-auto px-4 md:px-8">
-            <div className="text-center max-w-4xl mx-auto">
+            <div className={`text-center max-w-4xl mx-auto transform transition-all duration-700 ${showAnimation ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+              <div className="inline-block mb-6">
+                <Badge className="bg-green-50 text-green-700 dark:bg-green-900/40 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/60 px-3 py-1">
+                  <Zap className="h-3.5 w-3.5 mr-1 inline-block" /> Competitive Coding
+                </Badge>
+              </div>
+              
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-emerald-500">
                 Become a Better Developer Through Challenges
               </h1>
@@ -66,16 +86,19 @@ const Home = () => {
                 <Button 
                   onClick={handleQuickMatch}
                   size="lg" 
-                  className="bg-green-600 hover:bg-green-700 text-white py-6 px-8 rounded-xl font-medium flex items-center justify-center gap-2"
+                  className="relative group bg-green-600 hover:bg-green-700 text-white py-6 px-8 rounded-xl font-medium flex items-center justify-center gap-2 shadow-lg shadow-green-600/20 hover:shadow-green-600/30 transition-all"
                 >
-                  <Flame className="h-5 w-5" />
-                  Quick Match
+                  <Flame className="h-5 w-5 group-hover:animate-pulse" />
+                  <span>Quick Match</span>
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                    GO
+                  </span>
                 </Button>
                 <Button 
                   variant="outline" 
                   size="lg"
                   onClick={() => navigate('/challenges')}
-                  className="py-6 px-8 rounded-xl dark:bg-zinc-800 dark:border-zinc-700 dark:text-white flex items-center justify-center gap-2"
+                  className="py-6 px-8 rounded-xl dark:bg-zinc-800/80 dark:border-zinc-700 dark:text-white dark:hover:bg-zinc-700 flex items-center justify-center gap-2 transition-all backdrop-blur-sm"
                 >
                   <Sword className="h-5 w-5" />
                   Browse Challenges
@@ -86,21 +109,29 @@ const Home = () => {
         </section>
 
         {/* Mock Battle Interface */}
-        <section className="py-8 bg-zinc-50 dark:bg-zinc-900/50">
-          <div className="container mx-auto px-4 md:px-8">
+        <section className="py-12 bg-zinc-50 dark:bg-zinc-900/50 relative overflow-hidden">
+          {/* Background pattern */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjI" opacity="0.03" />
+          
+          <div className="container mx-auto px-4 md:px-8 relative">
             <div className="text-center mb-8">
-              <Badge className="mb-2 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-100 hover:dark:bg-green-900/30">
-                New Feature
-              </Badge>
+              <div className="inline-flex items-center justify-center gap-1 mb-3">
+                <Badge className="mb-2 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-100 hover:dark:bg-green-900/30">
+                  <Star className="h-3 w-3 mr-1" /> New Feature
+                </Badge>
+              </div>
               <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">
-                Exciting 1v1 <span className="text-green-600 dark:text-green-500">Code Battles</span>
+                Exciting 1v1 <span className="text-green-600 dark:text-green-500 relative">
+                  Code Battles
+                  <span className="absolute bottom-0 left-0 w-full h-1 bg-green-500/30 rounded-full"></span>
+                </span>
               </h2>
               <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
                 Challenge your friends or find random opponents to test your skills in real-time coding battles.
               </p>
             </div>
             
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-2xl mx-auto transform hover:scale-[1.01] transition-transform">
               <ChatBattleNotification 
                 challenge={mockBattleChallenge}
                 onAccept={handleChallengeAccept}
@@ -126,10 +157,11 @@ const Home = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <Card className="border-green-100 dark:border-green-900/30 dark:bg-zinc-800">
+              <Card className="border-green-100 dark:border-green-900/30 dark:bg-zinc-800/80 backdrop-blur-sm transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
-                    <Code className="h-6 w-6 text-green-600 dark:text-green-500" />
+                  <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <Code className="h-6 w-6 text-green-600 dark:text-green-500 relative z-10" />
                   </div>
                   <CardTitle>Real-world Problems</CardTitle>
                   <CardDescription>
@@ -138,10 +170,11 @@ const Home = () => {
                 </CardHeader>
               </Card>
               
-              <Card className="border-green-100 dark:border-green-900/30 dark:bg-zinc-800">
+              <Card className="border-green-100 dark:border-green-900/30 dark:bg-zinc-800/80 backdrop-blur-sm transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
-                    <GitCompare className="h-6 w-6 text-green-600 dark:text-green-500" />
+                  <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <GitCompare className="h-6 w-6 text-green-600 dark:text-green-500 relative z-10" />
                   </div>
                   <CardTitle>Live Competition</CardTitle>
                   <CardDescription>
@@ -150,10 +183,11 @@ const Home = () => {
                 </CardHeader>
               </Card>
               
-              <Card className="border-green-100 dark:border-green-900/30 dark:bg-zinc-800">
+              <Card className="border-green-100 dark:border-green-900/30 dark:bg-zinc-800/80 backdrop-blur-sm transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
-                    <Trophy className="h-6 w-6 text-green-600 dark:text-green-500" />
+                  <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <Trophy className="h-6 w-6 text-green-600 dark:text-green-500 relative z-10" />
                   </div>
                   <CardTitle>Leaderboard</CardTitle>
                   <CardDescription>
@@ -166,8 +200,11 @@ const Home = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 bg-gradient-to-r from-green-600 to-emerald-500 text-white">
-          <div className="container mx-auto px-4 md:px-8">
+        <section className="py-16 bg-gradient-to-r from-green-600 to-emerald-500 text-white relative overflow-hidden">
+          {/* Diagonal pattern overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNTkuOTEgMEgwdjU5LjkxaDU5LjkxVjB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTU5LjkxIDU5LjkxTDAgMHY1OS45MWg1OS45MVoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuMDUiLz48L3N2Zz4=')] opacity-30" />
+          
+          <div className="container mx-auto px-4 md:px-8 relative">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="max-w-2xl">
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -182,7 +219,7 @@ const Home = () => {
                 <Button 
                   onClick={() => navigate('/register')}
                   size="lg" 
-                  className="bg-white text-green-600 hover:bg-green-50 py-6 px-8 rounded-xl font-medium flex items-center justify-center gap-2"
+                  className="bg-white text-green-600 hover:bg-green-50 py-6 px-8 rounded-xl font-medium flex items-center justify-center gap-2 shadow-lg shadow-green-700/30 transition-all"
                 >
                   Get Started
                   <ArrowRight className="h-5 w-5" />
@@ -191,7 +228,7 @@ const Home = () => {
                   variant="outline" 
                   size="lg"
                   onClick={() => navigate('/login')}
-                  className="py-6 px-8 rounded-xl bg-transparent border-white text-white hover:bg-white/10 flex items-center justify-center gap-2"
+                  className="py-6 px-8 rounded-xl bg-transparent border-white text-white hover:bg-white/10 flex items-center justify-center gap-2 transition-all"
                 >
                   Log In
                 </Button>
@@ -216,10 +253,11 @@ const Home = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Card className="border-green-100 dark:border-green-900/30 dark:bg-zinc-800">
+              <Card className="border-green-100 dark:border-green-900/30 dark:bg-zinc-800/80 backdrop-blur-sm transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
-                    <Users className="h-6 w-6 text-green-600 dark:text-green-500" />
+                  <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 relative group">
+                    <div className="absolute inset-0 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 bg-gradient-to-br from-green-400 to-emerald-600"></div>
+                    <Users className="h-6 w-6 text-green-600 dark:text-green-500 relative z-10 group-hover:text-white transition-colors duration-300" />
                   </div>
                   <CardTitle>10,000+</CardTitle>
                   <CardDescription>
@@ -228,10 +266,11 @@ const Home = () => {
                 </CardHeader>
               </Card>
               
-              <Card className="border-green-100 dark:border-green-900/30 dark:bg-zinc-800">
+              <Card className="border-green-100 dark:border-green-900/30 dark:bg-zinc-800/80 backdrop-blur-sm transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
-                    <Code className="h-6 w-6 text-green-600 dark:text-green-500" />
+                  <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 relative group">
+                    <div className="absolute inset-0 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 bg-gradient-to-br from-green-400 to-emerald-600"></div>
+                    <Code className="h-6 w-6 text-green-600 dark:text-green-500 relative z-10 group-hover:text-white transition-colors duration-300" />
                   </div>
                   <CardTitle>500+</CardTitle>
                   <CardDescription>
@@ -240,10 +279,11 @@ const Home = () => {
                 </CardHeader>
               </Card>
               
-              <Card className="border-green-100 dark:border-green-900/30 dark:bg-zinc-800">
+              <Card className="border-green-100 dark:border-green-900/30 dark:bg-zinc-800/80 backdrop-blur-sm transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
-                    <Github className="h-6 w-6 text-green-600 dark:text-green-500" />
+                  <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 relative group">
+                    <div className="absolute inset-0 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 bg-gradient-to-br from-green-400 to-emerald-600"></div>
+                    <Github className="h-6 w-6 text-green-600 dark:text-green-500 relative z-10 group-hover:text-white transition-colors duration-300" />
                   </div>
                   <CardTitle>Open Source</CardTitle>
                   <CardDescription>
@@ -262,3 +302,4 @@ const Home = () => {
 };
 
 export default Home;
+
