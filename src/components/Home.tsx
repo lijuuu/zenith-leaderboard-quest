@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -111,7 +110,8 @@ const Home = () => {
         {/* Mock Battle Interface */}
         <section className="py-12 bg-zinc-50 dark:bg-zinc-900/50 relative overflow-hidden">
           {/* Background pattern */}
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjI" opacity="0.03" />
+          <div className="absolute inset-0 opacity-[0.03]">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjI" opacity="0.03" />
           
           <div className="container mx-auto px-4 md:px-8 relative">
             <div className="text-center mb-8">
@@ -202,7 +202,7 @@ const Home = () => {
         {/* CTA Section */}
         <section className="py-16 bg-gradient-to-r from-green-600 to-emerald-500 text-white relative overflow-hidden">
           {/* Diagonal pattern overlay */}
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNTkuOTEgMEgwdjU5LjkxaDU5LjkxVjB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTU5LjkxIDU5LjkxTDAgMHY1OS45MWg1OS45MVoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuMDUiLz48L3N2Zz4=')] opacity-30" />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNTkuOTEgMEgwdjU5LjkxaDU5LjkxVjB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iNTkuOTEgNTkuOTFMMCAwdjU5LjkxaDU5LjkxWiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-30" />
           
           <div className="container mx-auto px-4 md:px-8 relative">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
@@ -302,4 +302,3 @@ const Home = () => {
 };
 
 export default Home;
-

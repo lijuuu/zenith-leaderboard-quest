@@ -55,7 +55,7 @@ const Navbar = ({ isAuthenticated = true }) => {
   useEffect(() => {
     // Close mobile menu when route changes
     setMobileMenuOpen(false);
-  }, [location]);
+  }, [location.pathname]);
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -149,8 +149,8 @@ const Navbar = ({ isAuthenticated = true }) => {
       {/* Mobile Navigation */}
       <div
         className={cn(
-          "md:hidden transition-transform duration-300 ease-in-out",
-          mobileMenuOpen ? "transform translate-y-0" : "transform -translate-y-full"
+          "md:hidden transition-all duration-300 ease-in-out absolute w-full",
+          mobileMenuOpen ? "opacity-100 visible max-h-[500px]" : "opacity-0 invisible max-h-0"
         )}
       >
         <nav className="border-t border-zinc-800 py-4 px-6 space-y-1 backdrop-blur-lg bg-zinc-900/90">
