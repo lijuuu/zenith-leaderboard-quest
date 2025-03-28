@@ -23,7 +23,6 @@ import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
 import MainNavbar from "@/components/MainNavbar";
-import Home from "./components/Home";
 
 // Create the query client instance
 const queryClient = new QueryClient({
@@ -46,13 +45,8 @@ const App = () => {
               <div className="min-h-screen bg-zinc-950 text-white">
                 <div>
                   <Routes>
-<<<<<<< HEAD
                     <Route path="/" element={<Home />} />
                     <Route path="/dashboard" element={<Index />} />
-=======
-                    <Route path="/home" element={<Home/>}></Route>
-                    <Route path="/" element={<Index />} />
->>>>>>> cd7cb7e (fix: minor changes on Home.tsx)
                     <Route path="/leaderboard" element={<Leaderboard />} />
                     <Route path="/problems" element={<Problems />} />
                     <Route path="/problems/:id" element={<ProblemDetail />} />
