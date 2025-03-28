@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AccentColorProvider } from "@/contexts/AccentColorContext";
 import { Provider } from "react-redux";
 import { store } from "@/store";
-import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
@@ -46,7 +46,7 @@ const App = () => {
                 <div>
                   <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/dashboard" element={<Index />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/leaderboard" element={<Leaderboard />} />
                     <Route path="/problems" element={<Problems />} />
                     <Route path="/problems/:id" element={<ProblemDetail />} />

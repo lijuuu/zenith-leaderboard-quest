@@ -14,7 +14,8 @@ import {
   Search, 
   Menu, 
   X,
-  Bell
+  Bell,
+  LayoutDashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DarkModeToggle from "./DarkModeToggle";
@@ -47,6 +48,7 @@ const MainNavbar = () => {
   
   const navItems: NavItem[] = [
     { name: "Home", path: "/", icon: <Home className="h-4 w-4" /> },
+    { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
     { name: "Profile", path: "/profile", icon: <User className="h-4 w-4" /> },
     { name: "Problems", path: "/problems", icon: <Code className="h-4 w-4" /> },
     { name: "Compiler", path: "/compiler", icon: <Terminal className="h-4 w-4" /> },

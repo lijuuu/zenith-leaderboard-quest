@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, User, Code, Terminal, Zap, Award, MessageSquare, Settings, LogOut, Menu, X } from "lucide-react";
+import { Home, User, Code, Terminal, Zap, Award, MessageSquare, Settings, LogOut, Menu, X, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DarkModeToggle from "./DarkModeToggle";
 import { useAccentColor } from "@/contexts/AccentColorContext";
@@ -20,6 +20,7 @@ const Navbar = ({ isAuthenticated = true }) => {
 
   const navItems: NavItem[] = [
     { name: "Home", path: "/", icon: <Home className="w-4 h-4" /> },
+    { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
     { name: "Problems", path: "/problems", icon: <Code className="w-4 h-4" /> },
     { name: "Compiler", path: "/compiler", icon: <Terminal className="w-4 h-4" /> },
     { name: "Challenges", path: "/challenges", icon: <Zap className="w-4 h-4" /> },
@@ -119,7 +120,7 @@ const Navbar = ({ isAuthenticated = true }) => {
               </Link>
             ) : (
               <Link
-                to="/login"
+                to="/dashboard"
                 className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-md text-sm font-medium transition-colors text-white"
               >
                 Login
@@ -181,7 +182,7 @@ const Navbar = ({ isAuthenticated = true }) => {
             </Link>
           ) : (
             <Link
-              to="/login"
+              to="/dashboard"
               className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium bg-green-500 hover:bg-green-600 text-white transition-colors"
             >
               Login
