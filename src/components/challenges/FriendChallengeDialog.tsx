@@ -46,13 +46,22 @@ interface FriendChallengeDialogProps {
   onClose: () => void;
 }
 
+// Create a simplified Friend type that doesn't need all User properties
+interface FriendItem {
+  id: string;
+  username: string;
+  fullName: string;
+  profileImage: string;
+  isOnline?: boolean;
+}
+
 const FriendChallengeDialog: React.FC<FriendChallengeDialogProps> = ({
   isOpen,
   onClose
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<UserType[]>([]);
-  const [selectedFriend, setSelectedFriend] = useState<UserType | null>(null);
+  const [selectedFriend, setSelectedFriend] = useState<FriendItem | null>(null);
   const [difficulty, setDifficulty] = useState('easy');
   const [timeLimit, setTimeLimit] = useState('5');
   const [isPrivate, setIsPrivate] = useState(true);
@@ -62,7 +71,7 @@ const FriendChallengeDialog: React.FC<FriendChallengeDialogProps> = ({
   const navigate = useNavigate();
 
   // Mock friends data
-  const friends = [
+  const friends: FriendItem[] = [
     { id: '1', username: 'sophie', fullName: 'Sophie Williams', profileImage: 'https://i.pravatar.cc/300?img=9', isOnline: true },
     { id: '2', username: 'taylor', fullName: 'Taylor Smith', profileImage: 'https://i.pravatar.cc/300?img=5', isOnline: false },
     { id: '3', username: 'mchen', fullName: 'Mike Chen', profileImage: 'https://i.pravatar.cc/300?img=3', isOnline: true },
@@ -87,8 +96,17 @@ const FriendChallengeDialog: React.FC<FriendChallengeDialogProps> = ({
     }
   };
 
-  const selectFriend = (friend: UserType) => {
-    setSelectedFriend(friend);
+  const selectFriend = (friend: FriendItem | UserType) => {
+    // Create a FriendItem from either a FriendItem or UserType
+    const friendItem: FriendItem = {
+      id: friend.id,
+      username: friend.username,
+      fullName: friend.fullName,
+      profileImage: friend.profileImage || '',
+      isOnline: 'isOnline' in friend ? friend.isOnline : undefined
+    };
+    
+    setSelectedFriend(friendItem);
     setShowPreview(false);
   };
 
