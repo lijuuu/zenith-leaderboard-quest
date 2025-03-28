@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, RefreshCw, Clock, CheckCircle, XCircle, ArrowLeft, Plus, Terminal, Server, Menu, Maximize2, Minimize2, Download, Settings, Code as CodeIcon } from 'lucide-react';
@@ -726,4 +727,152 @@ const Playground: React.FC = () => {
       }
     } catch (error) {
       const errorMsg = (error as Error).message || 'Network error occurred';
-      setOutput([`[Error] ${
+      setOutput([`[Error] ${errorMsg}`]);
+      setConsoleTab('output');
+      
+      toast.error(`${type === 'run' ? 'Run' : 'Submit'} Failed`, {
+        description: 'Network or server error occurred.',
+      });
+    } finally {
+      setIsExecuting(false);
+    }
+  }, [problem, language, code, customTestCases]);
+
+  const handleRunCode = () => handleCodeExecution('run');
+  const handleSubmitCode = () => handleCodeExecution('submit');
+
+  const resetConsole = () => {
+    setOutput([]);
+    setExecutionResult(null);
+  };
+
+  const handleCustomTestCase = (input: string, expected: string) => {
+    const newTestCase: TestCase = {
+      id: `custom-${Date.now()}`,
+      input,
+      expected,
+    };
+    setCustomTestCases([...customTestCases, newTestCase]);
+    toast.success('Test case added', {
+      description: 'Custom test case has been added successfully.',
+    });
+  };
+
+  return (
+    <SidebarProvider>
+      <div className="bg-background transition-colors duration-300 h-screen w-full flex flex-col overflow-hidden">
+        {!isLoading && problem && (
+          <ResizablePanelGroup direction="horizontal" className="h-full">
+            {!isMobile && (
+              <>
+                <ResizablePanel defaultSize={30} minSize={25} maxSize={40} className="overflow-hidden">
+                  <ProblemDescription problem={problem} />
+                </ResizablePanel>
+                <ResizableHandle className="w-1.5 bg-border/30" />
+              </>
+            )}
+            
+            <ResizablePanel defaultSize={isMobile ? 100 : 70} className="flex flex-col">
+              <div className="flex items-center justify-between p-3 border-b border-border/50 bg-muted/20">
+                <div className="flex items-center gap-2">
+                  {isMobile && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => navigate('/problems')} 
+                      className="h-8 w-8"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <div>
+                    <h2 className="text-sm font-medium text-foreground">{problem.title}</h2>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                        problem.difficulty === 'Easy' ? 'bg-green-500/20 text-green-400' :
+                        problem.difficulty === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-red-500/20 text-red-400'
+                      }`}>
+                        {problem.difficulty}
+                      </span>
+                      <Timer />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="border-border/50">
+                        {languageOptions.find(l => l.value === language)?.label || 'Select Language'}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-background border-border/50">
+                      {languageOptions
+                        .filter(lang => problem.supported_languages.includes(lang.value))
+                        .map(lang => (
+                          <DropdownMenuItem 
+                            key={lang.value} 
+                            onClick={() => setLanguage(lang.value)}
+                            className="hover:bg-muted cursor-pointer"
+                          >
+                            {lang.label}
+                          </DropdownMenuItem>
+                        ))
+                      }
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  
+                  <Button variant="default" size="sm" onClick={handleRunCode} disabled={isExecuting || !code.trim()}>
+                    <Play className="h-3.5 w-3.5 mr-1.5" />
+                    Run
+                  </Button>
+                  
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="bg-green-600 hover:bg-green-700"
+                    onClick={handleSubmitCode} 
+                    disabled={isExecuting || !code.trim()}
+                  >
+                    Submit
+                  </Button>
+                </div>
+              </div>
+              
+              <ResizablePanelGroup direction="vertical" className="flex-grow">
+                <ResizablePanel defaultSize={60} className="overflow-hidden">
+                  <CodeEditor value={code} onChange={setCode} language={language} />
+                </ResizablePanel>
+                <ResizableHandle className="h-1.5 bg-border/30" />
+                <ResizablePanel defaultSize={40} className="overflow-hidden">
+                  <Console 
+                    output={output}
+                    executionResult={executionResult}
+                    onReset={resetConsole}
+                    testCases={problem.testcase_run.run}
+                    customTestCases={customTestCases}
+                    onAddCustomTestCase={handleCustomTestCase}
+                    activeTab={consoleTab}
+                    setActiveTab={setConsoleTab}
+                  />
+                </ResizablePanel>
+              </ResizablePanelGroup>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        )}
+        
+        {isLoading && (
+          <div className="flex-1 flex justify-center items-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <p className="text-foreground">Loading problem...</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </SidebarProvider>
+  );
+};
+
+export default Playground;
