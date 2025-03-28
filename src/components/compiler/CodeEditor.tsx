@@ -9,8 +9,10 @@ import { useTheme } from '@/hooks/theme-provider';
 import { cn } from '@/lib/utils';
 import { RootState } from '@/store';
 import { toast } from 'sonner';
-import { File, languages } from './CompilerLayout';
+import { runCode } from '@/store/slices/compilerSlice';
+import { File } from '@/api/types/compiler';
 import * as monaco from 'monaco-editor';
+import { languages } from './CompilerLayout';
 
 interface CodeEditorProps {
   className?: string;
@@ -38,7 +40,7 @@ const CodeEditor = ({ className, isMobile }: CodeEditorProps) => {
   const handleRun = () => {
     if (dispatch) {
       const reqLang = languages.find((lang) => lang.value === language)?.req || '';
-      dispatch({ type: 'xCodeCompiler/runCode', payload: { code, reqLang } });
+      dispatch(runCode({ code, reqLang }));
     }
   };
 
@@ -127,7 +129,7 @@ const CodeEditor = ({ className, isMobile }: CodeEditorProps) => {
             onClick={handleRun}
             disabled={!code.trim()}
             size="sm"
-            className="gap-1 bg-primary hover:bg-primary/90"
+            className="gap-1 bg-green-600 hover:bg-green-700 text-white"
           >
             <PlayIcon className="h-3.5 w-3.5" />
             <span>Run</span>

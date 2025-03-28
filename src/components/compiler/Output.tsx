@@ -24,7 +24,7 @@ function Output({ className }: OutputProps) {
     const textToCopy = result.output || result.status_message || result.error || '';
     
     try {
-      await navigator.clipboard.writeText(textToCopy);
+      await navigator.clipboard.writeText(String(textToCopy));
       setCopied(true);
       toast.success('Copied to clipboard');
       setTimeout(() => setCopied(false), 2000);
@@ -39,8 +39,7 @@ function Output({ className }: OutputProps) {
     if (!text) return false;
     
     // Convert to string to ensure split can be called
-    const textAsString = String(text);
-    return textAsString.split('\n').length > 5;
+    return String(text).split('\n').length > 5;
   };
 
   return (
@@ -63,7 +62,7 @@ function Output({ className }: OutputProps) {
               </button>
             )}
             {result && result.execution_time && (
-              <div className="bg-yellow-200/20 text-yellow-600 px-3 py-1 rounded-md text-sm border border-yellow-600/20">
+              <div className="bg-green-200/20 text-green-600 px-3 py-1 rounded-md text-sm border border-green-600/20">
                 Time: {typeof result.execution_time === 'string' 
                   ? result.execution_time.split('.')[0] 
                   : result.execution_time} ms
