@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   PlusCircle,
@@ -51,6 +51,7 @@ const Challenges = () => {
   const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const { data: challenges, isLoading: challengesLoading, refetch: refetchChallenges } = useQuery({
     queryKey: ["challenges"],
@@ -91,6 +92,10 @@ const Challenges = () => {
   const handleJoinSuccess = (challenge: Challenge) => {
     setActiveChallenge(challenge);
     setActiveChallengeId(challenge.id);
+  };
+
+  const handleQuickMatch = () => {
+    navigate('/quick-match');
   };
 
   return (
@@ -167,7 +172,7 @@ const Challenges = () => {
                         <p className="text-sm font-medium">Quick Match</p>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">Find an opponent with similar skill</p>
                       </div>
-                      <Button size="sm" className="bg-green-500 hover:bg-green-600">
+                      <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={handleQuickMatch}>
                         Start
                       </Button>
                     </div>
@@ -474,7 +479,7 @@ const Challenges = () => {
                             </div>
                           </div>
                         )}
-                      </CardContent>
+                      </CardFooter>
                       <CardFooter className="flex justify-end gap-2">
                         <Button
                           variant="outline"
