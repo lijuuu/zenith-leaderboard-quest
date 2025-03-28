@@ -33,7 +33,11 @@ function Output({ className }: OutputProps) {
     }
   };
 
-  const isLongContent = (text: string | undefined) => (text?.split('\n').length || 0) > 5;
+  // Fix the error by adding type safety to the isLongContent function
+  const isLongContent = (text: string | undefined): boolean => {
+    if (!text) return false;
+    return (text.split('\n').length || 0) > 5;
+  };
 
   return (
     <div className={cn('h-full bg-background', className)}>
