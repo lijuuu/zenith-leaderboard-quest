@@ -38,7 +38,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { createChallenge } from "@/api/challengeApi";
-import { Challenge, User as UserType } from "@/api/types";
+import { Challenge } from "@/api/types";
 import {
   FileCode,
   Lock,
@@ -57,6 +57,7 @@ import {
 } from "lucide-react";
 import UserSearch from "./UserSearch";
 import { searchUsers } from "@/api/challengeApi";
+import { User as UserType } from "@/api/types";
 
 const formSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }),
@@ -73,15 +74,6 @@ interface CreateChallengeFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: (challenge: Challenge) => void;
-}
-
-// Create a simplified Friend type that doesn't need all User properties
-interface FriendItem {
-  id: string;
-  username: string;
-  fullName: string;
-  profileImage: string;
-  isOnline?: boolean;
 }
 
 const CreateChallengeForm: React.FC<CreateChallengeFormProps> = ({
@@ -103,7 +95,7 @@ const CreateChallengeForm: React.FC<CreateChallengeFormProps> = ({
     { id: "p8", title: "Trapping Rain Water", difficulty: "Hard" },
     { id: "p9", title: "Word Search II", difficulty: "Hard" },
   ]);
-  const [selectedFriends, setSelectedFriends] = useState<FriendItem[]>([]);
+  const [selectedFriends, setSelectedFriends] = useState<UserType[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<UserType[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -111,7 +103,7 @@ const CreateChallengeForm: React.FC<CreateChallengeFormProps> = ({
   const { toast } = useToast();
 
   // Mock friends
-  const friends: FriendItem[] = [
+  const friends = [
     { id: '1', username: 'sophiew', fullName: 'Sophie Williams', profileImage: 'https://i.pravatar.cc/300?img=9', isOnline: true },
     { id: '2', username: 'tsmith', fullName: 'Taylor Smith', profileImage: 'https://i.pravatar.cc/300?img=5', isOnline: false },
     { id: '3', username: 'mchen', fullName: 'Mike Chen', profileImage: 'https://i.pravatar.cc/300?img=3', isOnline: true },
@@ -184,21 +176,12 @@ const CreateChallengeForm: React.FC<CreateChallengeFormProps> = ({
     }
   };
 
-  const toggleFriendSelection = (friend: FriendItem | UserType) => {
-    // Create a FriendItem from either a FriendItem or UserType
-    const friendItem: FriendItem = {
-      id: friend.id,
-      username: friend.username,
-      fullName: friend.fullName,
-      profileImage: friend.profileImage || '',
-      isOnline: 'isOnline' in friend ? friend.isOnline : undefined
-    };
-    
+  const toggleFriendSelection = (friend: UserType) => {
     setSelectedFriends(prev => {
-      const isSelected = prev.some(f => f.id === friendItem.id);
+      const isSelected = prev.some(f => f.id === friend.id);
       return isSelected 
-        ? prev.filter(f => f.id !== friendItem.id)
-        : [...prev, friendItem];
+        ? prev.filter(f => f.id !== friend.id)
+        : [...prev, friend];
     });
   };
 
