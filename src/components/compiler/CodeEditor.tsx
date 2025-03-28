@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Copy, CheckCheck, PlayIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Editor from "@monaco-editor/react";
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useTheme } from '@/hooks/theme-provider';
 import { cn } from '@/lib/utils';
 import { RootState } from '@/store';
@@ -13,7 +13,7 @@ import { runCode } from '@/store/slices/compilerSlice';
 import { File } from '@/api/types/compiler';
 import * as monaco from 'monaco-editor';
 import { languages } from './CompilerLayout';
-import { useAppDispatch } from '@/hooks/useAppDispatch'; // Import the typed dispatch
+import { useAppDispatch } from '@/hooks/useAppDispatch';
 
 interface CodeEditorProps {
   className?: string;
@@ -22,7 +22,7 @@ interface CodeEditorProps {
 
 const CodeEditor = ({ className, isMobile }: CodeEditorProps) => {
   const { theme } = useTheme();
-  const dispatch = useAppDispatch(); // Use the typed dispatch
+  const dispatch = useAppDispatch();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   
   // Get state from Redux store

@@ -16,7 +16,7 @@ export const executeCode = async (code: string, language: string): Promise<Compi
 
   try {
     const response = await axios.post(
-      apiUrl || 'https://api.zenx.codes/execute', // Fallback URL if env variable not set
+      apiUrl || 'http://localhost:7000/api/v1/compile', // Default to localhost if env variable not set
       { code: btoa(code), language },
       { headers: { 'Content-Type': 'application/json' } }
     );
