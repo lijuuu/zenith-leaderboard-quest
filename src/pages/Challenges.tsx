@@ -42,6 +42,7 @@ import SubmissionHistory from "@/components/SubmissionHistory";
 import ChallengeInterface from "@/components/ChallengeInterface";
 import CreateChallengeForm from "@/components/CreateChallengeForm";
 import JoinPrivateChallenge from "@/components/JoinPrivateChallenge";
+import FriendChallengeDialog from "@/components/challenges/FriendChallengeDialog";
 // import UserSearch from "@/components/UserSearch";
 import { getChallenges, getChallenge, getChallengeInvites } from "@/api/challengeApi";
 import { Challenge } from "@/api/types";
@@ -51,6 +52,7 @@ const Challenges = () => {
   const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const [isFriendChallengeOpen, setIsFriendChallengeOpen] = useState(false);
   const navigate = useNavigate();
 
   const { data: challenges, isLoading: challengesLoading, refetch: refetchChallenges } = useQuery({
@@ -98,8 +100,12 @@ const Challenges = () => {
     navigate('/quick-match');
   };
 
+  const handleChallengeAFriend = () => {
+    setIsFriendChallengeOpen(true);
+  };
+
   return (
-   <div className="min-h-screen  rounded-lg shadow-lg text-foreground pt-16 pb-8">
+    <div className="min-h-screen rounded-lg shadow-lg text-foreground pt-16 pb-8">
       <MainNavbar />
 
       {activeChallengeId ? (
@@ -185,7 +191,7 @@ const Challenges = () => {
                         <p className="text-sm font-medium">Challenge a Friend</p>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">Send a challenge to a specific user</p>
                       </div>
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={handleChallengeAFriend}>
                         Select
                       </Button>
                     </div>
@@ -479,7 +485,7 @@ const Challenges = () => {
                             </div>
                           </div>
                         )}
-                      </CardFooter>
+                      </CardContent>
                       <CardFooter className="flex justify-end gap-2">
                         <Button
                           variant="outline"
@@ -514,8 +520,6 @@ const Challenges = () => {
             </div>
 
             <div className="space-y-8">
-
-
               <Card className="bento-card">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-lg">
@@ -626,6 +630,11 @@ const Challenges = () => {
         isOpen={isJoinModalOpen}
         onClose={() => setIsJoinModalOpen(false)}
         onSuccess={handleJoinSuccess}
+      />
+
+      <FriendChallengeDialog
+        isOpen={isFriendChallengeOpen}
+        onClose={() => setIsFriendChallengeOpen(false)}
       />
     </div>
   );
