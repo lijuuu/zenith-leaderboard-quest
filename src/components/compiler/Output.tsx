@@ -165,11 +165,14 @@ function Output({ className }: OutputProps) {
                     >
                       <ReactMarkdown
                         components={{
-                          code({ node, inline, className, children, ...props }) {
+                          code({ node, className, children, ...props }) {
+                            const match = /language-(\w+)/.exec(className || '');
+                            const isInline = !match && (props.inline === true || !props.className?.includes('language-'));
+
                             return (
                               <code
                                 className={cn(
-                                  inline ? 'bg-muted/30 px-1 py-0.5 rounded' : 'block bg-muted/30 p-2 rounded-md overflow-x-auto my-2',
+                                  isInline ? 'bg-muted/30 px-1 py-0.5 rounded' : 'block bg-muted/30 p-2 rounded-md overflow-x-auto my-2',
                                   'text-blue-400',
                                   className
                                 )}
