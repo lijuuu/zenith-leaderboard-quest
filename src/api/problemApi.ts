@@ -1,4 +1,3 @@
-
 import { Problem, Submission, CompileRequest, CompileResponse } from './types';
 
 // Mock data for problems
@@ -433,5 +432,105 @@ export const runTestCases = async (problemId: string, code: string, language: st
       passed: allPassed,
       results
     }), 1500);
+  });
+};
+
+// Add these new functions for the problem execution
+export const fetchProblemByIdAPI = async (problemId: string) => {
+  // Get problem from the existing mock data for development
+  const problem = await getProblem(problemId);
+  
+  if (!problem) {
+    throw new Error('Problem not found');
+  }
+
+  // Map the mock data to the expected format
+  return {
+    problem_id: problem.id,
+    title: problem.title,
+    description: problem.description,
+    tags: problem.tags,
+    testcase_run: {
+      run: problem.examples.map(example => ({
+        input: example.input,
+        expected: example.output
+      }))
+    },
+    difficulty: problem.difficulty,
+    supported_languages: ['javascript', 'python', 'java', 'cpp', 'go'],
+    validated: true,
+    placeholder_maps: {
+      javascript: 'function solution(nums, target) {\n  // Write your solution here\n}',
+      python: 'def solution(nums, target):\n  # Write your solution here\n  pass',
+      java: 'class Solution {\n  public int[] solution(int[] nums, int target) {\n    // Write your solution here\n    return new int[0];\n  }\n}',
+      cpp: '#include <vector>\n\nclass Solution {\npublic:\n  std::vector<int> solution(std::vector<int>& nums, int target) {\n    // Write your solution here\n    return {};\n  }\n};',
+      go: 'package main\n\nfunc solution(nums []int, target int) []int {\n  // Write your solution here\n  return []int{}\n}'
+    }
+  };
+};
+
+export const executeCode = async (
+  problemId: string,
+  language: string,
+  code: string,
+  isRunTestcase: boolean
+) => {
+  // For now, we'll simulate the API call with a mocked response
+  // In production, this would be a real API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Create a simulated success response (70% chance)
+      const success = Math.random() > 0.3;
+      
+      if (success) {
+        const passedCount = Math.floor(Math.random() * 4); // 0-3 passed tests
+        const totalCount = 3; // Mock 3 test cases
+        
+        resolve({
+          success: true,
+          status: 200,
+          payload: {
+            problem_id: problemId,
+            language,
+            is_run_testcase: isRunTestcase,
+            rawoutput: {
+              totalTestCases: totalCount,
+              passedTestCases: passedCount,
+              failedTestCases: totalCount - passedCount,
+              overallPass: passedCount === totalCount,
+              failedTestCase: passedCount < totalCount ? {
+                testCaseIndex: passedCount,
+                input: { nums: [2, 7, 11, 15], target: 9 },
+                expected: [0, 1],
+                received: [1, 0],
+                passed: false
+              } : undefined
+            }
+          }
+        });
+      } else {
+        // Simulate error response
+        resolve({
+          success: false,
+          status: 400,
+          payload: {
+            problem_id: problemId,
+            language,
+            is_run_testcase: isRunTestcase,
+            rawoutput: {
+              totalTestCases: 0,
+              passedTestCases: 0,
+              failedTestCases: 0,
+              overallPass: false,
+              syntaxError: "Unexpected token in line 3"
+            }
+          },
+          error: {
+            errorType: "SyntaxError",
+            message: "Unexpected token in line 3"
+          }
+        });
+      }
+    }, 1500);
   });
 };
