@@ -167,7 +167,8 @@ function Output({ className }: OutputProps) {
                         components={{
                           code({ node, className, children, ...props }) {
                             const match = /language-(\w+)/.exec(className || '');
-                            const isInline = !match && (props.inline === true || !props.className?.includes('language-'));
+                            // Fix: Use type assertion for props to access inline property safely
+                            const isInline = !match && ((props as any).inline === true || !(className?.includes('language-')));
 
                             return (
                               <code
@@ -219,7 +220,9 @@ function Output({ className }: OutputProps) {
               <div className="bg-green-200/20 text-green-600 px-3 py-1 rounded-md text-sm border border-green-600/20">
                 Time: {typeof result.execution_time === 'string' 
                   ? result.execution_time.split('.')[0] 
-                  : result.execution_time} ms
+                  : typeof result.execution_time === 'number'
+                    ? String(result.execution_time).split('.')[0]
+                    : result.execution_time} ms
               </div>
             )}
             <div className="flex justify-center items-center">
