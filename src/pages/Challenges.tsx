@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -99,7 +100,7 @@ const Challenges = () => {
   };
 
   return (
-   <div className="min-h-screen  rounded-lg shadow-lg text-foreground pt-16 pb-8">
+    <div className="min-h-screen rounded-lg shadow-lg text-foreground pt-16 pb-8">
       <MainNavbar />
 
       {activeChallengeId ? (
@@ -479,7 +480,7 @@ const Challenges = () => {
                             </div>
                           </div>
                         )}
-                      </CardFooter>
+                      </CardContent>
                       <CardFooter className="flex justify-end gap-2">
                         <Button
                           variant="outline"
@@ -514,8 +515,6 @@ const Challenges = () => {
             </div>
 
             <div className="space-y-8">
-
-
               <Card className="bento-card">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-lg">
