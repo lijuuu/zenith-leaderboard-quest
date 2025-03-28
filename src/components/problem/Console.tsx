@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { RefreshCw, CheckCircle, XCircle, Plus, Terminal, Server } from "lucide-react";
@@ -42,6 +41,16 @@ export const Console = ({
       onAddCustomTestCase(customInput, customExpected);
       setCustomInput('');
       setCustomExpected('');
+    }
+  };
+
+  // Function to prettify JSON but keep formatting
+  const formatTestCase = (jsonString: string) => {
+    try {
+      // We're not actually reformatting, just displaying the raw string
+      return jsonString;
+    } catch (e) {
+      return jsonString;
     }
   };
 
@@ -104,7 +113,7 @@ export const Console = ({
                 <div key={i} className="whitespace-pre-wrap break-all">
                   {line.startsWith('[Error]') ? 
                     <span className="text-red-400">{line}</span> : 
-                    line.match(/Array|Object/) ? 
+                    line.match(/Array|Object|ProblemID|Language|IsRunTestcase|ExecutionResult/) ? 
                     <span className="text-green-500">{line}</span> : 
                     <span className="text-zinc-300">{line}</span>
                   }
@@ -131,26 +140,26 @@ export const Console = ({
                       ) : null}
                     </div>
                     <div className="ml-4 mt-1.5 text-xs space-y-1.5">
-                      <div className="flex">
-                        <span className="text-zinc-500 w-20 inline-block">Input:</span>
-                        <span className="text-green-500 font-mono">{tc.input}</span>
+                      <div className="flex flex-col">
+                        <span className="text-zinc-500 mb-1">Input:</span>
+                        <pre className="text-green-500 font-mono bg-black/30 p-2 rounded overflow-x-auto">{formatTestCase(tc.input)}</pre>
                       </div>
-                      <div className="flex">
-                        <span className="text-zinc-500 w-20 inline-block">Expected:</span>
-                        <span className="text-green-500 font-mono">{tc.expected}</span>
+                      <div className="flex flex-col">
+                        <span className="text-zinc-500 mb-1">Expected:</span>
+                        <pre className="text-green-500 font-mono bg-black/30 p-2 rounded overflow-x-auto">{formatTestCase(tc.expected)}</pre>
                       </div>
                       {executionResult && executionResult.failedTestCase && executionResult.failedTestCase.testCaseIndex === i && (
                         <>
                           {JSON.stringify(executionResult.failedTestCase.received) && 
-                            <div className="flex">
-                              <span className="text-zinc-500 w-20 inline-block">Received:</span>
-                              <span className="text-red-400 font-mono">{JSON.stringify(executionResult.failedTestCase.received)}</span>
+                            <div className="flex flex-col">
+                              <span className="text-zinc-500 mb-1">Received:</span>
+                              <pre className="text-red-400 font-mono bg-black/30 p-2 rounded overflow-x-auto">{JSON.stringify(executionResult.failedTestCase.received, null, 2)}</pre>
                             </div>
                           }
                           {executionResult.failedTestCase.error && 
-                            <div className="flex">
-                              <span className="text-zinc-500 w-20 inline-block">Error:</span>
-                              <span className="text-red-400 font-mono">{executionResult.failedTestCase.error}</span>
+                            <div className="flex flex-col">
+                              <span className="text-zinc-500 mb-1">Error:</span>
+                              <pre className="text-red-400 font-mono bg-black/30 p-2 rounded overflow-x-auto">{executionResult.failedTestCase.error}</pre>
                             </div>
                           }
                         </>
@@ -196,22 +205,22 @@ export const Console = ({
                         <span className="text-zinc-400 w-24 inline-block">Test Case:</span>
                         <span className="text-zinc-300">{executionResult.failedTestCase?.testCaseIndex + 1}</span>
                       </div>
-                      <div className="flex">
-                        <span className="text-zinc-400 w-24 inline-block">Input:</span>
-                        <span className="text-green-500 font-mono">{JSON.stringify(executionResult.failedTestCase?.input)}</span>
+                      <div className="flex flex-col">
+                        <span className="text-zinc-400 mb-1">Input:</span>
+                        <pre className="text-green-500 font-mono bg-black/30 p-2 rounded overflow-x-auto">{JSON.stringify(executionResult.failedTestCase?.input, null, 2)}</pre>
                       </div>
-                      <div className="flex">
-                        <span className="text-zinc-400 w-24 inline-block">Expected:</span>
-                        <span className="text-green-500 font-mono">{JSON.stringify(executionResult.failedTestCase?.expected)}</span>
+                      <div className="flex flex-col">
+                        <span className="text-zinc-400 mb-1">Expected:</span>
+                        <pre className="text-green-500 font-mono bg-black/30 p-2 rounded overflow-x-auto">{JSON.stringify(executionResult.failedTestCase?.expected, null, 2)}</pre>
                       </div>
-                      <div className="flex">
-                        <span className="text-zinc-400 w-24 inline-block">Received:</span>
-                        <span className="text-red-400 font-mono">{JSON.stringify(executionResult.failedTestCase?.received)}</span>
+                      <div className="flex flex-col">
+                        <span className="text-zinc-400 mb-1">Received:</span>
+                        <pre className="text-red-400 font-mono bg-black/30 p-2 rounded overflow-x-auto">{JSON.stringify(executionResult.failedTestCase?.received, null, 2)}</pre>
                       </div>
                       {executionResult.failedTestCase?.error && 
-                        <div className="flex">
-                          <span className="text-zinc-400 w-24 inline-block">Error:</span>
-                          <span className="text-red-400 font-mono">{executionResult.failedTestCase?.error}</span>
+                        <div className="flex flex-col">
+                          <span className="text-zinc-400 mb-1">Error:</span>
+                          <pre className="text-red-400 font-mono bg-black/30 p-2 rounded overflow-x-auto">{executionResult.failedTestCase?.error}</pre>
                         </div>
                       }
                     </div>
@@ -259,14 +268,14 @@ export const Console = ({
                   {customTestCases.map((tc, i) => (
                     <div key={i} className="p-2.5 rounded-md bg-zinc-900/70 border border-zinc-800/80 hover:border-zinc-700/80 transition-colors">
                       <div className="text-xs font-medium text-zinc-400 mb-1.5">Custom Test #{i+1}</div>
-                      <div className="ml-2 space-y-1.5 text-xs">
-                        <div className="flex">
-                          <span className="text-zinc-500 w-20 inline-block">Input:</span>
-                          <span className="text-green-500 font-mono">{tc.input}</span>
+                      <div className="space-y-2">
+                        <div className="flex flex-col">
+                          <span className="text-zinc-500 text-xs mb-1">Input:</span>
+                          <pre className="text-green-500 font-mono bg-black/30 p-2 rounded text-xs overflow-x-auto">{formatTestCase(tc.input)}</pre>
                         </div>
-                        <div className="flex">
-                          <span className="text-zinc-500 w-20 inline-block">Expected:</span>
-                          <span className="text-green-500 font-mono">{tc.expected}</span>
+                        <div className="flex flex-col">
+                          <span className="text-zinc-500 text-xs mb-1">Expected:</span>
+                          <pre className="text-green-500 font-mono bg-black/30 p-2 rounded text-xs overflow-x-auto">{formatTestCase(tc.expected)}</pre>
                         </div>
                       </div>
                     </div>
