@@ -33,12 +33,12 @@ function Output({ className }: OutputProps) {
     }
   };
 
-  // Ensure text is properly typed for the split method
+  // Fixed version of isLongContent function
   const isLongContent = (text: string | undefined | null): boolean => {
     // If text is null, undefined, or empty, it's not "long"
     if (!text) return false;
     
-    // Convert to string to ensure split can be called
+    // Convert to string and then split
     return String(text).split('\n').length > 5;
   };
 

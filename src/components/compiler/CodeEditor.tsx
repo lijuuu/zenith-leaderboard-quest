@@ -13,6 +13,7 @@ import { runCode } from '@/store/slices/compilerSlice';
 import { File } from '@/api/types/compiler';
 import * as monaco from 'monaco-editor';
 import { languages } from './CompilerLayout';
+import { useAppDispatch } from '@/hooks/useAppDispatch'; // Import the typed dispatch
 
 interface CodeEditorProps {
   className?: string;
@@ -21,7 +22,7 @@ interface CodeEditorProps {
 
 const CodeEditor = ({ className, isMobile }: CodeEditorProps) => {
   const { theme } = useTheme();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch(); // Use the typed dispatch
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   
   // Get state from Redux store
