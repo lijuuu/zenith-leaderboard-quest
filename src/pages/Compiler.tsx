@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import FileSystem from '@/components/compiler/FileSystem';
 import CompilerLayout from '@/components/compiler/CompilerLayout';
+import ZenXPlayground from '@/components/playground/ZenXPlayground';
 
 const Compiler = () => {
   // Set root element class for green theme
@@ -17,10 +18,19 @@ const Compiler = () => {
     };
   }, []);
 
+  // Check if we're in playground mode by looking for problem_id in URL
+  const isPlaygroundMode = window.location.search.includes('problem_id');
+
   return (
     <SidebarProvider>
-      <FileSystem />
-      <CompilerLayout />
+      {isPlaygroundMode ? (
+        <ZenXPlayground />
+      ) : (
+        <>
+          <FileSystem />
+          <CompilerLayout />
+        </>
+      )}
       <Toaster />
     </SidebarProvider>
   );

@@ -112,6 +112,16 @@ function Output({ className }: OutputProps) {
     return textStr.split('\n').length > 5;
   };
 
+  // Helper function to safely format execution time with type handling
+  const formatExecutionTime = (time: string | number | undefined) => {
+    if (typeof time === 'string') {
+      return time.split('.')[0];
+    } else if (typeof time === 'number') {
+      return String(time).split('.')[0];
+    }
+    return time;
+  };
+
   return (
     <div className={cn('h-full bg-background', className)}>
       <div className="p-4 h-full flex flex-col">
@@ -218,11 +228,7 @@ function Output({ className }: OutputProps) {
             )}
             {result && result.execution_time && (
               <div className="bg-green-200/20 text-green-600 px-3 py-1 rounded-md text-sm border border-green-600/20">
-                Time: {typeof result.execution_time === 'string' 
-                  ? result.execution_time.split('.')[0] 
-                  : typeof result.execution_time === 'number'
-                    ? String(result.execution_time).split('.')[0]
-                    : result.execution_time} ms
+                Time: {formatExecutionTime(result.execution_time)} ms
               </div>
             )}
             <div className="flex justify-center items-center">
