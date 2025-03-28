@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { RootState } from '@/store';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import ReactMarkdown from 'react-markdown';
 
 interface OutputProps {
   className?: string;
@@ -115,7 +116,7 @@ function Output({ className }: OutputProps) {
     <div className={cn('h-full bg-background', className)}>
       <div className="p-4 h-full flex flex-col">
         <div className="flex justify-between items-center mb-4 p-2 bg-muted/20 rounded-md border border-border/50">
-          <h2 className="text-base font-semibold text-foreground">Output</h2>
+          <h2 className="text-base font-semibold text-foreground">ZenX Output</h2>
           <div className="flex items-center gap-2">
             <Sheet>
               <SheetTrigger asChild>
@@ -160,9 +161,38 @@ function Output({ className }: OutputProps) {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.3 }}
-                      className="text-sm p-4 whitespace-pre-wrap"
+                      className="text-sm p-4"
                     >
-                      {hints}
+                      <ReactMarkdown
+                        components={{
+                          code({ node, inline, className, children, ...props }) {
+                            return (
+                              <code
+                                className={cn(
+                                  inline ? 'bg-muted/30 px-1 py-0.5 rounded' : 'block bg-muted/30 p-2 rounded-md overflow-x-auto my-2',
+                                  'text-blue-400',
+                                  className
+                                )}
+                                {...props}
+                              >
+                                {children}
+                              </code>
+                            );
+                          },
+                          pre({ children, ...props }) {
+                            return (
+                              <pre
+                                className="bg-blue-500/10 p-2 rounded-md overflow-x-auto my-2"
+                                {...props}
+                              >
+                                {children}
+                              </pre>
+                            );
+                          },
+                        }}
+                      >
+                        {hints || ''}
+                      </ReactMarkdown>
                     </motion.div>
                   )}
                 </ScrollArea>
