@@ -110,7 +110,11 @@ export const CodeEditor = ({ value, onChange, language }: CodeEditorProps) => {
           lineDecorationsWidth: 10,
           renderLineHighlight: 'all',
           colorDecorators: true,
-          renderIndentGuides: true,
+          guides: {
+            indentation: true,
+            highlightActiveIndentation: true,
+            bracketPairs: true
+          },
           renderValidationDecorations: 'on',
           fixedOverflowWidgets: true
         }}
