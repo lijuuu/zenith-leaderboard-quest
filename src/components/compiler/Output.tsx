@@ -33,13 +33,14 @@ function Output({ className }: OutputProps) {
     }
   };
 
-  // Fix the error by explicitly handling string types in isLongContent
-  const isLongContent = (text: string | undefined): boolean => {
+  // Ensure text is properly typed for the split method
+  const isLongContent = (text: string | undefined | null): boolean => {
+    // If text is null, undefined, or empty, it's not "long"
     if (!text) return false;
     
-    // Ensure text is treated as string and not 'never' type
-    const textStr = String(text);
-    return textStr.split('\n').length > 5;
+    // Convert to string to ensure split can be called
+    const textAsString = String(text);
+    return textAsString.split('\n').length > 5;
   };
 
   return (
