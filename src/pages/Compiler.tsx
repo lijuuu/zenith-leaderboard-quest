@@ -1,17 +1,18 @@
 
-import { useState } from 'react';
-import Playground from '@/components/playground/Playground';
+import React from 'react';
 import { useTheme } from '@/hooks/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import FileSystem from '@/components/compiler/FileSystem';
+import CompilerLayout from '@/components/compiler/CompilerLayout';
 
 const Compiler = () => {
-  const { theme } = useTheme();
-  
   return (
-    <>
-      <Playground />
+    <SidebarProvider>
+      <FileSystem />
+      <CompilerLayout />
       <Toaster />
-    </>
+    </SidebarProvider>
   );
 };
 
