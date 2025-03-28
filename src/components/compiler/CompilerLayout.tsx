@@ -115,9 +115,9 @@ const CompilerLayout = () => {
   return (
     <div className="bg-background transition-colors duration-300 h-screen w-full flex flex-col overflow-hidden">
       {/* Top navbar */}
-      <div className="flex items-center justify-between border-b border-border/50 p-2 h-12 bg-muted/20">
-        <div className="flex items-center gap-2">
-          <SidebarTrigger className="h-8 w-8 p-0 hover:bg-muted rounded-md">
+      <div className="flex items-center justify-between border-b border-zinc-800/50 p-2 h-12 bg-zinc-900/80 backdrop-blur-sm">
+        <div className="flex items-center gap-3">
+          <SidebarTrigger className="h-8 w-8 p-0 hover:bg-zinc-800 rounded-md">
             <Menu className="h-4 w-4" />
           </SidebarTrigger>
           
@@ -127,15 +127,15 @@ const CompilerLayout = () => {
             onMouseLeave={() => setShowToolTip(false)}
             onClick={() => navigate("/")}
           >
-            <span className="font-medium text-foreground relative">xcode</span>
+            <span className="font-bold text-xl text-white relative">zen<span className="text-green-500">x</span></span>
             
             {showToolTip && (
-              <div className="absolute w-40 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded-md shadow-md mt-1 z-50">
-                Want to go back to home? Click here
+              <div className="absolute w-40 left-1/2 transform -translate-x-1/2 bg-zinc-800 text-white text-xs px-2 py-1 rounded-md shadow-md mt-1 z-50">
+                Return to home
               </div>
             )}
 
-            <span className="text-xs text-muted-foreground ml-1 hidden sm:inline">
+            <span className="text-xs text-zinc-400 ml-1 hidden sm:inline">
               compiler
             </span>
           </div>
@@ -144,7 +144,7 @@ const CompilerLayout = () => {
         <div className="flex items-center gap-1 md:gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 px-2 md:px-3 border-border/50 hover:bg-muted">
+              <Button variant="outline" size="sm" className="h-8 px-2 md:px-3 border-zinc-700/50 hover:bg-zinc-800 bg-zinc-800/50">
                 <span className="flex items-center">
                   {languages.find(l => l.value === language)?.icon}
                   <span className="hidden sm:inline ml-2">
@@ -153,12 +153,12 @@ const CompilerLayout = () => {
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-background border-border/50">
+            <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800">
               {languages.map((lang) => (
                 <DropdownMenuItem
                   key={lang.value}
                   onClick={() => handleSetLanguage(lang.value, lang.file)}
-                  className="hover:bg-muted flex items-center"
+                  className="hover:bg-zinc-800 flex items-center"
                 >
                   <span className="mr-2">{lang.icon}</span> {lang.label}
                 </DropdownMenuItem>
@@ -170,7 +170,7 @@ const CompilerLayout = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 hover:bg-muted"
+              className="h-8 w-8 hover:bg-zinc-800"
               onClick={toggleOutputPanel}
               title={outputExpanded ? "Show Editor" : "Show Output"}
             >
@@ -180,15 +180,15 @@ const CompilerLayout = () => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
+              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-zinc-800">
                 <Settings className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-background border-border/50">
-              <DropdownMenuItem onClick={() => setTheme("light")} className="hover:bg-muted">
+            <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800">
+              <DropdownMenuItem onClick={() => setTheme("light")} className="hover:bg-zinc-800">
                 Light Mode
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")} className="hover:bg-muted">
+              <DropdownMenuItem onClick={() => setTheme("dark")} className="hover:bg-zinc-800">
                 Dark Mode
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -197,7 +197,7 @@ const CompilerLayout = () => {
       </div>
 
       {/* Main content area */}
-      <div className="flex-grow overflow-hidden bg-background">
+      <div className="flex-grow overflow-hidden bg-zinc-950">
         {isMobile ? (
           <div className="h-full">
             <div
@@ -218,7 +218,7 @@ const CompilerLayout = () => {
             <ResizablePanel defaultSize={65} minSize={40} className="flex flex-col overflow-hidden">
               <CodeEditor className="flex-grow" isMobile={false} />
             </ResizablePanel>
-            <ResizableHandle withHandle className="bg-border/50" />
+            <ResizableHandle withHandle className="bg-zinc-800" />
             <ResizablePanel defaultSize={35} maxSize={45} minSize={20} className="overflow-hidden">
               <Output className="h-full" />
             </ResizablePanel>

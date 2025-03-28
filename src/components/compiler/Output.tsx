@@ -101,14 +101,10 @@ function Output({ className }: OutputProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isHintsModalOpen]);
 
-  // Fixed version of isLongContent function with proper type handling
+  // Fix the isLongContent function to properly handle type checking
   const isLongContent = (text: string | undefined): boolean => {
-    // If text is null, undefined, or empty, it's not "long"
-    if (!text) return false;
-    
-    // Safely convert to string before using split
-    const textStr = String(text);
-    return textStr.split('\n').length > 5;
+    if (typeof text !== 'string') return false;
+    return text.split('\n').length > 5;
   };
 
   return (
@@ -126,33 +122,33 @@ function Output({ className }: OutputProps) {
                     'px-3 py-1 rounded-md text-sm border flex items-center gap-1 transition-colors',
                     loadingHints
                       ? 'bg-yellow-200/10 text-yellow-600/50 border-yellow-600/10'
-                      : 'bg-blue-500/20 text-blue-600 border-blue-600/20 hover:bg-blue-500/30'
+                      : 'bg-emerald-500/20 text-emerald-600 border-emerald-600/20 hover:bg-emerald-500/30'
                   )}
                   title="Get code suggestions"
                 >
                   {loadingHints ? 'Loading...' : 'Suggest Hints'}
                 </button>
               </SheetTrigger>
-              <SheetContent className="w-[90vw] sm:max-w-md overflow-y-auto">
+              <SheetContent className="w-[90vw] sm:max-w-md overflow-y-auto bg-zinc-900 border-zinc-800">
                 <SheetHeader>
-                  <SheetTitle className="flex items-center gap-2">
+                  <SheetTitle className="flex items-center gap-2 text-zinc-200">
                     <span>Code Hints</span>
                     <button
                       onClick={handleRefreshHints}
                       disabled={loadingHints}
-                      className="p-2 hover:bg-blue-500/20 rounded-md transition-colors"
+                      className="p-2 hover:bg-emerald-500/20 rounded-md transition-colors"
                       title="Refresh Hints"
                     >
-                      <RefreshCw className="h-4 w-4 text-blue-600" />
+                      <RefreshCw className="h-4 w-4 text-emerald-500" />
                     </button>
                   </SheetTitle>
                 </SheetHeader>
                 <ScrollArea className="h-[calc(100vh-10rem)]">
                   {loadingHints ? (
                     <div className="space-y-2 p-4">
-                      <Skeleton className="w-full h-4 rounded-full bg-blue-200/30 animate-pulse" />
-                      <Skeleton className="w-3/4 h-4 rounded-full bg-blue-200/30 animate-pulse" />
-                      <Skeleton className="w-1/2 h-4 rounded-full bg-blue-200/30 animate-pulse" />
+                      <Skeleton className="w-full h-4 rounded-full bg-zinc-800 animate-pulse" />
+                      <Skeleton className="w-3/4 h-4 rounded-full bg-zinc-800 animate-pulse" />
+                      <Skeleton className="w-1/2 h-4 rounded-full bg-zinc-800 animate-pulse" />
                     </div>
                   ) : (
                     <motion.div
@@ -160,7 +156,7 @@ function Output({ className }: OutputProps) {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.3 }}
-                      className="text-sm p-4 whitespace-pre-wrap"
+                      className="text-sm p-4 whitespace-pre-wrap text-zinc-300"
                     >
                       {hints}
                     </motion.div>

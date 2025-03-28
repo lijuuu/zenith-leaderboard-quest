@@ -171,8 +171,9 @@ const ProblemListing: React.FC = () => {
     return true;
   });
 
-  const navigateToCompiler = (problem_id: string) => {
-    navigate(`/compiler?problem_id=${problem_id}`);
+  // Navigate to problem detail page instead of compiler
+  const navigateToProblemDetail = (problem_id: string) => {
+    navigate(`/problems/${problem_id}`);
   };
 
   return (
@@ -182,7 +183,7 @@ const ProblemListing: React.FC = () => {
       <main className="page-container py-8 pt-20">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold">Problem Set</h1>
+            <h1 className="text-3xl font-bold text-white">Problem Set <span className="text-green-500">zen<span className="text-white">x</span></span></h1>
             <p className="text-zinc-400 mt-1">
               Practice your coding skills by solving our carefully curated problems
             </p>
@@ -303,8 +304,8 @@ const ProblemListing: React.FC = () => {
             {filteredProblems.map((problem) => (
               <Card
                 key={problem.problem_id}
-                className="bg-zinc-800/40 border border-zinc-700/40 hover:border-green-500/50 transition-colors cursor-pointer"
-                onClick={() => navigateToCompiler(problem.problem_id)}
+                className="bg-zinc-800/40 border border-zinc-700/40 hover:border-green-500/50 transition-colors cursor-pointer transform transition-transform hover:scale-[1.02]"
+                onClick={() => navigateToProblemDetail(problem.problem_id)}
               >
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">

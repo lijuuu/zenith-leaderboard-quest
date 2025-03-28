@@ -22,9 +22,9 @@ const ProblemCard = ({ id, title, difficulty, tags, solved }: ProblemCardProps) 
   return (
     <Link to={`/problems/${id}`}>
       <div className={cn(
-        "problem-card relative h-full group",
-        "hover:border-zinc-300 dark:hover:border-zinc-700 transition-all",
-        solved && "border-green-200 dark:border-green-900/50"
+        "problem-card relative h-full group p-4 rounded-lg border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 transition-all",
+        "hover:border-green-500/50 transition-all transform hover:scale-[1.02]",
+        solved && "border-green-900/40"
       )}>
         {solved && (
           <div className="absolute top-4 right-4">
@@ -39,13 +39,13 @@ const ProblemCard = ({ id, title, difficulty, tags, solved }: ProblemCardProps) 
           {difficulty}
         </div>
         
-        <h3 className="text-xl font-bold mt-3 mb-4 group-hover:text-zenblue transition-colors">
+        <h3 className="text-xl font-bold mt-3 mb-4 group-hover:text-green-500 transition-colors text-white">
           {title}
         </h3>
         
         <div className="flex flex-wrap gap-2">
           {tags.map((tag, index) => (
-            <div key={index} className="tag-pill">
+            <div key={index} className="px-2 py-1 text-xs rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700/50">
               {tag}
             </div>
           ))}
