@@ -19,11 +19,9 @@ const Compiler = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen bg-zinc-950">
-        <FileSystem />
-        <CompilerLayout />
-        <Toaster />
-      </div>
+      <FileSystem />
+      <CompilerLayout />
+      <Toaster />
     </SidebarProvider>
   );
 };
