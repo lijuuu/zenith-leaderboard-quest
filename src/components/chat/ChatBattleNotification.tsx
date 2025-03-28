@@ -47,16 +47,16 @@ const ChatBattleNotification: React.FC<ChatBattleNotificationProps> = ({ challen
   };
   
   return (
-    <Card className="w-full overflow-hidden border-zinc-200/50 dark:border-zinc-800/30 shadow-sm bg-white/95 dark:bg-zinc-900/90">
-      <div className="h-1 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500" />
+    <Card className="w-full overflow-hidden border-green-200/50 dark:border-green-800/30 shadow-sm bg-white/95 dark:bg-zinc-900/90">
+      <div className="h-1 bg-gradient-to-r from-green-500 via-green-400 to-emerald-500" />
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0 relative">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-orange-500/10 overflow-hidden">
-              <Flame className="h-5 w-5 text-orange-500 absolute animate-pulse opacity-60" />
-              <Sword className="h-5 w-5 text-orange-500" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500/10 overflow-hidden">
+              <Flame className="h-5 w-5 text-green-500 absolute animate-pulse opacity-60" />
+              <Sword className="h-5 w-5 text-green-500" />
             </div>
-            <div className="absolute -bottom-1 -right-1 bg-orange-500 text-white w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold border border-background">
+            <div className="absolute -bottom-1 -right-1 bg-green-500 text-white w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold border border-background">
               VS
             </div>
           </div>
@@ -107,7 +107,7 @@ const ChatBattleNotification: React.FC<ChatBattleNotificationProps> = ({ challen
                 </Button>
                 <Button 
                   size="sm" 
-                  className="h-7 text-xs accent-color"
+                  className="h-7 text-xs bg-green-600 hover:bg-green-700 text-white"
                   onClick={handleAccept}
                 >
                   <Zap className="h-3 w-3 mr-1" />
