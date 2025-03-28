@@ -84,13 +84,13 @@ const MainNavbar = () => {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-300 ease-in-out backdrop-blur-sm",
+        "fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-300 ease-in-out ",
         isScrolled || mobileMenuOpen
           ? "bg-zinc-900/90 border-b border-zinc-800"
           : "bg-zinc-900/80 border-b border-zinc-800/50"
       )}
     >
-      <div className="page-container h-full flex items-center justify-between">
+      <div className="page-container h-full flex items-center justify-between z-10">
         <div className="flex items-center">
           <Link to="/" className="flex items-center gap-2 mr-8">
             <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-white font-bold text-lg">
@@ -204,11 +204,11 @@ const MainNavbar = () => {
       {/* Mobile Navigation */}
       <div
         className={cn(
-          "md:hidden fixed inset-0 top-16 z-40 transition-transform duration-300 ease-in-out bg-zinc-900/95 backdrop-blur-lg",
+          "md:hidden fixed inset-0 top-16 z-40 transition-transform duration-300 ease-in-out bg-zinc-900/95 bg-black",
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
-        <nav className="py-6 px-4 space-y-1 h-full overflow-y-auto">
+        <nav className="py-6 px-4 space-y-1 min-h-screen overflow-y-auto">
           {navItems.map((item) => {
             const isActiveRoute = isActive(item.path);
             return (

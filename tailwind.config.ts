@@ -72,6 +72,7 @@ export default {
 					DEFAULT: 'hsl(var(--info))',
 					foreground: 'hsl(var(--info-foreground))'
 				},
+				darkbackground:"000000",
 				zinc: {
 					50: '#fafafa',
 					100: '#f4f4f5',

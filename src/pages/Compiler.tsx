@@ -6,6 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Download, Copy, Play, FilePlus, Lightbulb, Settings, Terminal } from 'lucide-react';
+import MainNavbar from '@/components/MainNavbar';
 
 const Compiler = () => {
   const [fontSize, setFontSize] = useState(14);
@@ -58,8 +59,9 @@ type UniversalExecutionResult struct {
 }`;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
-      <div className="flex flex-col h-screen overflow-hidden">
+    <div className="min-h-screen  text-white">
+      <MainNavbar/>
+      <div className="flex flex-col h-screen overflow-hidden pt-16">
         {/* Main Content */}
         <div className="flex flex-1 overflow-hidden">
           {/* Left Sidebar - File Explorer */}
@@ -118,7 +120,7 @@ type UniversalExecutionResult struct {
 
             {/* Editor Content */}
             <div className="flex flex-1">
-              <div className="flex-1 flex flex-col bg-zinc-950">
+              <div className="flex-1 flex flex-col">
                 {/* File Tab and Controls */}
                 <div className="flex items-center justify-between border-b border-zinc-800 p-3">
                   <div className="text-sm text-zinc-400">{activeFile}</div>

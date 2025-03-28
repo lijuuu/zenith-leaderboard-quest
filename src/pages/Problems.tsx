@@ -130,10 +130,10 @@ const Problems = () => {
     : [];
   
   return (
-    <div className="min-h-screen bg-zinc-900 text-white pt-5">
+    <div className="min-h-screen text-white">
       <MainNavbar />
       
-      <main className="page-container py-8">
+      <main className="page-container py-8 pt-20">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-3xl font-bold">Problem Set</h1>

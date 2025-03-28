@@ -24,6 +24,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router";
 
 interface ProfileHeaderProps {
   profile: UserProfile;
@@ -69,6 +70,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, userId }) => {
       setIsLoading(false);
     }
   };
+
+
+  const navigate = useNavigate();
   
   return (
     <div className="flex flex-col md:flex-row gap-6">
@@ -87,7 +91,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, userId }) => {
         </div>
         
         <div className="flex gap-2 mt-3">
-          {profile.isVerified && (
+          {/* {profile.isVerified && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -100,9 +104,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, userId }) => {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          )}
+          )} */}
           
-          {profile.isBanned && (
+          {/* {profile.isBanned && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -115,7 +119,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, userId }) => {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          )}
+          )} */}
           
           {profile.country && (
             <img 
@@ -179,7 +183,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, userId }) => {
         
         <div className="flex flex-wrap gap-2 mt-4">
           {isOwnProfile ? (
-            <Button variant="outline" className="flex items-center gap-1.5">
+            <Button variant="outline" className="flex items-center gap-1.5" onClick={()=>navigate("/settings")}>
               <Edit className="h-4 w-4" />
               Edit Profile
             </Button>
@@ -201,13 +205,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile, userId }) => {
             </Button>
           )}
           
-          <Button variant="outline">
+          <Button variant="outline" onClick={()=>navigate("/chat")}>
             Message
           </Button>
         </div>
       </div>
       
-      <div className="md:ml-auto flex items-center gap-4 mt-4 md:mt-0">
+      <div className="md:ml-auto flex items-center gap-4 mt-4 md:mt-0 justify-center">
         <div className="flex flex-col items-center p-3 border border-border/50 rounded-lg min-w-[100px]">
           <span className="text-2xl font-bold">{profile.problemsSolved}</span>
           <span className="text-sm text-muted-foreground">Problems</span>

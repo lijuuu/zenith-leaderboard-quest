@@ -94,8 +94,8 @@ const Challenges = () => {
   };
 
   return (
-   <div className="min-h-screen bg-green-500/10 backdrop-blur-md border-[0.5px] border-green-500/20 rounded-lg shadow-lg text-foreground pt-5 pb-8">
-      {/* <MainNavbar /> */}
+   <div className="min-h-screen  rounded-lg shadow-lg text-foreground pt-16 pb-8">
+      <MainNavbar />
 
       {activeChallengeId ? (
         <main className="page-container py-8">

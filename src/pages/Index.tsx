@@ -7,7 +7,7 @@ import { Trophy, Users, Code, Zap, Plus, Play, User, ChevronRight, Award } from 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import StatsCard from '@/components/StatsCard';
 import MonthlyActivityHeatmap from '@/components/MonthlyActivityHeatmap';
 import ClearInactivityCard from '@/components/ClearInactivityCard';
@@ -16,17 +16,19 @@ import { getProblems } from '@/api/problemApi';
 import { getChallenges } from '@/api/challengeApi';
 import { getLeaderboard } from '@/api/leaderboardApi';
 import { useIsMobile } from '@/hooks/use-mobile';
+import MainNavbar from '@/components/MainNavbar';
+// import {Cover} from "@/components/ui/cover"
 
 const Index = () => {
   const { toast } = useToast();
   const dispatch = useAppDispatch();
   const userProfile = useAppSelector((state) => state.user.profile);
   const isMobile = useIsMobile();
-  
+
   useEffect(() => {
     // Scroll to top on component mount
     window.scrollTo(0, 0);
-    
+
     // Load user profile on mount
     dispatch(fetchUserProfile('1'));
   }, [dispatch]);
@@ -36,13 +38,13 @@ const Index = () => {
     queryKey: ['problemStats'],
     queryFn: () => getProblems(),
   });
-  
+
   // Fetch recent challenges with React Query
   const { data: recentChallenges } = useQuery({
     queryKey: ['recentChallenges'],
     queryFn: () => getChallenges(),
   });
-  
+
   // Fetch top performers with React Query
   const { data: topPerformers } = useQuery({
     queryKey: ['topPerformers'],
@@ -54,10 +56,14 @@ const Index = () => {
     queryKey: ['userProfile'],
     queryFn: () => getUserProfile('1'),
   });
-  
+
+  // Navigate to other pages
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen bg-zinc-900">
-      <main className="pt-10 pb-16">
+    <div className="min-h-screen">
+      <MainNavbar/>
+      <main className="pt-16 pb-16">
         <div className="page-container">
           {/* Welcome Section */}
           <section className="pt-6 pb-10">
@@ -70,13 +76,13 @@ const Index = () => {
                   Continue improving your coding skills and climb the ranks
                 </p>
               </div>
-              
+
               <div className="flex flex-wrap gap-3">
-                <Button className="bg-green-500 hover:bg-green-600 gap-2">
+                <Button className="bg-green-500 hover:bg-green-600 gap-2" onClick={() => navigate("/challenges")}>
                   <Plus className="h-4 w-4" />
                   Create Challenge
                 </Button>
-                
+
                 <Link to="/problems">
                   <Button variant="outline" className="border-zinc-700 hover:bg-zinc-800 gap-2">
                     <Code className="h-4 w-4" />
@@ -86,38 +92,42 @@ const Index = () => {
               </div>
             </div>
           </section>
-          
+
           {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column - Stats & Activity */}
             <div className="lg:col-span-2 space-y-6">
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <StatsCard 
-                  title="Problems Solved" 
-                  value={userProfileData?.problemsSolved || 147} 
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 ">
+                <StatsCard
+                  className="hover:scale-105 transition-transform duration-200 ease-in-out"
+                  title="Problems Solved"
+                  value={userProfileData?.problemsSolved || 147}
                   change="+3 this week"
                   icon={<Code className="h-4 w-4 text-green-400" />}
                 />
-                <StatsCard 
-                  title="Current Streak" 
+                <StatsCard
+                  className="hover:scale-105 transition-transform duration-200 ease-in-out"
+                  title="Current Streak"
                   value={`${userProfileData?.dayStreak || 26} days`}
                   icon={<Zap className="h-4 w-4 text-amber-400" />}
                 />
-                <StatsCard 
-                  title="Global Rank" 
-                  value={`#${userProfileData?.ranking || 354}`} 
+                <StatsCard
+                  className="hover:scale-105 transition-transform duration-200 ease-in-out"
+                  title="Global Rank"
+                  value={`#${userProfileData?.ranking || 354}`}
                   change="+12"
                   icon={<Trophy className="h-4 w-4 text-amber-500" />}
                 />
-                <StatsCard 
-                  title="Current Rating" 
-                  value={userProfileData?.ranking || 354} 
+                <StatsCard
+                  className="hover:scale-105 transition-transform duration-200 ease-in-out"
+                  title="Current Rating"
+                  value={userProfileData?.ranking || 354}
                   change="+15"
                   icon={<Award className="h-4 w-4 text-blue-400" />}
                 />
               </div>
-              
+
               {/* 1v1 Challenges */}
               <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
                 <CardHeader>
@@ -141,11 +151,11 @@ const Index = () => {
                           <div className="text-sm text-zinc-400">Find an opponent with similar skill</div>
                         </div>
                       </div>
-                      <Button size="sm" className="bg-green-500 hover:bg-green-600">
+                      <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => navigate("/challenges")}>
                         Start
                       </Button>
                     </div>
-                    
+
                     <div className="bg-zinc-800/70 backdrop-blur-sm border border-zinc-700/50 rounded-lg p-4 flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="bg-blue-500/10 p-2 rounded-lg">
@@ -156,23 +166,23 @@ const Index = () => {
                           <div className="text-sm text-zinc-400">Send a challenge to a specific user</div>
                         </div>
                       </div>
-                      <Button size="sm" variant="outline" className="border-zinc-700 hover:bg-zinc-700">
+                      <Button size="sm" variant="outline" className="border-zinc-700 hover:bg-zinc-700" onClick={() => navigate("/challenges")}>
                         Select
                       </Button>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-              
+
               {/* Clear Recent Inactivity */}
               <ClearInactivityCard />
             </div>
-            
+
             {/* Right Column - Activity & Leaderboard */}
             <div className="space-y-6">
               {/* Monthly Activity Heatmap */}
               <MonthlyActivityHeatmap />
-              
+
               {/* Leaderboard Preview */}
               <Card className="bg-zinc-900/40 backdrop-blur-sm border-zinc-800/50">
                 <CardHeader className="pb-2">
@@ -198,9 +208,9 @@ const Index = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full overflow-hidden">
-                              <img 
-                                src={entry.user.profileImage} 
-                                alt={entry.user.username} 
+                              <img
+                                src={entry.user.profileImage}
+                                alt={entry.user.username}
                                 className="w-full h-full object-cover"
                               />
                             </div>
@@ -214,7 +224,7 @@ const Index = () => {
                       </div>
                     ))}
                   </div>
-                  
+
                   <Link to="/leaderboard" className="mt-4 flex items-center text-sm text-green-400 hover:text-green-300 transition-colors group">
                     View full leaderboard
                     <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />

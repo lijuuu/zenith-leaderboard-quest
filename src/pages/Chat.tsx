@@ -120,10 +120,10 @@ const Chat = () => {
   }, [messages]);
   
   return (
-    <div className="min-h-screen bg-zinc-900 text-white">
+    <div className="min-h-screen  text-white">
       <MainNavbar />
       
-      <main className="pt-16 h-[calc(100vh-64px)]">
+      <main className="pt-16  h-[calc(100vh-64px)]">
         <div className="h-full grid grid-cols-1 md:grid-cols-[320px_1fr] lg:grid-cols-[350px_1fr]">
           {/* Chats Sidebar */}
           <div className="border-r border-zinc-800 flex flex-col">

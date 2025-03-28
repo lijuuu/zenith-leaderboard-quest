@@ -22,6 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getLeaderboard, getFriendsLeaderboard } from '@/api/leaderboardApi';
 import { useToast } from '@/hooks/use-toast';
+import MainNavbar from '@/components/MainNavbar';
 
 const Leaderboard = () => {
   const dispatch = useAppDispatch();
@@ -116,7 +117,8 @@ const Leaderboard = () => {
 
   return (
     <div className="pt-4 pb-16">
-      <div className="container px-4 mx-auto max-w-6xl">
+      <MainNavbar/>
+      <div className="container px-4 mx-auto max-w-6xl pt-20">
         <div className="mb-8">
           <div className="flex items-center justify-between gap-4">
             <div>

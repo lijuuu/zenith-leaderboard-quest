@@ -27,23 +27,23 @@ const ProblemsSolvedChart: React.FC<ProblemsSolvedChartProps> = ({ profile }) =>
   const total = easy.solved + medium.solved + hard.solved;
   const totalAvailable = easy.total + medium.total + hard.total;
   
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-background border border-border rounded-md p-2 shadow-md">
-          <p className="font-medium text-sm">{data.name} Problems</p>
-          <p className="text-sm">
-            Solved: <span className="font-medium">{data.value}</span>/{data.total}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {Math.round((data.value / data.total) * 100)}% completion
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
+  // const CustomTooltip = ({ active, payload }: any) => {
+  //   if (active && payload && payload.length) {
+  //     const data = payload[0].payload;
+  //     return (
+  //       <div className="bg-background border border-border rounded-md p-2 shadow-md">
+  //         <p className="font-medium text-sm">{data.name} Problems</p>
+  //         <p className="text-sm">
+  //           Solved: <span className="font-medium">{data.value}</span>/{data.total}
+  //         </p>
+  //         <p className="text-sm text-muted-foreground">
+  //           {Math.round((data.value / data.total) * 100)}% completion
+  //         </p>
+  //       </div>
+  //     );
+  //   }
+  //   return null;
+  // };
   
   return (
     <div className="space-y-4">
@@ -82,7 +82,7 @@ const ProblemsSolvedChart: React.FC<ProblemsSolvedChartProps> = ({ profile }) =>
         </div>
       </div>
       
-      <div className="flex justify-between items-center">
+      {/* <div className="flex justify-between items-center">
         <div>
           <h3 className="font-medium">Problems Solved Distribution</h3>
           <p className="text-sm text-muted-foreground">
@@ -120,7 +120,7 @@ const ProblemsSolvedChart: React.FC<ProblemsSolvedChartProps> = ({ profile }) =>
             />
           </PieChart>
         </ResponsiveContainer>
-      </div>
+      </div> */}
     </div>
   );
 };

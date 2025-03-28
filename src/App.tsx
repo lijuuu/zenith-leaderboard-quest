@@ -42,8 +42,8 @@ const App = () => {
           <AccentColorProvider defaultColor="green" storageKey="zenx-accent-color">
             <TooltipProvider>
               <div className="min-h-screen bg-zinc-950 text-white">
-                <MainNavbar />
-                <div className="pt-16">
+                {/* <MainNavbar /> */}
+                <div>
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/leaderboard" element={<Leaderboard />} />

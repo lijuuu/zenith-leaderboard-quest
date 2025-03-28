@@ -18,10 +18,10 @@ const Settings = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white pt-14">
+    <div className="min-h-screen  text-white ">
       <MainNavbar />
       
-      <main className="page-container py-8">
+      <main className="page-container py-8 pt-20">
         <h1 className="text-3xl font-bold mb-6">Settings</h1>
         
         <div className="bg-zinc-800/40 border border-zinc-700/40 rounded-lg p-6">

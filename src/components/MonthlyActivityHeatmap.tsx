@@ -102,7 +102,7 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({
   const gap = 'gap-1'; // Equal X and Y gaps between circles
 
   return (
-    <Card className={`bg-zinc-950 border-zinc-800/50 ${className}`}>
+    <Card className={`bg-black border-zinc-800/50 ${className}`}>
       {showTitle && (
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center gap-2">
@@ -132,7 +132,7 @@ const MonthlyActivityHeatmap: React.FC<MonthlyActivityHeatmapProps> = ({
                         return (
                           <div
                             key={`empty-${weekIndex}-${dayIndex}`}
-                            className={`${circleSize} rounded-full bg-gray-600 opacity-50`}
+                            className={`${circleSize} rounded-full bg-gray-900 opacity-50`}
                           />
                         );
                       }

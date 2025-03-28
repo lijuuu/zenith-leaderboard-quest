@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -26,16 +25,11 @@ const VerifyEmail = () => {
 
     try {
       setIsLoading(true);
-      
-      // In a real application, this would call an API to verify the OTP
-      // For mock purposes, we'll just simulate success (any 6-digit code is "valid")
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       toast({
         title: "Email verified",
         description: "Your email has been successfully verified.",
       });
-      
       setIsVerified(true);
     } catch (error) {
       toast({
@@ -51,11 +45,7 @@ const VerifyEmail = () => {
   const handleResendCode = async () => {
     try {
       setIsLoading(true);
-      
-      // In a real application, this would call an API to resend the verification code
-      // For mock purposes, we'll just simulate success
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       toast({
         title: "Code resent",
         description: "A new verification code has been sent to your email.",
@@ -97,10 +87,7 @@ const VerifyEmail = () => {
                   <p className="text-muted-foreground mb-4">
                     Your email has been successfully verified.
                   </p>
-                  <Button
-                    className="accent-color mt-2"
-                    asChild
-                  >
+                  <Button className="accent-color mt-2" asChild>
                     <Link to="/">Continue to Homepage</Link>
                   </Button>
                 </div>
@@ -109,7 +96,7 @@ const VerifyEmail = () => {
                   <div className="flex justify-center mb-2">
                     <Mail className="h-10 w-10 text-accent-color" />
                   </div>
-                  
+
                   <div className="text-center mb-4">
                     <p className="text-sm text-muted-foreground">
                       Enter the 6-digit code sent to your email address
@@ -120,15 +107,17 @@ const VerifyEmail = () => {
                     <InputOTP
                       maxLength={6}
                       value={otp}
-                      onChange={setOtp}
-                      render={({ slots }) => (
-                        <InputOTPGroup>
-                          {slots.map((slot, i) => (
-                            <InputOTPSlot key={i} {...slot} index={i} />
-                          ))}
-                        </InputOTPGroup>
-                      )}
-                    />
+                      onChange={(value) => setOtp(value)}
+                    >
+                      <InputOTPGroup>
+                        <InputOTPSlot index={0} />
+                        <InputOTPSlot index={1} />
+                        <InputOTPSlot index={2} />
+                        <InputOTPSlot index={3} />
+                        <InputOTPSlot index={4} />
+                        <InputOTPSlot index={5} />
+                      </InputOTPGroup>
+                    </InputOTP>
                   </div>
 
                   <Button

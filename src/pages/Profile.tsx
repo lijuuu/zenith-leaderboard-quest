@@ -21,6 +21,7 @@ import MonthlyActivityHeatmap from "@/components/MonthlyActivityHeatmap";
 import ProblemsSolvedChart from "@/components/profile/ProblemsSolvedChart";
 import RecentSubmissions from "@/components/profile/RecentSubmissions";
 import ProfileAchievements from "@/components/profile/ProfileAchievements";
+import MainNavbar from "@/components/MainNavbar";
 
 const Profile = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -110,8 +111,9 @@ const Profile = () => {
   }
   
   return (
-    <div className="min-h-screen bg-zinc-900 text-white">
-      <main className="pt-5 pb-8">
+    <div className="min-h-screen  text-white">
+      <MainNavbar/>
+      <main className="pt-20 pb-8">
         <div className="page-container">
           <div className="w-full max-w-6xl mx-auto">
             {/* Profile Overview */}
@@ -132,7 +134,7 @@ const Profile = () => {
               <CardContent className="p-6">
                 <ProfileStats profile={profile!} />
                 
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Card className="bg-zinc-800 border-zinc-700">
                     <CardHeader className="p-4 pb-2">
                       <CardTitle className="text-sm font-medium">Challenges</CardTitle>
@@ -198,7 +200,7 @@ const Profile = () => {
                       </div>
                     </CardContent>
                   </Card>
-                </div>
+                </div> */}
               </CardContent>
             </Card>
             
