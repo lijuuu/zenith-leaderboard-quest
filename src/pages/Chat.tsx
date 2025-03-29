@@ -1,1221 +1,540 @@
+import { useState, useEffect, useRef } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { 
+  Send, 
+  User, 
+  Plus, 
+  Users, 
+  Filter, 
+  Settings, 
+  ChevronDown, 
+  Search,
+  MessageSquare,
+  Video,
+  Phone,
+  Info,
+  Image,
+  Paperclip,
+  Code,
+  Smile,
+  UserPlus
+} from "lucide-react";
 
-// src/pages/Chat.tsx
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  query,
-  orderBy,
-  onSnapshot,
-  doc,
-  updateDoc,
-  arrayUnion,
-  arrayRemove,
-  getDocs,
-  where,
-  limit,
-} from "firebase/firestore";
-import { db, auth } from "@/firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useRouter } from "next/router";
-import { useTheme } from "next-themes";
-import { toast } from "sonner";
-import { v4 as uuidv4 } from "uuid";
-import { useSidebar } from "@/components/ui/sidebar";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import MainNavbar from "@/components/MainNavbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import {
-  ArrowRight,
-  ArrowLeft,
-  Plus,
-  Menu,
-  Moon,
-  Sun,
-  Loader2,
-  MoreVertical,
-  Trash2,
-  UserPlus,
-  UserMinus,
-  Search,
-  X,
-} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-interface Message {
-  id: string;
-  text: string;
-  createdAt: any;
-  user: {
-    uid: string;
-    displayName: string | null;
-    photoURL: string | null;
-  };
-}
+import { useToast } from "@/hooks/use-toast";
+import ChatInput from "@/components/chat/ChatInput";
+import ChatMessage from "@/components/ChatMessage";
+import ChallengeBattleInvite from "@/components/chat/ChallengeBattleInvite";
+import ChatChallengeDialog from "@/components/chat/ChatChallengeDialog";
+import { 
+  getChannels, 
+  getMessages, 
+  sendMessage,
+  createDirectChannel
+} from "@/api/chatApi";
+import { ChatChannel, ChatMessage as MessageType } from "@/api/types";
 
-interface Channel {
-  id: string;
-  name: string;
-  createdAt: any;
-  createdBy: string;
-  users: string[];
-}
-
-interface GroupChannel extends Channel {
-  description: string;
-}
-
-const Chat: React.FC = () => {
-  const [user, loading, error] = useAuthState(auth);
-  const router = useRouter();
-  const { theme, setTheme } = useTheme();
-  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
-  const isMobile = useMediaQuery("(max-width: 768px)");
-
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [channels, setChannels] = useState<Channel[]>([]);
-  const [groupChannels, setGroupChannels] = useState<GroupChannel[]>([]);
-  const [newChannelName, setNewChannelName] = useState("");
-  const [newGroupChannelName, setNewGroupChannelName] = useState("");
-  const [newGroupChannelDescription, setNewGroupChannelDescription] =
-    useState("");
-  const [isCreatingChannel, setIsCreatingChannel] = useState(false);
-  const [isCreatingGroupChannel, setIsCreatingGroupChannel] = useState(false);
-  const [currentChannel, setCurrentChannel] = useState<Channel | null>(null);
-  const [currentGroupChannel, setCurrentGroupChannel] =
-    useState<GroupChannel | null>(null);
-  const [isGroupChat, setIsGroupChat] = useState(false);
-  const [isUserInGroup, setIsUserInGroup] = useState(false);
-  const [isAddingUsers, setIsAddingUsers] = useState(false);
-  const [isRemovingUsers, setIsRemovingUsers] = useState(false);
-  const [usersToAdd, setUsersToAdd] = useState<string[]>([]);
-  const [usersToRemove, setUsersToRemove] = useState<string[]>([]);
-  const [availableUsers, setAvailableUsers] = useState<
-    { uid: string; displayName: string | null; photoURL: string | null }[]
-  >([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<
-    { uid: string; displayName: string | null; photoURL: string | null }[]
-  >([]);
-  const [isLeavingGroup, setIsLeavingGroup] = useState(false);
-  const [isDeletingGroup, setIsDeletingGroup] = useState(false);
-  const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [formattedDate, setFormattedDate] = useState(
-    format(new Date(), "yyyy-MM-dd")
-  );
-
+const Chat = () => {
+  const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
+  const [selectedChat, setSelectedChat] = useState<ChatChannel | null>(null);
+  const [message, setMessage] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [challengeDialogOpen, setChallengeDialogOpen] = useState(false);
+  
+  // Fetch chats
+  const { 
+    data: chats,
+    isLoading: chatsLoading,
+    refetch: refetchChats
+  } = useQuery({
+    queryKey: ["chats"],
+    queryFn: getChannels,
+  });
+  
+  // Fetch messages for selected chat
+  const { 
+    data: messages,
+    isLoading: messagesLoading,
+    refetch: refetchMessages
+  } = useQuery({
+    queryKey: ["chatMessages", selectedChat?.id],
+    queryFn: () => selectedChat ? getMessages(selectedChat.id) : Promise.resolve([]),
+    enabled: !!selectedChat,
+  });
+  
+  // Send message mutation
+  const sendMessageMutation = useMutation({
+    mutationFn: (data: { chatId: string; content: string }) => 
+      sendMessage(data.chatId, data.content),
+    onSuccess: () => {
+      refetchMessages();
+      setMessage("");
+    },
+    onError: (error) => {
+      toast({
+        title: "Error sending message",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Handle selecting a chat
+  const handleSelectChat = (chat: ChatChannel) => {
+    setSelectedChat(chat);
+    // We don't have a markAsRead function available, so we'll just skip that part
+  };
+  
+  // Handle sending a message
+  const handleSendMessage = () => {
+    if (!selectedChat || !message.trim()) return;
+    
+    sendMessageMutation.mutate({
+      chatId: selectedChat.id,
+      content: message,
+    });
+  };
+  
+  // Filter chats based on search query
+  const filteredChats = chats ? chats.filter((chat: ChatChannel) => 
+    chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (chat.participants && chat.participants.some(participant => 
+      participant.username.toLowerCase().includes(searchQuery.toLowerCase())
+    ))
+  ) : [];
+  
+  // Scroll to bottom when new messages arrive
   useEffect(() => {
-    if (!user && !loading) {
-      router.push("/login");
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [user, loading, router]);
-
-  useEffect(() => {
-    if (date) {
-      setFormattedDate(format(date, "yyyy-MM-dd"));
-    }
-  }, [date]);
-
-  useEffect(() => {
-    const fetchAvailableUsers = async () => {
-      if (!user) return;
-
-      const usersCollection = collection(db, "users");
-      const usersSnapshot = await getDocs(usersCollection);
-      const usersList = usersSnapshot.docs
-        .map((doc) => doc.data())
-        .filter((u: any) => u.uid !== user.uid);
-
-      setAvailableUsers(usersList as any);
-    };
-
-    fetchAvailableUsers();
-  }, [user]);
-
-  useEffect(() => {
-    if (currentGroupChannel) {
-      setIsUserInGroup(currentGroupChannel.users.includes(user?.uid || ""));
-    }
-  }, [currentGroupChannel, user]);
-
-  useEffect(() => {
-    const unsubscribeChannels = onSnapshot(
-      query(collection(db, "channels"), orderBy("createdAt")),
-      (snapshot) => {
-        setChannels(
-          snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          })) as Channel[]
-        );
-      }
-    );
-
-    const unsubscribeGroupChannels = onSnapshot(
-      query(collection(db, "groupChannels"), orderBy("createdAt")),
-      (snapshot) => {
-        setGroupChannels(
-          snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          })) as GroupChannel[]
-        );
-      }
-    );
-
-    return () => {
-      unsubscribeChannels();
-      unsubscribeGroupChannels();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (currentChannel && !isGroupChat) {
-      const channelId =
-        currentChannel.createdBy > (user?.uid || "")
-          ? `${currentChannel.createdBy}-${user?.uid}`
-          : `${user?.uid}-${currentChannel.createdBy}`;
-
-      const messageQuery = query(
-        collection(db, "directMessages", channelId, "messages"),
-        orderBy("createdAt")
-      );
-
-      const unsubscribeMessages = onSnapshot(messageQuery, (snapshot) => {
-        const fetchedMessages = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Message[];
-        setMessages(fetchedMessages);
-        scrollToBottom();
-      });
-
-      return () => unsubscribeMessages();
-    } else if (currentGroupChannel && isGroupChat) {
-      const messageQuery = query(
-        collection(db, "groupChannels", currentGroupChannel.id, "messages"),
-        orderBy("createdAt")
-      );
-
-      const unsubscribeMessages = onSnapshot(messageQuery, (snapshot) => {
-        const fetchedMessages = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Message[];
-        setMessages(fetchedMessages);
-        scrollToBottom();
-      });
-
-      return () => unsubscribeMessages();
-    } else {
-      setMessages([]);
-    }
-  }, [currentChannel, currentGroupChannel, user, isGroupChat]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handleSendDirectMessage = async () => {
-    if (!newMessage.trim() || !user || !currentChannel) return;
-
-    setIsGroupChat(false);
-
-    const channelId =
-      currentChannel.createdBy > user.uid
-        ? `${currentChannel.createdBy}-${user.uid}`
-        : `${user.uid}-${currentChannel.createdBy}`;
-
-    try {
-      const messageData = {
-        text: newMessage,
-        createdAt: serverTimestamp(),
-        user: {
-          uid: user.uid,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-        },
-      };
-
-      await addDoc(
-        collection(db, "directMessages", channelId, "messages"),
-        messageData
-      );
-      setNewMessage("");
-      scrollToBottom();
-    } catch (error) {
-      toast.error("Failed to send message.");
-    }
-  };
-
-  const handleSendGroupMessage = async () => {
-    if (!newMessage.trim() || !user || !currentGroupChannel) return;
-
-    setIsGroupChat(true);
-
-    try {
-      const messageData = {
-        text: newMessage,
-        createdAt: serverTimestamp(),
-        user: {
-          uid: user.uid,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-        },
-      };
-
-      await addDoc(
-        collection(db, "groupChannels", currentGroupChannel.id, "messages"),
-        messageData
-      );
-      setNewMessage("");
-      scrollToBottom();
-    } catch (error) {
-      toast.error("Failed to send message.");
-    }
-  };
-
-  const handleCreateChannel = async () => {
-    if (!newChannelName.trim() || !user) return;
-
-    setIsCreatingChannel(true);
-
-    try {
-      await addDoc(collection(db, "channels"), {
-        name: newChannelName,
-        createdAt: serverTimestamp(),
-        createdBy: user.uid,
-        users: [user.uid],
-      });
-      setNewChannelName("");
-      toast.success("Channel created successfully!");
-    } catch (error) {
-      toast.error("Failed to create channel.");
-    } finally {
-      setIsCreatingChannel(false);
-    }
-  };
-
-  const handleCreateGroupChannel = async () => {
-    if (
-      !newGroupChannelName.trim() ||
-      !newGroupChannelDescription.trim() ||
-      !user
-    )
-      return;
-
-    setIsCreatingGroupChannel(true);
-
-    try {
-      await addDoc(collection(db, "groupChannels"), {
-        name: newGroupChannelName,
-        description: newGroupChannelDescription,
-        createdAt: serverTimestamp(),
-        createdBy: user.uid,
-        users: [user.uid],
-      });
-      setNewGroupChannelName("");
-      setNewGroupChannelDescription("");
-      toast.success("Group channel created successfully!");
-    } catch (error) {
-      toast.error("Failed to create group channel.");
-    } finally {
-      setIsCreatingGroupChannel(false);
-    }
-  };
-
-  const handleAddUsersToGroup = async () => {
-    if (!currentGroupChannel || !usersToAdd.length) return;
-
-    setIsAddingUsers(true);
-
-    try {
-      const groupChannelRef = doc(db, "groupChannels", currentGroupChannel.id);
-      await updateDoc(groupChannelRef, {
-        users: arrayUnion(...usersToAdd),
-      });
-
-      setCurrentGroupChannel((prevChannel) => {
-        if (prevChannel) {
-          return {
-            ...prevChannel,
-            users: [...prevChannel.users, ...usersToAdd],
-          };
-        }
-        return prevChannel;
-      });
-
-      setUsersToAdd([]);
-      toast.success("Users added to group successfully!");
-    } catch (error) {
-      toast.error("Failed to add users to group.");
-    } finally {
-      setIsAddingUsers(false);
-    }
-  };
-
-  const handleRemoveUsersFromGroup = async () => {
-    if (!currentGroupChannel || !usersToRemove.length) return;
-
-    setIsRemovingUsers(true);
-
-    try {
-      const groupChannelRef = doc(db, "groupChannels", currentGroupChannel.id);
-      await updateDoc(groupChannelRef, {
-        users: arrayRemove(...usersToRemove),
-      });
-
-      setCurrentGroupChannel((prevChannel) => {
-        if (prevChannel) {
-          return {
-            ...prevChannel,
-            users: prevChannel.users.filter(
-              (uid) => !usersToRemove.includes(uid)
-            ),
-          };
-        }
-        return prevChannel;
-      });
-
-      setUsersToRemove([]);
-      toast.success("Users removed from group successfully!");
-    } catch (error) {
-      toast.error("Failed to remove users from group.");
-    } finally {
-      setIsRemovingUsers(false);
-    }
-  };
-
-  const handleLeaveGroup = async () => {
-    if (!currentGroupChannel || !user) return;
-
-    setIsLeavingGroup(true);
-
-    try {
-      const groupChannelRef = doc(db, "groupChannels", currentGroupChannel.id);
-      await updateDoc(groupChannelRef, {
-        users: arrayRemove(user.uid),
-      });
-
-      setCurrentGroupChannel((prevChannel) => {
-        if (prevChannel) {
-          return {
-            ...prevChannel,
-            users: prevChannel.users.filter((uid) => uid !== user.uid),
-          };
-        }
-        return prevChannel;
-      });
-
-      setIsUserInGroup(false);
-      toast.success("Left group successfully!");
-    } catch (error) {
-      toast.error("Failed to leave group.");
-    } finally {
-      setIsLeavingGroup(false);
-    }
-  };
-
-  const handleDeleteGroup = async () => {
-    if (!currentGroupChannel) return;
-
-    setIsDeletingGroup(true);
-
-    try {
-      const groupChannelRef = doc(db, "groupChannels", currentGroupChannel.id);
-      await updateDoc(groupChannelRef, {
-        users: [],
-      });
-
-      setCurrentGroupChannel(null);
-      setIsGroupChat(false);
-      toast.success("Group deleted successfully!");
-    } catch (error) {
-      toast.error("Failed to delete group.");
-    } finally {
-      setIsDeletingGroup(false);
-    }
-  };
-
-  const handleSearchUsers = async () => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
-    }
-
-    setIsSearching(true);
-
-    try {
-      const usersCollection = collection(db, "users");
-      const q = query(
-        usersCollection,
-        where("displayName", ">=", searchQuery),
-        where("displayName", "<=", searchQuery + "\uf8ff"),
-        limit(10)
-      );
-
-      const querySnapshot = await getDocs(q);
-      const results = querySnapshot.docs.map((doc) => doc.data());
-      setSearchResults(results as any);
-    } catch (error) {
-      toast.error("Failed to search users.");
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const debouncedSearch = useCallback(
-    debounce((query) => handleSearchUsers(), 300),
-    []
-  );
-
-  useEffect(() => {
-    if (searchQuery) {
-      debouncedSearch(searchQuery);
-    } else {
-      setSearchResults([]);
-    }
-  }, [searchQuery, debouncedSearch]);
-
-  function debounce<Params extends any[]>(
-    func: (...args: Params) => any,
-    timeout: number
-  ): (...args: Params) => void {
-    let timer: NodeJS.Timeout;
-    return (...args: Params) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        func(...args);
-      }, timeout);
-    };
-  }
-
-  const availableUsersForAdding = useMemo(() => {
-    if (!currentGroupChannel) return [];
-    return availableUsers.filter(
-      (user) => !currentGroupChannel.users.includes(user.uid)
-    );
-  }, [availableUsers, currentGroupChannel]);
-
-  const usersInGroupForRemoving = useMemo(() => {
-    if (!currentGroupChannel) return [];
-    return availableUsers.filter((user) =>
-      currentGroupChannel.users.includes(user.uid)
-    );
-  }, [availableUsers, currentGroupChannel]);
-
-  const isUserTheCreator = useMemo(() => {
-    if (!currentGroupChannel || !user) return false;
-    return currentGroupChannel.createdBy === user.uid;
-  }, [currentGroupChannel, user]);
-
+  }, [messages]);
+  
   return (
-    <div className="flex h-screen bg-zinc-950 text-white">
-      {isMobile ? (
-        <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-          <SheetTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute left-4 top-4 md:hidden"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-full">
-            <SheetHeader className="place-items-start border-b border-zinc-800 pb-4 pt-4">
-              <SheetTitle>ZenX Chat</SheetTitle>
-              <SheetDescription>
-                Select a channel to start chatting.
-              </SheetDescription>
-            </SheetHeader>
-            <div className="flex flex-col gap-2 p-4">
-              <h3 className="text-sm font-medium text-zinc-400">
-                Direct Messages
-              </h3>
-              <ScrollArea className="h-[200px] rounded-md border border-zinc-800 p-2">
-                {channels.map((channel) => (
-                  <Button
-                    key={channel.id}
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start rounded-md",
-                      currentChannel?.id === channel.id && "bg-zinc-800"
-                    )}
-                    onClick={() => {
-                      setCurrentChannel(channel);
-                      setCurrentGroupChannel(null);
-                      setIsGroupChat(false);
-                      setIsSidebarOpen(false);
-                    }}
-                  >
-                    {channel.name}
+    <div className="min-h-screen  text-white">
+      <MainNavbar />
+      
+      <main className="pt-16  h-[calc(100vh-64px)]">
+        <div className="h-full grid grid-cols-1 md:grid-cols-[320px_1fr] lg:grid-cols-[350px_1fr]">
+          {/* Chats Sidebar */}
+          <div className="border-r border-zinc-800 flex flex-col">
+            <div className="p-4 border-b border-zinc-800">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold">Messages</h2>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                    <Settings className="h-5 w-5" />
                   </Button>
-                ))}
-              </ScrollArea>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="w-full justify-start">
-                  New Channel
-                </Button>
-              </SheetTrigger>
-              <h3 className="text-sm font-medium text-zinc-400">
-                Group Channels
-              </h3>
-              <ScrollArea className="h-[200px] rounded-md border border-zinc-800 p-2">
-                {groupChannels.map((channel) => (
-                  <Button
-                    key={channel.id}
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start rounded-md",
-                      currentGroupChannel?.id === channel.id && "bg-zinc-800"
-                    )}
-                    onClick={() => {
-                      setCurrentGroupChannel(channel);
-                      setCurrentChannel(null);
-                      setIsGroupChat(true);
-                      setIsSidebarOpen(false);
-                    }}
-                  >
-                    {channel.name}
+                  <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                    <Filter className="h-5 w-5" />
                   </Button>
-                ))}
-              </ScrollArea>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="w-full justify-start">
-                  New Group Channel
-                </Button>
-              </SheetTrigger>
-            </div>
-          </SheetContent>
-        </Sheet>
-      ) : (
-        <aside className="w-64 border-r border-zinc-800">
-          <div className="flex flex-col gap-2 p-4">
-            <h3 className="text-sm font-medium text-zinc-400">
-              Direct Messages
-            </h3>
-            <ScrollArea className="h-[200px] rounded-md border border-zinc-800 p-2">
-              {channels.map((channel) => (
-                <Button
-                  key={channel.id}
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start rounded-md",
-                    currentChannel?.id === channel.id && "bg-zinc-800"
-                  )}
-                  onClick={() => {
-                    setCurrentChannel(channel);
-                    setCurrentGroupChannel(null);
-                    setIsGroupChat(false);
-                  }}
-                >
-                  {channel.name}
-                </Button>
-              ))}
-            </ScrollArea>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="w-full justify-start">
-                  New Channel
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-full">
-                <SheetHeader className="place-items-start border-b border-zinc-800 pb-4 pt-4">
-                  <SheetTitle>Create Channel</SheetTitle>
-                  <SheetDescription>
-                    Enter a name for the channel.
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="flex flex-col gap-2 p-4">
-                  <Input
-                    type="text"
-                    placeholder="Channel Name"
-                    value={newChannelName}
-                    onChange={(e) => setNewChannelName(e.target.value)}
-                  />
-                  <Button
-                    onClick={handleCreateChannel}
-                    disabled={isCreatingChannel}
-                  >
-                    {isCreatingChannel ? (
-                      <>
-                        Creating...
-                        <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                      </>
-                    ) : (
-                      "Create Channel"
-                    )}
+                  <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                    <Plus className="h-5 w-5" />
                   </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
-            <h3 className="text-sm font-medium text-zinc-400">
-              Group Channels
-            </h3>
-            <ScrollArea className="h-[200px] rounded-md border border-zinc-800 p-2">
-              {groupChannels.map((channel) => (
-                <Button
-                  key={channel.id}
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start rounded-md",
-                    currentGroupChannel?.id === channel.id && "bg-zinc-800"
-                  )}
-                  onClick={() => {
-                    setCurrentGroupChannel(channel);
-                    setCurrentChannel(null);
-                    setIsGroupChat(true);
-                  }}
-                >
-                  {channel.name}
-                </Button>
-              ))}
-            </ScrollArea>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="w-full justify-start">
-                  New Group Channel
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-full">
-                <SheetHeader className="place-items-start border-b border-zinc-800 pb-4 pt-4">
-                  <SheetTitle>Create Group Channel</SheetTitle>
-                  <SheetDescription>
-                    Enter a name and description for the group channel.
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="flex flex-col gap-2 p-4">
-                  <Input
-                    type="text"
-                    placeholder="Group Channel Name"
-                    value={newGroupChannelName}
-                    onChange={(e) => setNewGroupChannelName(e.target.value)}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Group Channel Description"
-                    value={newGroupChannelDescription}
-                    onChange={(e) =>
-                      setNewGroupChannelDescription(e.target.value)
-                    }
-                  />
-                  <Button
-                    onClick={handleCreateGroupChannel}
-                    disabled={isCreatingGroupChannel}
-                  >
-                    {isCreatingGroupChannel ? (
-                      <>
-                        Creating...
-                        <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                      </>
-                    ) : (
-                      "Create Group Channel"
-                    )}
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </aside>
-      )}
-      <main className="flex-1 flex flex-col">
-        <header className="h-14 border-b border-zinc-800 p-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {isMobile && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            )}
-            <h2 className="text-lg font-semibold">
-              {isGroupChat
-                ? currentGroupChannel?.name || "Select a group channel"
-                : currentChannel?.name || "Select a channel"}
-            </h2>
-          </div>
-          <div className="flex items-center gap-2">
-            <Popover open={isDatePopoverOpen} onOpenChange={setIsDatePopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-[240px] justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <Calendar className="mr-2 h-4 w-4" />
-                  {date ? formattedDate : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() =>
-                setTheme(theme === "light" ? "dark" : "light")
-              }
-            >
-              {theme === "light" ? (
-                <Moon className="h-5 w-5" />
-              ) : (
-                <Sun className="h-5 w-5" />
-              )}
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => auth.signOut()}>
-                  Sign Out
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {isGroupChat && currentGroupChannel && (
-                  <>
-                    <DropdownMenuItem>
-                      <Sheet>
-                        <SheetTrigger asChild>
-                          <Button variant="ghost" className="w-full justify-start">
-                            <UserPlus className="mr-2 h-4 w-4" />
-                            Add Users
-                          </Button>
-                        </SheetTrigger>
-                        <SheetContent side="left" className="w-full">
-                          <SheetHeader className="place-items-start border-b border-zinc-800 pb-4 pt-4">
-                            <SheetTitle>Add Users to Group</SheetTitle>
-                            <SheetDescription>
-                              Select users to add to the group.
-                            </SheetDescription>
-                          </SheetHeader>
-                          <div className="flex flex-col gap-2 p-4">
-                            <div className="relative">
-                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
-                              <Input
-                                type="text"
-                                placeholder="Search users..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 w-full border-gray-200 dark:border-[#1F1F23] dark:bg-[#0F0F12] text-gray-900 dark:text-gray-100"
-                              />
-                              {isSearching && (
-                                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-gray-400 dark:text-gray-500" />
-                              )}
-                              {searchQuery && searchResults.length > 0 && (
-                                <div className="absolute left-0 right-0 top-12 z-10 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-lg">
-                                  <ScrollArea className="max-h-40">
-                                    {searchResults.map((user) => (
-                                      <Button
-                                        key={user.uid}
-                                        variant="ghost"
-                                        className="w-full justify-start rounded-none hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                                        onClick={() => {
-                                          setUsersToAdd((prev) => [
-                                            ...prev,
-                                            user.uid,
-                                          ]);
-                                          setSearchQuery("");
-                                        }}
-                                      >
-                                        <Avatar className="mr-2 h-5 w-5">
-                                          <AvatarImage src={user.photoURL} />
-                                          <AvatarFallback>
-                                            {user.displayName
-                                              ?.charAt(0)
-                                              .toUpperCase()}
-                                          </AvatarFallback>
-                                        </Avatar>
-                                        {user.displayName}
-                                      </Button>
-                                    ))}
-                                  </ScrollArea>
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              {usersToAdd.map((uid) => {
-                                const user = availableUsers.find(
-                                  (user) => user.uid === uid
-                                );
-                                return (
-                                  user && (
-                                    <Badge
-                                      key={uid}
-                                      variant="secondary"
-                                      className="flex items-center gap-1 rounded-full"
-                                    >
-                                      <Avatar className="mr-2 h-5 w-5">
-                                        <AvatarImage src={user.photoURL} />
-                                        <AvatarFallback>
-                                          {user.displayName
-                                            ?.charAt(0)
-                                            .toUpperCase()}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                      {user.displayName}
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="-mr-1 h-5 w-5 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700"
-                                        onClick={() =>
-                                          setUsersToAdd((prev) =>
-                                            prev.filter((u) => u !== uid)
-                                          )
-                                        }
-                                      >
-                                        <X className="h-3 w-3" />
-                                      </Button>
-                                    </Badge>
-                                  )
-                                );
-                              })}
-                            </div>
-                            <Button
-                              onClick={handleAddUsersToGroup}
-                              disabled={isAddingUsers || usersToAdd.length === 0}
-                            >
-                              {isAddingUsers ? (
-                                <>
-                                  Adding...
-                                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                                </>
-                              ) : (
-                                "Add Users"
-                              )}
-                            </Button>
-                          </div>
-                        </SheetContent>
-                      </Sheet>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Sheet>
-                        <SheetTrigger asChild>
-                          <Button variant="ghost" className="w-full justify-start">
-                            <UserMinus className="mr-2 h-4 w-4" />
-                            Remove Users
-                          </Button>
-                        </SheetTrigger>
-                        <SheetContent side="left" className="w-full">
-                          <SheetHeader className="place-items-start border-b border-zinc-800 pb-4 pt-4">
-                            <SheetTitle>Remove Users from Group</SheetTitle>
-                            <SheetDescription>
-                              Select users to remove from the group.
-                            </SheetDescription>
-                          </SheetHeader>
-                          <div className="flex flex-col gap-2 p-4">
-                            <div className="flex flex-wrap gap-2">
-                              {usersInGroupForRemoving.map((user) => (
-                                <Button
-                                  key={user.uid}
-                                  variant="outline"
-                                  className={cn(
-                                    "flex items-center gap-1 rounded-full",
-                                    usersToRemove.includes(user.uid) &&
-                                      "bg-zinc-800"
-                                  )}
-                                  onClick={() => {
-                                    if (usersToRemove.includes(user.uid)) {
-                                      setUsersToRemove((prev) =>
-                                        prev.filter((u) => u !== user.uid)
-                                      );
-                                    } else {
-                                      setUsersToRemove((prev) => [
-                                        ...prev,
-                                        user.uid,
-                                      ]);
-                                    }
-                                  }}
-                                >
-                                  <Avatar className="mr-2 h-5 w-5">
-                                    <AvatarImage src={user.photoURL} />
-                                    <AvatarFallback>
-                                      {user.displayName
-                                        ?.charAt(0)
-                                        .toUpperCase()}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  {user.displayName}
-                                </Button>
-                              ))}
-                            </div>
-                            <Button
-                              onClick={handleRemoveUsersFromGroup}
-                              disabled={
-                                isRemovingUsers || usersToRemove.length === 0
-                              }
-                            >
-                              {isRemovingUsers ? (
-                                <>
-                                  Removing...
-                                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                                </>
-                              ) : (
-                                "Remove Users"
-                              )}
-                            </Button>
-                          </div>
-                        </SheetContent>
-                      </Sheet>
-                    </DropdownMenuItem>
-                    {!isUserTheCreator && (
-                      <DropdownMenuItem>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" className="w-full justify-start">
-                              <Trash2 className="mr-2 h-4 w-4 text-red-500" />
-                              Leave Group
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Leave Group Channel
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to leave this group
-                                channel? You will need an invitation to rejoin.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={handleLeaveGroup}
-                                className="bg-red-500 hover:bg-red-600"
-                                disabled={isLeavingGroup}
-                              >
-                                {isLeavingGroup ? (
-                                  <>
-                                    Leaving...
-                                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                                  </>
-                                ) : (
-                                  "Leave Group"
-                                )}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </DropdownMenuItem>
-                    )}
-                    {isUserTheCreator && (
-                      <DropdownMenuItem>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" className="w-full justify-start">
-                              <Trash2 className="mr-2 h-4 w-4 text-red-500" />
-                              Delete Group
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Delete Group Channel
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete this group
-                                channel? This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={handleDeleteGroup}
-                                className="bg-red-500 hover:bg-red-600"
-                                disabled={isDeletingGroup}
-                              >
-                                {isDeletingGroup ? (
-                                  <>
-                                    Deleting...
-                                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                                  </>
-                                ) : (
-                                  "Delete Group"
-                                )}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </DropdownMenuItem>
-                    )}
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </header>
-        <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full p-4">
-            {messages.length === 0 ? (
-              <div className="flex h-full items-center justify-center">
-                <div className="text-center">
-                  <p className="text-zinc-400">No messages yet.</p>
-                  <p className="text-zinc-500 text-sm">
-                    Start a conversation by sending a message.
-                  </p>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-4 pb-4">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex items-start gap-2 ${
-                      message.user.uid === user?.uid
-                        ? "flex-row-reverse"
-                        : "flex-row"
-                    }`}
+              
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <Input
+                  placeholder="Search conversations..."
+                  className="pl-9 bg-zinc-800 border-zinc-700 text-white"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <Tabs defaultValue="all" className="flex-1">
+              <div className="px-2 pt-2 border-b border-zinc-800">
+                <TabsList className="w-full bg-zinc-800">
+                  <TabsTrigger 
+                    value="all" 
+                    className="flex-1 data-[state=active]:bg-green-500"
                   >
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={message.user.photoURL || ""} />
-                      <AvatarFallback className="bg-zinc-700">
-                        {message.user.displayName
-                          ?.charAt(0)
-                          .toUpperCase() || "?"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div
-                      className={`flex flex-col ${
-                        message.user.uid === user?.uid
-                          ? "items-end"
-                          : "items-start"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">
-                          {message.user.displayName}
-                        </span>
-                        <span className="text-xs text-zinc-400">
-                          {message.createdAt?.toDate
-                            ? format(
-                                message.createdAt.toDate(),
-                                "h:mm a, MMM d"
-                              )
-                            : "Just now"}
-                        </span>
+                    All
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="unread" 
+                    className="flex-1 data-[state=active]:bg-green-500"
+                  >
+                    Unread
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="groups" 
+                    className="flex-1 data-[state=active]:bg-green-500"
+                  >
+                    Groups
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+              
+              <TabsContent value="all" className="flex-1 mt-0">
+                <ScrollArea className="h-[calc(100vh-190px)]">
+                  <div className="px-2 py-2 space-y-1">
+                    {chatsLoading ? (
+                      <div className="flex justify-center py-4">
+                        <div className="animate-pulse text-zinc-500">Loading chats...</div>
                       </div>
-                      <div
-                        className={`mt-1 rounded-lg px-3 py-2 ${
-                          message.user.uid === user?.uid
-                            ? "bg-green-500/20 text-white"
-                            : "bg-zinc-800"
-                        }`}
-                      >
-                        <p>{message.text}</p>
+                    ) : filteredChats.length === 0 ? (
+                      <div className="text-center py-8 text-zinc-500">
+                        {searchQuery ? "No matching conversations" : "No conversations yet"}
+                      </div>
+                    ) : (
+                      filteredChats.map((chat) => (
+                        <div
+                          key={chat.id}
+                          className={`relative p-2 rounded-lg cursor-pointer transition-colors ${
+                            selectedChat?.id === chat.id
+                              ? "bg-green-500/10 hover:bg-green-500/20"
+                              : "hover:bg-zinc-800"
+                          }`}
+                          onClick={() => handleSelectChat(chat)}
+                        >
+                          <div className="flex items-center gap-3">
+                            {chat.type === 'public' ? (
+                              <div className="relative">
+                                <div className="h-10 w-10 bg-zinc-800 rounded-full flex items-center justify-center">
+                                  <Users className="h-5 w-5 text-zinc-400" />
+                                </div>
+                              </div>
+                            ) : (
+                              <Avatar className="h-10 w-10">
+                                {chat.participants && chat.participants[0] && (
+                                  <AvatarImage src={chat.participants[0].profileImage} />
+                                )}
+                                <AvatarFallback>
+                                  {chat.name ? chat.name.substring(0, 2).toUpperCase() : 'CH'}
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium truncate">
+                                  {chat.name || (chat.participants && chat.participants[0] ? chat.participants[0].username : 'Chat')}
+                                </span>
+                                <span className="text-xs text-zinc-500">
+                                  {new Date(chat.lastMessageTime || '').toLocaleTimeString([], { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit' 
+                                  })}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs text-zinc-400 truncate">
+                                  {chat.lastMessage || "No messages yet"}
+                                </p>
+                                {chat.unreadCount > 0 && (
+                                  <Badge className="bg-green-500 text-white">
+                                    {chat.unreadCount}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+              
+              <TabsContent value="unread" className="flex-1 mt-0">
+                <ScrollArea className="h-[calc(100vh-190px)]">
+                  <div className="px-2 py-2 space-y-1">
+                    {(filteredChats || []).filter(chat => chat.unreadCount && chat.unreadCount > 0).length === 0 ? (
+                      <div className="text-center py-8 text-zinc-500">
+                        No unread messages
+                      </div>
+                    ) : (
+                      filteredChats
+                        .filter(chat => chat.unreadCount && chat.unreadCount > 0)
+                        .map((chat) => (
+                          <div
+                            key={chat.id}
+                            className={`relative p-2 rounded-lg cursor-pointer transition-colors ${
+                              selectedChat?.id === chat.id
+                                ? "bg-green-500/10 hover:bg-green-500/20"
+                                : "hover:bg-zinc-800"
+                            }`}
+                            onClick={() => handleSelectChat(chat)}
+                          >
+                            {/* Chat entry content (same as above) */}
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-10 w-10">
+                                {chat.participants && chat.participants[0] && (
+                                  <AvatarImage src={chat.participants[0].profileImage} />
+                                )}
+                                <AvatarFallback>
+                                  {chat.name ? chat.name.substring(0, 2).toUpperCase() : 'CH'}
+                                </AvatarFallback>
+                              </Avatar>
+                              
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-medium truncate">
+                                    {chat.name || (chat.participants && chat.participants[0] ? chat.participants[0].username : 'Chat')}
+                                  </span>
+                                  <span className="text-xs text-zinc-500">
+                                    {new Date(chat.lastMessageTime || '').toLocaleTimeString([], { 
+                                      hour: '2-digit', 
+                                      minute: '2-digit' 
+                                    })}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <p className="text-xs text-zinc-400 truncate">
+                                    {chat.lastMessage || "No messages yet"}
+                                  </p>
+                                  <Badge className="bg-green-500 text-white">
+                                    {chat.unreadCount}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+              
+              <TabsContent value="groups" className="flex-1 mt-0">
+                <ScrollArea className="h-[calc(100vh-190px)]">
+                  <div className="px-2 py-2 space-y-1">
+                    {(filteredChats || []).filter(chat => chat.type === 'public').length === 0 ? (
+                      <div className="text-center py-8 text-zinc-500">
+                        No group conversations
+                      </div>
+                    ) : (
+                      filteredChats
+                        .filter(chat => chat.type === 'public')
+                        .map((chat) => (
+                          <div
+                            key={chat.id}
+                            className={`relative p-2 rounded-lg cursor-pointer transition-colors ${
+                              selectedChat?.id === chat.id
+                                ? "bg-green-500/10 hover:bg-green-500/20"
+                                : "hover:bg-zinc-800"
+                            }`}
+                            onClick={() => handleSelectChat(chat)}
+                          >
+                            {/* Group chat entry content */}
+                            <div className="flex items-center gap-3">
+                              <div className="relative">
+                                <div className="h-10 w-10 bg-zinc-800 rounded-full flex items-center justify-center">
+                                  <Users className="h-5 w-5 text-zinc-400" />
+                                </div>
+                              </div>
+                              
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-medium truncate">
+                                    {chat.name}
+                                  </span>
+                                  <span className="text-xs text-zinc-500">
+                                    {new Date(chat.lastMessageTime || '').toLocaleTimeString([], { 
+                                      hour: '2-digit', 
+                                      minute: '2-digit' 
+                                    })}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <p className="text-xs text-zinc-400 truncate">
+                                    {chat.lastMessage || "No messages yet"}
+                                  </p>
+                                  {chat.unreadCount > 0 && (
+                                    <Badge className="bg-green-500 text-white">
+                                      {chat.unreadCount}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+            </Tabs>
+          </div>
+          
+          {/* Chat Area */}
+          {selectedChat ? (
+            <div className="flex flex-col h-full">
+              {/* Chat Header */}
+              <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {selectedChat.type === 'public' ? (
+                    <div className="relative">
+                      <div className="h-10 w-10 bg-zinc-800 rounded-full flex items-center justify-center">
+                        <Users className="h-5 w-5 text-zinc-400" />
                       </div>
                     </div>
+                  ) : (
+                    <Avatar className="h-10 w-10">
+                      {selectedChat.participants && selectedChat.participants[0] && (
+                        <AvatarImage src={selectedChat.participants[0].profileImage} />
+                      )}
+                      <AvatarFallback>
+                        {selectedChat.name ? selectedChat.name.substring(0, 2).toUpperCase() : 'CH'}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                  
+                  <div>
+                    <h3 className="font-medium">
+                      {selectedChat.name || (selectedChat.participants && selectedChat.participants[0] ? selectedChat.participants[0].username : 'Chat')}
+                    </h3>
+                    <div className="text-xs text-zinc-400">
+                      {selectedChat.type === 'public' 
+                        ? `${selectedChat.participants ? selectedChat.participants.length : 0} members` 
+                        : selectedChat.participants && selectedChat.participants[0] && selectedChat.participants[0].isOnline 
+                          ? "Online" 
+                          : "Offline"}
+                    </div>
                   </div>
-                ))}
-                <div ref={messagesEndRef} />
+                </div>
+                
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                    <Phone className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                    <Video className="h-5 w-5" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="text-zinc-400 hover:text-white hover:bg-zinc-800"
+                    onClick={() => setChallengeDialogOpen(true)}
+                  >
+                    <Code className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                    <Info className="h-5 w-5" />
+                  </Button>
+                </div>
               </div>
-            )}
-          </ScrollArea>
-        </div>
-        <div className="border-t border-zinc-800 p-4">
-          <div className="flex items-center gap-2">
-            <Input
-              type="text"
-              placeholder={
-                isGroupChat
-                  ? "Send a message to the group..."
-                  : "Send a message..."
-              }
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  if (isGroupChat) {
-                    handleSendGroupMessage();
-                  } else {
-                    handleSendDirectMessage();
-                  }
-                }
-              }}
-              disabled={!currentChannel && !currentGroupChannel}
-              className="flex-1"
-            />
-            <Button
-              onClick={
-                isGroupChat ? handleSendGroupMessage : handleSendDirectMessage
-              }
-              disabled={
-                !newMessage.trim() ||
-                (!currentChannel && !currentGroupChannel)
-              }
-            >
-              Send
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
+              
+              {/* Messages */}
+              <ScrollArea className="flex-1 p-4">
+                <div className="space-y-4">
+                  {messagesLoading ? (
+                    <div className="flex justify-center py-4">
+                      <div className="animate-pulse text-zinc-500">Loading messages...</div>
+                    </div>
+                  ) : messages?.length === 0 ? (
+                    <div className="text-center py-8 text-zinc-500">
+                      No messages yet. Start the conversation!
+                    </div>
+                  ) : (
+                    <>
+                      {messages?.map((msg: MessageType) => (
+                        <ChatMessage 
+                          key={msg.id} 
+                          message={msg}
+                        />
+                      ))}
+                      
+                      {/* Sample challenge invite - this will be handled separately */}
+                      {selectedChat.id === 'general' && (
+                        <div className="border rounded-md p-3 mt-2 border-blue-200 bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-800/50">
+                          <p className="text-sm">Challenge invite will appear here</p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+              </ScrollArea>
+              
+              {/* Message Input */}
+              <div className="p-4 border-t border-zinc-800">
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                    <Paperclip className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                    <Image className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                    <Code className="h-5 w-5" />
+                  </Button>
+                  <div className="relative flex-1">
+                    <Input
+                      placeholder="Type a message..."
+                      className="bg-zinc-800 border-zinc-700 pr-10"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                    />
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-zinc-400 hover:text-white"
+                    >
+                      <Smile className="h-5 w-5" />
+                    </Button>
+                  </div>
+                  <Button 
+                    size="icon" 
+                    className="bg-green-500 hover:bg-green-600"
+                    onClick={handleSendMessage}
+                    disabled={!message.trim() || sendMessageMutation.isPending}
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Challenge Dialog */}
+              {challengeDialogOpen && (
+                <ChatChallengeDialog
+                  isOpen={challengeDialogOpen}
+                  onClose={() => setChallengeDialogOpen(false)}
+                  onCreateChallenge={(challenge) => {
+                    // Handle the created challenge, for example:
+                    toast({
+                      title: "Challenge Created",
+                      description: `Your challenge "${challenge.title}" has been created successfully.`,
+                    });
+                    refetchMessages();
+                  }}
+                />
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full text-center p-6">
+              <div className="bg-zinc-800/50 rounded-full p-6 mb-4">
+                <MessageSquare className="h-12 w-12 text-zinc-600" />
+              </div>
+              <h3 className="text-xl font-medium mb-2">Select a conversation</h3>
+              <p className="text-zinc-400 mb-6 max-w-md">
+                Choose an existing conversation or start a new one to begin messaging.
+              </p>
+              <Button className="bg-green-500 hover:bg-green-600">
+                <UserPlus className="mr-2 h-4 w-4" />
+                New Conversation
+              </Button>
+            </div>
+          )}
         </div>
       </main>
     </div>

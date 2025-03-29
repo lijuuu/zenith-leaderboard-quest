@@ -12,7 +12,6 @@ import Home from "./pages/Home";
 import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 import Problems from "./pages/Problems";
-import ProblemDetail from "./pages/ProblemDetail";
 import Profile from "./pages/Profile";
 import Challenges from "./pages/Challenges";
 import Chat from "./pages/Chat";
@@ -55,7 +54,6 @@ const AppContent = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/problems" element={<Problems />} />
-          <Route path="/problems/:id" element={<ProblemDetail />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:userId" element={<Profile />} />
           <Route path="/challenges" element={<Challenges />} />

@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import * as monaco from 'monaco-editor';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { mockProblems } from '@/api/problemApi';
 import { 
   TestCase, 
   TestCaseRunOnly, 
@@ -17,7 +18,8 @@ import {
   TestResult, 
   ExecutionResult,
   ApiResponsePayload, 
-  GenericResponse 
+  GenericResponse, 
+  twoSumProblem
 } from '@/api/types/problem-execution';
 
 const API_BASE_URL = 'http://localhost:7000/api/v1';
@@ -569,21 +571,7 @@ const ZenXPlayground: React.FC = () => {
       .catch(error => {
         console.error('Error fetching problem:', error);
         // Set a default problem to prevent undefined states
-        setProblem({
-          problem_id: '',
-          title: 'Error Loading Problem',
-          description: 'Failed to load problem data. Please try again later.',
-          tags: [],
-          testcase_run: { run: [] },
-          difficulty: 'Unknown',
-          supported_languages: ['javascript', 'go', 'python', 'cpp'],
-          placeholder_maps: {
-            javascript: '// Write your JavaScript solution here\n',
-            go: '// Write your Go solution here\npackage main\n',
-            python: '# Write your Python solution here\n',
-            cpp: '// Write your C++ solution here\n#include <string>\n',
-          },
-        });
+        setProblem(twoSumProblem);
         setLanguage(storedLanguage || 'javascript');
         setIsLoading(false);
       });

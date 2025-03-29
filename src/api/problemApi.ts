@@ -1,7 +1,7 @@
 import { Problem, Submission, CompileRequest, CompileResponse } from './types';
 
 // Mock data for problems based on the provided JSON
-const mockProblems: Problem[] = [
+export const mockProblems: Problem[] = [
   {
     id: "67d96452d3fe6af39801337b",
     title: "Two Sum",
