@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Play, RefreshCw, Clock, CheckCircle, XCircle, ArrowLeft, Plus } from 'lucide-react';
@@ -6,7 +5,6 @@ import Editor from '@monaco-editor/react';
 import { Button } from '@/components/ui/button';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import ReactMarkdown from 'react-markdown';
-import { useTheme } from '@/hooks/theme-provider';
 import { useNavigate } from 'react-router-dom';
 import * as monaco from 'monaco-editor';
 import { Input } from '@/components/ui/input';
@@ -177,10 +175,7 @@ interface CodeEditorProps {
 
 const CodeEditor: React.FC<CodeEditorProps> = ({ value, onChange, language }) => {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-  const { theme } = useTheme();
-  const [editorTheme, setEditorTheme] = useState<string>(theme === 'dark' ? 'vs-dark' : 'light');
-
-  useEffect(() => setEditorTheme(theme === 'dark' ? 'vs-dark' : 'light'), [theme]);
+  const [editorTheme, setEditorTheme] = useState<string>('vs-dark');
 
   const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor) => {
     editorRef.current = editor;
@@ -717,140 +712,4 @@ const ZenXPlayground: React.FC = () => {
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-64 bg-zinc-800 rounded"></div>
           <div className="h-4 w-48 bg-zinc-800 rounded"></div>
-          <div className="h-[600px] w-full max-w-4xl bg-zinc-800 rounded"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!problem) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-zinc-300">
-        <div className="text-center p-6 max-w-md">
-          <h2 className="text-xl font-semibold mb-3">No Problem Found</h2>
-          <p className="text-zinc-400 mb-4">No problem ID was specified or the problem could not be loaded.</p>
-          <Button 
-            variant="outline" 
-            onClick={() => window.location.href = '/problems'} 
-            className="bg-zinc-800 border-zinc-700 text-green-500 hover:bg-zinc-700"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" /> View All Problems
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-300 overflow-hidden">
-      <ResizablePanelGroup
-        direction={isMobile ? 'vertical' : 'horizontal'}
-        className="h-screen"
-      >
-        <ResizablePanel defaultSize={isMobile ? 40 : 35} minSize={20}>
-          <ProblemDescription problem={problem} />
-        </ResizablePanel>
-        
-        <ResizableHandle withHandle className="bg-zinc-800" />
-        
-        <ResizablePanel defaultSize={isMobile ? 60 : 65} minSize={30}>
-          <ResizablePanelGroup direction="vertical">
-            <ResizablePanel defaultSize={70} minSize={30}>
-              <motion.div 
-                className="p-4 space-y-4 h-full flex flex-col bg-zinc-900/70"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex gap-2">
-                    <motion.button
-                      onClick={() => handleCodeExecution('run')}
-                      disabled={isExecuting}
-                      className="px-3 py-1.5 rounded-md flex items-center gap-2 text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 border border-green-500/20 shadow-sm"
-                      whileTap={{ scale: 0.97 }}
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      {isExecuting ? (
-                        <RefreshCw className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                      <span className="text-sm font-medium">Run</span>
-                    </motion.button>
-                    
-                    <motion.button
-                      onClick={() => handleCodeExecution('submit')}
-                      disabled={isExecuting}
-                      className="px-3 py-1.5 rounded-md flex items-center gap-2 text-white bg-zinc-700 hover:bg-zinc-600 disabled:opacity-50 border border-zinc-600/20 shadow-sm"
-                      whileTap={{ scale: 0.97 }}
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      {isExecuting ? (
-                        <RefreshCw className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                      <span className="text-sm font-medium">Submit</span>
-                    </motion.button>
-                    
-                    <motion.button
-                      onClick={handleResetCode}
-                      disabled={isExecuting}
-                      className="px-3 py-1.5 rounded-md flex items-center gap-2 text-white bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 border border-zinc-700/20 shadow-sm"
-                      whileTap={{ scale: 0.97 }}
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                      <span className="text-sm font-medium">Reset</span>
-                    </motion.button>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <Timer />
-                    
-                    <select
-                      value={language}
-                      onChange={(e) => setLanguage(e.target.value)}
-                      className="bg-zinc-800 text-zinc-200 px-3 py-1.5 rounded-md border border-zinc-700 focus:border-green-500 focus:outline-none text-sm"
-                    >
-                      {problem.supported_languages.map((lang: string) => (
-                        <option key={lang} value={lang} className="capitalize">{lang}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                
-                <div className="flex-grow">
-                  <CodeEditor
-                    value={code}
-                    onChange={setCode}
-                    language={language}
-                  />
-                </div>
-              </motion.div>
-            </ResizablePanel>
-            
-            <ResizableHandle withHandle className="bg-zinc-800" />
-            
-            <ResizablePanel defaultSize={30} minSize={15}>
-              <Console
-                output={output}
-                executionResult={executionResult}
-                isMobile={isMobile}
-                onReset={handleResetCode}
-                testCases={problem.testcase_run.run}
-                customTestCases={customTestCases}
-                onAddCustomTestCase={handleAddCustomTestCase}
-                activeTab={consoleTab}
-                setActiveTab={setConsoleTab}
-              />
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </div>
-  );
-};
-
-export default ZenXPlayground;
+          <div className="h-[600px] w-full max

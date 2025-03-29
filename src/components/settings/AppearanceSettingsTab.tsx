@@ -144,10 +144,10 @@ const AppearanceSettingsTab = () => {
             <div className="space-y-3 p-4 border rounded-md">
               <div className="flex flex-wrap gap-3">
                 <Button className="bg-green-500 text-white hover:bg-green-600">Primary Button</Button>
-                <Button variant="outline" className={`border-${selectedAccentColor}-500 text-${selectedAccentColor}-500`}>
+                <Button variant="outline" className="border-green-500 text-green-500">
                   Outline Button
                 </Button>
-                <Button variant="ghost" className={`text-${selectedAccentColor}-500`}>
+                <Button variant="ghost" className="text-green-500">
                   Ghost Button
                 </Button>
               </div>

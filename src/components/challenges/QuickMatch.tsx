@@ -4,14 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, Zap, Clock, UserCheck, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { useAccentColor } from '@/contexts/AccentColorContext';
 
 const QuickMatch: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'searching' | 'matched'>('idle');
   const [countdown, setCountdown] = useState(3);
   const [searchTime, setSearchTime] = useState(0);
   const navigate = useNavigate();
-  const { accentColor } = useAccentColor();
 
   useEffect(() => {
     if (status === 'searching') {
@@ -58,7 +56,7 @@ const QuickMatch: React.FC = () => {
               {status === 'idle' && (
                 <div className="space-y-6">
                   <div className="flex justify-center">
-                    <div className={`w-24 h-24 rounded-full flex items-center justify-center accent-color`}>
+                    <div className="w-24 h-24 rounded-full flex items-center justify-center bg-green-600">
                       <Zap className="h-10 w-10 text-white" />
                     </div>
                   </div>
@@ -71,7 +69,7 @@ const QuickMatch: React.FC = () => {
                   </div>
                   <Button 
                     onClick={startMatching} 
-                    className="w-full py-6 text-lg accent-color"
+                    className="w-full py-6 text-lg bg-green-600 hover:bg-green-700"
                   >
                     <Zap className="mr-2 h-5 w-5" /> Start Quick Match
                   </Button>
@@ -82,7 +80,7 @@ const QuickMatch: React.FC = () => {
                 <div className="space-y-6">
                   <div className="flex justify-center">
                     <div className="relative">
-                      <div className={`w-24 h-24 rounded-full flex items-center justify-center bg-amber-600/20`}>
+                      <div className="w-24 h-24 rounded-full flex items-center justify-center bg-amber-600/20">
                         <Loader2 className="h-10 w-10 text-amber-400 animate-spin" />
                       </div>
                       <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-amber-600 text-white px-2 py-1 rounded-full text-xs">
@@ -111,7 +109,7 @@ const QuickMatch: React.FC = () => {
                   <div className="flex justify-center">
                     <div className="relative">
                       <motion.div 
-                        className={`w-24 h-24 rounded-full flex items-center justify-center bg-green-600/20`}
+                        className="w-24 h-24 rounded-full flex items-center justify-center bg-green-600/20"
                         animate={{ scale: [1, 1.1, 1] }}
                         transition={{ repeat: Infinity, duration: 1.5 }}
                       >

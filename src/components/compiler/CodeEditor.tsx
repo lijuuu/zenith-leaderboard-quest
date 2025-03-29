@@ -5,7 +5,6 @@ import { Download, Copy, CheckCheck, PlayIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Editor from "@monaco-editor/react";
 import { useSelector } from 'react-redux';
-import { useTheme } from '@/hooks/theme-provider';
 import { cn } from '@/lib/utils';
 import { RootState } from '@/store';
 import { toast } from 'sonner';
@@ -21,7 +20,6 @@ interface CodeEditorProps {
 }
 
 const CodeEditor = ({ className, isMobile }: CodeEditorProps) => {
-  const { theme } = useTheme();
   const dispatch = useAppDispatch();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   
@@ -148,7 +146,7 @@ const CodeEditor = ({ className, isMobile }: CodeEditorProps) => {
           language={language}
           value={code}
           onChange={handleCodeChange}
-          theme={theme === 'dark' ? 'vs-dark' : 'vs'}
+          theme="vs-dark"
           onMount={handleEditorDidMount}
           options={{
             automaticLayout: true,

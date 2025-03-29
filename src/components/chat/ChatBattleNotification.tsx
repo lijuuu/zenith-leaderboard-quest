@@ -6,7 +6,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { useAccentColor } from '@/contexts/AccentColorContext';
 
 interface ChatBattleNotificationProps {
   challenge: {
@@ -32,7 +31,6 @@ const ChatBattleNotification: React.FC<ChatBattleNotificationProps> = ({
 }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { accentColor } = useAccentColor();
   
   const handleAccept = () => {
     toast({

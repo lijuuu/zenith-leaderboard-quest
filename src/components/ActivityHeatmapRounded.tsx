@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { format, parseISO, eachDayOfInterval, subMonths, getMonth } from 'date-fns';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useAccentColor } from '@/contexts/AccentColorContext';
 
 interface HeatmapDataPoint {
   date: string;
@@ -19,7 +18,6 @@ const ActivityHeatmapRounded: React.FC<ActivityHeatmapRoundedProps> = ({
   data = [], 
   monthCount = 6 
 }) => {
-  const { accentColor } = useAccentColor();
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
   
   // Generate date range for the last N months
@@ -50,17 +48,15 @@ const ActivityHeatmapRounded: React.FC<ActivityHeatmapRoundedProps> = ({
   
   // Function to get color based on activity level
   const getLevelColor = (level: number): string => {
-    const colors: Record<string, string[]> = {
-      green: ['bg-green-50/30 dark:bg-green-950/30', 'bg-green-200 dark:bg-green-800', 'bg-green-300 dark:bg-green-700', 'bg-green-400 dark:bg-green-600', 'bg-green-500 dark:bg-green-500'],
-      blue: ['bg-blue-50/30 dark:bg-blue-950/30', 'bg-blue-200 dark:bg-blue-800', 'bg-blue-300 dark:bg-blue-700', 'bg-blue-400 dark:bg-blue-600', 'bg-blue-500 dark:bg-blue-500'],
-      purple: ['bg-purple-50/30 dark:bg-purple-950/30', 'bg-purple-200 dark:bg-purple-800', 'bg-purple-300 dark:bg-purple-700', 'bg-purple-400 dark:bg-purple-600', 'bg-purple-500 dark:bg-purple-500'],
-      orange: ['bg-orange-50/30 dark:bg-orange-950/30', 'bg-orange-200 dark:bg-orange-800', 'bg-orange-300 dark:bg-orange-700', 'bg-orange-400 dark:bg-orange-600', 'bg-orange-500 dark:bg-orange-500'],
-      red: ['bg-red-50/30 dark:bg-red-950/30', 'bg-red-200 dark:bg-red-800', 'bg-red-300 dark:bg-red-700', 'bg-red-400 dark:bg-red-600', 'bg-red-500 dark:bg-red-500'],
-      teal: ['bg-teal-50/30 dark:bg-teal-950/30', 'bg-teal-200 dark:bg-teal-800', 'bg-teal-300 dark:bg-teal-700', 'bg-teal-400 dark:bg-teal-600', 'bg-teal-500 dark:bg-teal-500'],
-    };
+    const colors: string[] = [
+      'bg-green-50/30 dark:bg-green-950/30', 
+      'bg-green-200 dark:bg-green-800', 
+      'bg-green-300 dark:bg-green-700', 
+      'bg-green-400 dark:bg-green-600', 
+      'bg-green-500 dark:bg-green-500'
+    ];
     
-    const colorSet = colors[accentColor] || colors.green;
-    return colorSet[level] || colorSet[0];
+    return colors[level] || colors[0];
   };
 
   // Month label formatter

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Users, FileCode, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAccentColor } from "@/contexts/AccentColorContext";
 
 interface ChallengeCardProps {
   id: string;
@@ -91,7 +90,7 @@ const ChallengeCard = ({
           </div>
         </div>
         
-        <Button variant="default" className="w-full gap-2 accent-color">
+        <Button variant="default" className="w-full gap-2 bg-green-500 hover:bg-green-600">
           <span className="h-4 w-4" aria-hidden="true">⚡</span>
           Start Coding
         </Button>

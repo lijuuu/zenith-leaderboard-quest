@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '@/hooks/theme-provider';
 import { Button } from '@/components/ui/button';
 import { Download, Settings, Menu, Maximize2, Minimize2 } from 'lucide-react';
 import {
@@ -74,7 +73,6 @@ export interface CompilerResult {
 
 const CompilerLayout = () => {
   const dispatch = useDispatch();
-  const { setTheme } = useTheme();
   const [isMobile, setIsMobile] = useState(false);
   const [outputExpanded, setOutputExpanded] = useState(false);
   const [showToolTip, setShowToolTip] = useState(false);
@@ -185,10 +183,10 @@ const CompilerLayout = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-background border-border/50">
-              <DropdownMenuItem onClick={() => setTheme("light")} className="hover:bg-muted">
+              <DropdownMenuItem className="hover:bg-muted">
                 Light Mode
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")} className="hover:bg-muted">
+              <DropdownMenuItem className="hover:bg-muted">
                 Dark Mode
               </DropdownMenuItem>
             </DropdownMenuContent>

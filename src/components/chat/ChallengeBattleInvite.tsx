@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useAccentColor } from '@/contexts/AccentColorContext';
 
 interface ChallengeBattleInviteProps {
   challenge: {
@@ -26,10 +25,8 @@ const ChallengeBattleInvite: React.FC<ChallengeBattleInviteProps> = ({
   onAccept,
   onDecline
 }) => {
-  const { accentColor } = useAccentColor();
-  
   return (
-    <Card className="w-full max-w-md my-2 overflow-hidden border-accent-color/30 dark:bg-background/70">
+    <Card className="w-full max-w-md my-2 overflow-hidden border-green-500/30 dark:bg-background/70">
       <div className="h-2 bg-gradient-to-r from-green-500 via-blue-500 to-purple-500" />
       <CardContent className="p-4">
         <div className="flex items-center mb-3">
@@ -124,7 +121,7 @@ const ChallengeBattleInvite: React.FC<ChallengeBattleInviteProps> = ({
                 Decline
               </Button>
             )}
-            <Button onClick={onAccept} className="accent-color" size="sm">
+            <Button onClick={onAccept} className="bg-green-500 hover:bg-green-600" size="sm">
               <Zap className="mr-1.5 h-3.5 w-3.5" />
               {challenge.isPrivate ? 'Accept Battle' : 'Join Challenge'}
             </Button>
