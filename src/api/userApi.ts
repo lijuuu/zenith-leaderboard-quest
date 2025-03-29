@@ -1,4 +1,3 @@
-
 import { User, UserProfile, Friend, Badge, AuthResponse, LoginCredentials, RegisterData } from './types';
 
 // Mock data for development
@@ -146,8 +145,26 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
   return new Promise(resolve => {
     const user = mockUsers.find(u => u.id === userId) || mockUsers[0];
     
+    // Map the user object to match the UserProfile type expected by the application
     const profile: UserProfile = {
-      ...user,
+      userID: user.id,
+      userName: user.username,
+      firstName: user.fullName.split(' ')[0],
+      lastName: user.fullName.split(' ')[1] || '',
+      avatarURL: user.profileImage || '',
+      email: user.email,
+      role: 'user', // Mock role
+      country: user.location || '',
+      isBanned: user.isBanned,
+      isVerified: user.isVerified,
+      primaryLanguageID: 'en', // Mock language
+      muteNotifications: false,
+      socials: {
+        github: user.githubProfile,
+        twitter: '',
+        linkedin: ''
+      },
+      createdAt: new Date(user.joinedDate).getTime(),
       stats: {
         easy: { solved: 78, total: 100 },
         medium: { solved: 45, total: 150 },
@@ -159,7 +176,11 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
         specialEvents: 2
       },
       badges: mockBadges,
-      activityHeatmap: generateHeatmapData()
+      activityHeatmap: generateHeatmapData(),
+      currentStreak: user.dayStreak,
+      longestStreak: user.dayStreak * 2, // Example calculation
+      currentRating: user.ranking,
+      globalRank: user.ranking
     };
     
     setTimeout(() => resolve(profile), 600);
