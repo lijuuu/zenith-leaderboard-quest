@@ -22,9 +22,9 @@ interface CodeEditorProps {
 const CodeEditor = ({ className, isMobile }: CodeEditorProps) => {
   const dispatch = useAppDispatch();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-  
+
   // Get state from Redux store
-  const { code, language, files, currentFile } = useSelector((state: RootState) => 
+  const { code, language, files, currentFile } = useSelector((state: RootState) =>
     state.xCodeCompiler ? state.xCodeCompiler : { code: '', language: 'javascript', files: [], currentFile: null }
   );
 
@@ -88,7 +88,7 @@ const CodeEditor = ({ className, isMobile }: CodeEditorProps) => {
           {!isMobile && (
             <div className="flex items-center gap-2 opacity-60 hover:opacity-85">
               <label htmlFor="font-size-slider" className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                Font Size:
+                font size:
               </label>
               <input
                 id="font-size-slider"
@@ -113,7 +113,7 @@ const CodeEditor = ({ className, isMobile }: CodeEditorProps) => {
             ) : (
               <Copy className="h-3.5 w-3.5 mr-1" />
             )}
-            Copy
+            copy
           </Button>
           <Button
             variant="outline"
@@ -122,7 +122,7 @@ const CodeEditor = ({ className, isMobile }: CodeEditorProps) => {
             className="border-border/50 hover:bg-muted"
           >
             <Download className="h-3.5 w-3.5 mr-1" />
-            Download
+            download
           </Button>
           <Button
             onClick={handleRun}
@@ -131,7 +131,7 @@ const CodeEditor = ({ className, isMobile }: CodeEditorProps) => {
             className="gap-1 bg-green-600 hover:bg-green-700 text-white"
           >
             <PlayIcon className="h-3.5 w-3.5" />
-            <span>Run</span>
+            <span>run</span>
           </Button>
         </div>
       </div>
@@ -146,17 +146,54 @@ const CodeEditor = ({ className, isMobile }: CodeEditorProps) => {
           language={language}
           value={code}
           onChange={handleCodeChange}
-          theme="vs-dark"
           onMount={handleEditorDidMount}
+          theme= {"vs-dark"}
           options={{
-            automaticLayout: true,
             minimap: { enabled: true },
-            fontSize: fontSize,
-            lineNumbers: 'on',
-            padding: { top: 10 },
             scrollBeyondLastLine: false,
+            fontSize: fontSize,
+            lineHeight: 22,
+            fontFamily: '"JetBrains Mono", monospace, Consolas, "Courier New"',
+            tabSize: 2,
+            wordWrap: 'on',
+            cursorBlinking: 'smooth',
+            cursorSmoothCaretAnimation: 'on',
+            smoothScrolling: true,
+            padding: { top: 12, bottom: 12 },
+            scrollbar: {
+              verticalScrollbarSize: 6,
+              horizontalScrollbarSize: 6,
+              verticalHasArrows: false,
+              horizontalHasArrows: false,
+              vertical: 'visible',
+              horizontal: 'visible',
+              verticalSliderSize: 6,
+              horizontalSliderSize: 6
+            },
+            lineNumbers: 'on',
+            glyphMargin: false,
+            folding: true,
+            contextmenu: true,
+            suggest: {
+              showMethods: true,
+              showFunctions: true,
+              showConstructors: true,
+              showFields: true,
+              showVariables: true,
+              showClasses: true,
+              showInterfaces: true
+            },
+            lineDecorationsWidth: 10,
+            renderLineHighlight: 'all',
+            colorDecorators: true,
+            guides: {
+              indentation: true,
+              highlightActiveIndentation: true,
+              bracketPairs: true
+            },
+            renderValidationDecorations: 'on',
+            fixedOverflowWidgets: true
           }}
-          loading={<div className="bg-background w-full h-full" />}
         />
       </motion.div>
     </div>

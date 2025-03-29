@@ -65,7 +65,7 @@ function Output({ className }: OutputProps) {
                 ],
               },
             ],
-            generationConfig: { temperature: 0.4, maxOutputTokens: 3000 },
+            generationConfig: { temperature: 0.4, maxOutputTokens: 5000 },
             safetySettings: [],
           }),
         }
@@ -126,7 +126,7 @@ function Output({ className }: OutputProps) {
     <div className={cn('h-full bg-background', className)}>
       <div className="p-4 h-full flex flex-col">
         <div className="flex justify-between items-center mb-4 p-2 bg-muted/20 rounded-md border border-border/50">
-          <h2 className="text-base font-semibold text-foreground">ZenX Output</h2>
+          <h2 className="text-base font-semibold text-foreground">output</h2>
           <div className="flex items-center gap-2">
             <Sheet>
               <SheetTrigger asChild>
@@ -139,15 +139,15 @@ function Output({ className }: OutputProps) {
                       ? 'bg-yellow-200/10 text-yellow-600/50 border-yellow-600/10'
                       : 'bg-blue-500/20 text-blue-600 border-blue-600/20 hover:bg-blue-500/30'
                   )}
-                  title="Get code suggestions"
+                  title="get code suggestions"
                 >
-                  {loadingHints ? 'Loading...' : 'Suggest Hints'}
+                  {loadingHints ? 'loading...' : 'suggest hints'}
                 </button>
               </SheetTrigger>
               <SheetContent className="w-[90vw] sm:max-w-md overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2">
-                    <span>Code Hints</span>
+                    <span>code hints</span>
                     <button
                       onClick={handleRefreshHints}
                       disabled={loadingHints}

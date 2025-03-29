@@ -274,7 +274,7 @@ const Home = () => {
                     <div className="absolute inset-0 rounded-xl scale-0 group-hover:scale-100 transition-transform duration-300 bg-gradient-to-br from-green-400 to-emerald-600"></div>
                     <Code className="h-7 w-7 text-green-600 dark:text-green-400 relative z-10 group-hover:text-white transition-colors duration-300" />
                   </div>
-                  <CardTitle className="text-2xl font-bold text-green-600 dark:text-green-400">500+</CardTitle>
+                  <CardTitle className="text-2xl font-bold text-green-600 dark:text-green-400">100+</CardTitle>
                   <CardDescription className="text-base">
                     Coding challenges in various languages and difficulty levels
                   </CardDescription>

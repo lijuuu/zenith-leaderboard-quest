@@ -165,7 +165,7 @@ const FileSystem: React.FC = () => {
       <SidebarContent>
         <SidebarGroup>
           <div className="flex items-center justify-between p-2">
-            <SidebarGroupLabel className="text-lg font-semibold">Files</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-lg font-semibold">files</SidebarGroupLabel>
             <Button
               variant="ghost"
               size="icon"
@@ -175,7 +175,7 @@ const FileSystem: React.FC = () => {
               <PlusIcon className="h-4 w-4" />
             </Button>
           </div>
-          <span className="text-xs text-muted-foreground mb-2 ml-2 block">Ctrl+B to Hide/Unhide</span>
+          <span className="text-xs text-muted-foreground mb-2 ml-2 block">ctrl+b to hide/unhide</span>
           <SidebarGroupContent>
             <ScrollArea className="h-[calc(90vh-130px)]">
               <AnimatePresence>
