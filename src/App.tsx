@@ -23,6 +23,7 @@ import ResetPassword from "./pages/Auth/ResetPassword";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
 import MainNavbar from "@/components/MainNavbar";
 import QuickMatch from "./components/challenges/QuickMatch";
+import AdminDashboard from "./pages-admin/AdminDashboard";
 
 // Create the query client instance
 const queryClient = new QueryClient({
@@ -67,6 +68,9 @@ const AppContent = () => {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
+
+          {/*Admin Dashboard*/}
+          <Route path="/admin/dashboard" element={<AdminDashboard />}></Route>
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

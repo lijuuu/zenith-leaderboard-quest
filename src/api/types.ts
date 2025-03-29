@@ -263,3 +263,83 @@ export interface CompileResponse {
   executionTime?: string;
   memory?: string;
 }
+
+// adminTypes.ts
+
+// Types based on Go backend models
+export interface UserProfile {
+  userID: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  avatarURL: string;
+  email: string;
+  role: string;
+  country: string;
+  isBanned: boolean;
+  isVerified: boolean;
+  primaryLanguageID: string;
+  muteNotifications: boolean;
+  socials: {
+    github: string;
+    twitter: string;
+    linkedin: string;
+  };
+  createdAt: number;
+}
+
+export interface BanHistory {
+  id: string;
+  userID: string;
+  bannedAt: number;
+  banType: string;
+  banReason: string;
+  banExpiry: number;
+}
+
+export interface GenericResponse<T> {
+  success: boolean;
+  status: number;
+  payload: T;
+  error?: {
+    code: number;
+    message: string;
+    details?: string;
+  };
+}
+
+// State interface for the admin slice
+export interface AdminState {
+  users: UserProfile[];
+  totalUsers: number;
+  nextPageToken: string;
+  banHistories: { [userID: string]: BanHistory[] };
+  loading: boolean;
+  error: string | null;
+  message: string;
+  isAuthenticated: boolean;
+  accessToken: string | null;
+  refreshToken: string | null;
+  adminID: string | null;
+  expiresIn: number | null;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  adminID: string;
+  message: string;
+}
+
+export interface UsersResponse {
+  users: UserProfile[];
+  totalCount: number;
+  nextPageToken: string;
+}
+
