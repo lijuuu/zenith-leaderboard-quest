@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
@@ -35,26 +34,35 @@ interface NavItem {
   path: string;
   icon: React.ReactNode;
   isHighlighted?: boolean;
+  requiresAuth?: boolean;
 }
 
-const MainNavbar = () => {
+interface MainNavbarProps {
+  isAuthenticated?: boolean;
+}
+
+const MainNavbar = ({ isAuthenticated = true }: MainNavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
-  
+
   const navItems: NavItem[] = [
     { name: "Home", path: "/", icon: <Home className="h-4 w-4" /> },
-    { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
-    { name: "Profile", path: "/profile", icon: <User className="h-4 w-4" /> },
+    { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard className="h-4 w-4" />, requiresAuth: true },
+    { name: "Profile", path: "/profile", icon: <User className="h-4 w-4" />, requiresAuth: true },
     { name: "Problems", path: "/problems", icon: <Code className="h-4 w-4" /> },
     { name: "Compiler", path: "/compiler", icon: <Terminal className="h-4 w-4" /> },
     { name: "Challenges", path: "/challenges", icon: <Zap className="h-4 w-4" />, isHighlighted: true },
     { name: "Leaderboard", path: "/leaderboard", icon: <Award className="h-4 w-4" /> },
-    { name: "Chat", path: "/chat", icon: <MessageSquare className="h-4 w-4" /> },
-    { name: "Settings", path: "/settings", icon: <Settings className="h-4 w-4" /> },
+    { name: "Chat", path: "/chat", icon: <MessageSquare className="h-4 w-4" />, requiresAuth: true },
+    { name: "Settings", path: "/settings", icon: <Settings className="h-4 w-4" />, requiresAuth: true },
   ];
-  
+
+  const filteredNavItems = navItems.filter(
+    (item) => !item.requiresAuth || (item.requiresAuth && isAuthenticated)
+  );
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -69,24 +77,25 @@ const MainNavbar = () => {
   }, []);
 
   useEffect(() => {
-    // Close mobile menu when route changes
     setMobileMenuOpen(false);
   }, [location]);
-  
+
   const isActive = (path: string) => {
     if (path === "/") {
       return location.pathname === "/";
     }
     return location.pathname.startsWith(path);
   };
-  
+
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-300 ease-in-out ",
+        "fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-300 ease-in-out",
         isScrolled || mobileMenuOpen
-          ? "bg-zinc-900/90 border-b border-zinc-800"
-          : "bg-zinc-900/80 border-b border-zinc-800/50"
+          ? "bg-zinc-900/90 border-b border-zinc-800 backdrop-blur"
+          : isAuthenticated
+          ? "bg-zinc-900/80 border-b border-zinc-800/50"
+          : "bg-transparent"
       )}
     >
       <div className="page-container h-full flex items-center justify-between z-10">
@@ -101,8 +110,8 @@ const MainNavbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => {
+          <nav className="hidden lg:flex items-center gap-1">
+            {filteredNavItems.map((item) => {
               const isActiveRoute = isActive(item.path);
               return (
                 <Button
@@ -112,8 +121,8 @@ const MainNavbar = () => {
                   size={isMobile ? "lg" : "default"}
                   className={cn(
                     "gap-2 font-medium",
-                    isActiveRoute 
-                      ? "bg-zinc-800 text-white" 
+                    isActiveRoute
+                      ? "bg-zinc-800 text-white"
                       : "text-zinc-400 hover:text-white hover:bg-zinc-800/50",
                     item.isHighlighted && !isActiveRoute && "bg-green-500/5 text-green-500 hover:bg-green-500/10 hover:text-green-500",
                     item.isHighlighted && isActiveRoute && "bg-green-500 text-white hover:bg-green-500/90"
@@ -133,59 +142,67 @@ const MainNavbar = () => {
           <Button variant="ghost" size="icon" aria-label="Search" className="text-zinc-400 hover:text-white">
             <Search className="h-5 w-5" />
           </Button>
-          
-          <Button variant="ghost" size="icon" aria-label="Notifications" className="text-zinc-400 hover:text-white relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full"></span>
-          </Button>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="relative h-8 w-8 rounded-full"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://i.pravatar.cc/300?img=1" alt="User" />
-                  <AvatarFallback>JD</AvatarFallback>
-                </Avatar>
+
+          {isAuthenticated ? (
+            <>
+              <Button variant="ghost" size="icon" aria-label="Notifications" className="text-zinc-400 hover:text-white relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full"></span>
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">John Doe</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    john.doe@example.com
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link to="/profile" className="cursor-pointer w-full flex items-center">
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/settings" className="cursor-pointer w-full flex items-center">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Logout</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="https://i.pravatar.cc/300?img=1" alt="User" />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">John Doe</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        john.doe@example.com
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer w-full flex items-center">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings" className="cursor-pointer w-full flex items-center">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="px-4 py-2 bg-green-500 rounded-md text-sm font-medium transition-colors text-white hidden lg:block"
+            >
+              Login
+            </Link>
+          )}
+
           {/* Mobile menu button */}
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden text-zinc-400 hover:text-white"
+            className="lg:hidden text-zinc-400 hover:text-white"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
@@ -196,16 +213,16 @@ const MainNavbar = () => {
           </Button>
         </div>
       </div>
-      
+
       {/* Mobile Navigation */}
       <div
         className={cn(
-          "md:hidden fixed inset-0 top-16 z-40 transition-transform duration-300 ease-in-out bg-zinc-900/95 bg-black",
+          "lg:hidden fixed inset-0 top-16 z-40 transition-transform duration-300 ease-in-out bg-zinc-900/95",
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         <nav className="py-6 px-4 space-y-1 min-h-screen overflow-y-auto">
-          {navItems.map((item) => {
+          {filteredNavItems.map((item) => {
             const isActiveRoute = isActive(item.path);
             return (
               <Button
@@ -215,8 +232,8 @@ const MainNavbar = () => {
                 size="lg"
                 className={cn(
                   "w-full justify-start gap-3 font-medium",
-                  isActiveRoute 
-                    ? "bg-zinc-800 text-white" 
+                  isActiveRoute
+                    ? "bg-zinc-800 text-white"
                     : "text-zinc-400 hover:text-white hover:bg-zinc-800/50",
                   item.isHighlighted && !isActiveRoute && "bg-green-500/5 text-green-500 hover:bg-green-500/10 hover:text-green-500",
                   item.isHighlighted && isActiveRoute && "bg-green-500 text-white hover:bg-green-500/90"
@@ -229,18 +246,30 @@ const MainNavbar = () => {
               </Button>
             );
           })}
-          
+
           <div className="pt-4 border-t border-zinc-800 mt-4">
-            <Button 
-              variant="ghost" 
-              size="lg" 
-              className="w-full justify-start gap-3 font-medium text-zinc-400 hover:text-white hover:bg-zinc-800/50"
-            >
-              <Link to="/logout" className="flex items-center gap-3">
-                <LogOut className="h-4 w-4" />
-                Logout
-              </Link>
-            </Button>
+            {isAuthenticated ? (
+              <Button
+                variant="ghost"
+                size="lg"
+                className="w-full justify-start gap-3 font-medium text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+              >
+                <Link to="/logout" className="flex items-center gap-3">
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </Link>
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="lg"
+                className="w-full justify-start gap-3 font-medium bg-green-500 text-white hover:bg-green-600"
+              >
+                <Link to="/login" className="flex items-center gap-3">
+                  Login
+                </Link>
+              </Button>
+            )}
           </div>
         </nav>
       </div>

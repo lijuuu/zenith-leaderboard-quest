@@ -6,9 +6,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { GitCompare, Sword, Trophy, Code, Flame, ArrowRight, Users, Github, Zap, Shield, Star,Sparkles } from 'lucide-react';
-import Navbar from './Navbar';
 import Footer from './Footer';
 import ChatBattleNotification from './chat/ChatBattleNotification';
+import MainNavbar from './MainNavbar';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ const Home = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar isAuthenticated={false} />
+      <MainNavbar isAuthenticated={false} />
 
       <main className="flex-1 bg-gradient-to-b from-white to-green-50 dark:from-zinc-900 dark:to-zinc-950">
         {/* Hero Section */}

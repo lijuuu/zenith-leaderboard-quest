@@ -4,8 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Mail, CheckCircle2 } from "lucide-react";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MainNavbar from "@/components/MainNavbar";
 
 const VerifyEmail = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -63,7 +63,7 @@ const VerifyEmail = () => {
 
   return (
     <div className="animate-page-in min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-300/20 via-white to-white dark:from-zinc-800/20 dark:via-zinc-900 dark:to-zinc-900 foggy-grain">
-      <Navbar isAuthenticated={false} />
+      <MainNavbar isAuthenticated={false} />
 
       <main className="flex-grow pt-24 pb-16">
         <div className="page-container">
