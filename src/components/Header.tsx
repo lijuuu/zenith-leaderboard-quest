@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
-import DarkModeToggle from "./DarkModeToggle";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -76,10 +75,6 @@ const Header = () => {
               </Link>
             ))}
             
-            <div className="pl-2">
-              <DarkModeToggle />
-            </div>
-            
             <Link
               to="/login"
               className="px-4 py-2 bg-green-500 text-white rounded-md text-sm font-medium transition-colors"
@@ -90,7 +85,6 @@ const Header = () => {
 
           {/* Mobile menu button */}
           <div className="flex items-center gap-2 md:hidden">
-            <DarkModeToggle />
             <button
               className="p-2 rounded-md text-zinc-800"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Home, User, Code, Terminal, Zap, Award, MessageSquare, Settings, LogOut, Menu, X, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
-import DarkModeToggle from "./DarkModeToggle";
 
 interface NavItem {
   name: string;
@@ -104,10 +103,6 @@ const Navbar = ({ isAuthenticated = true }) => {
               </Link>
             ))}
             
-            <div className="pl-2">
-              <DarkModeToggle />
-            </div>
-            
             {isAuthenticated ? (
               <Link
                 to="/logout"
@@ -128,7 +123,6 @@ const Navbar = ({ isAuthenticated = true }) => {
 
           {/* Mobile menu button */}
           <div className="flex items-center gap-2 md:hidden">
-            <DarkModeToggle />
             <button
               className="p-2 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
