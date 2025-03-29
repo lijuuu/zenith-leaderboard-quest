@@ -305,3 +305,4 @@
 .button-outline-dark {
   @apply border-zinc-700 bg-transparent hover:bg-zinc-800 text-zinc-400 hover:text-white;
 }
+

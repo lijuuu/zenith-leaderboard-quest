@@ -96,12 +96,12 @@ const MainNavbar = ({ isAuthenticated = true }: MainNavbarProps) => {
       <div className="page-container h-full flex items-center justify-between z-10">
         <div className="flex items-center">
           <Link to="/" className="flex items-center gap-2 mr-8">
-            <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-lg">
-              z
-            </div>
-            <span className="text-2xl lowercase font-bold font-display tracking-tight text-white">
-              zenx
-            </span>
+
+          <span
+  className="text-2xl lowercase font-bold font-display tracking-tight relative bg-gradient-to-r from-green-500 via-emerald-500 to-green-500 bg-clip-text text-transparent animate-glow"
+>
+  zenx
+</span>
           </Link>
 
           {/* Desktop Navigation */}
