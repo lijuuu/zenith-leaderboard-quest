@@ -41,16 +41,10 @@ const Home = () => {
   };
 
   useEffect(() => {
-    // Show a welcome toast when the component mounts
-    toast({
-      title: "Welcome to CodeBattle!",
-      description: "Ready to improve your coding skills?",
-    });
-
     // Trigger animation after a short delay
     const timer = setTimeout(() => {
       setShowAnimation(true);
-    }, 100);
+    }, 50);
 
     return () => clearTimeout(timer);
   }, []);

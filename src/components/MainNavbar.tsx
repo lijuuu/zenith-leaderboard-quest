@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { 
-  Home, 
-  User, 
-  Code, 
-  Terminal, 
-  Zap, 
-  Award, 
-  MessageSquare, 
-  Settings, 
-  LogOut, 
-  Search, 
-  Menu, 
+import {
+  Home,
+  User,
+  Code,
+  Terminal,
+  Zap,
+  Award,
+  MessageSquare,
+  Settings,
+  LogOut,
+  Search,
+  Menu,
   X,
   Bell,
   LayoutDashboard
@@ -90,12 +90,7 @@ const MainNavbar = ({ isAuthenticated = true }: MainNavbarProps) => {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-300 ease-in-out",
-        isScrolled || mobileMenuOpen
-          ? "bg-zinc-900/90 border-b border-zinc-800 backdrop-blur"
-          : isAuthenticated
-          ? "bg-zinc-900/80 border-b border-zinc-800/50"
-          : "bg-transparent"
+        "fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-300 ease-in-out bg-zinc-900 border-b border-zinc-800"
       )}
     >
       <div className="page-container h-full flex items-center justify-between z-10">
@@ -110,7 +105,7 @@ const MainNavbar = ({ isAuthenticated = true }: MainNavbarProps) => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden xl:flex items-center gap-1">
             {filteredNavItems.map((item) => {
               const isActiveRoute = isActive(item.path);
               return (
@@ -217,8 +212,8 @@ const MainNavbar = ({ isAuthenticated = true }: MainNavbarProps) => {
       {/* Mobile Navigation */}
       <div
         className={cn(
-          "lg:hidden fixed inset-0 top-16 z-40 transition-transform duration-300 ease-in-out bg-zinc-900/95",
-          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+          "xl:hidden fixed inset-y-0 right-0 z-40 transition-transform duration-300 ease-in-out bg-zinc-900",
+          mobileMenuOpen ? "translate-x-0 w-[85%]" : "translate-x-full w-[85%]"
         )}
       >
         <nav className="py-6 px-4 space-y-1 min-h-screen overflow-y-auto">
