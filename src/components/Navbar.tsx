@@ -4,8 +4,6 @@ import { Link, useLocation } from "react-router-dom";
 import { Home, User, Code, Terminal, Zap, Award, MessageSquare, Settings, LogOut, Menu, X, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DarkModeToggle from "./DarkModeToggle";
-import { useAccentColor } from "@/contexts/AccentColorContext";
-import { useTheme } from "@/contexts/ThemeContext";
 
 interface NavItem {
   name: string;
@@ -17,8 +15,6 @@ const Navbar = ({ isAuthenticated = true }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { accentColor } = useAccentColor();
-  const { theme } = useTheme();
 
   const navItems: NavItem[] = [
     { name: "Home", path: "/", icon: <Home className="w-4 h-4" /> },
@@ -79,7 +75,7 @@ const Navbar = ({ isAuthenticated = true }) => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full accent-color flex items-center justify-center text-white font-bold text-lg">
+              <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-lg">
                 z
               </div>
               <span className="text-2xl lowercase font-bold font-display tracking-tight text-white">
@@ -98,7 +94,7 @@ const Navbar = ({ isAuthenticated = true }) => {
                   "relative px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2",
                   isActive(item.path)
                     ? item.name === "Challenges" 
-                      ? "accent-color" 
+                      ? "bg-green-500" 
                       : "bg-zinc-800 text-white"
                     : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
                 )}
@@ -123,7 +119,7 @@ const Navbar = ({ isAuthenticated = true }) => {
             ) : (
               <Link
                 to="/dashboard"
-                className="px-4 py-2 accent-color rounded-md text-sm font-medium transition-colors text-white"
+                className="px-4 py-2 bg-green-500 rounded-md text-sm font-medium transition-colors text-white"
               >
                 Login
               </Link>
@@ -164,7 +160,7 @@ const Navbar = ({ isAuthenticated = true }) => {
                 "flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium transition-colors",
                 isActive(item.path)
                   ? item.name === "Challenges"
-                    ? "accent-color"
+                    ? "bg-green-500"
                     : "bg-zinc-800 text-white"
                   : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
               )}
@@ -185,7 +181,7 @@ const Navbar = ({ isAuthenticated = true }) => {
           ) : (
             <Link
               to="/dashboard"
-              className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium accent-color transition-colors"
+              className="flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium bg-green-500 transition-colors"
             >
               Login
             </Link>

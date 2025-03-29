@@ -4,8 +4,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route, useLocation } from "react-router-dom";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { AccentColorProvider } from "@/contexts/AccentColorContext";
 import { Provider } from "react-redux";
 import { store } from "@/store";
 import { useEffect } from "react";
@@ -81,13 +79,9 @@ const App = () => {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="dark" storageKey="zenx-theme">
-          <AccentColorProvider defaultColor="green" storageKey="zenx-accent-color">
-            <TooltipProvider>
-              <AppContent />
-            </TooltipProvider>
-          </AccentColorProvider>
-        </ThemeProvider>
+        <TooltipProvider>
+          <AppContent />
+        </TooltipProvider>
       </QueryClientProvider>
     </Provider>
   );

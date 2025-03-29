@@ -4,15 +4,11 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import DarkModeToggle from "./DarkModeToggle";
-import { useTheme } from "@/contexts/ThemeContext";
-import { useAccentColor } from "@/contexts/AccentColorContext";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { theme } = useTheme();
-  const { accentColor } = useAccentColor();
 
   const navigationItems = [
     { name: "Home", href: "/" },
@@ -45,14 +41,14 @@ const Header = () => {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
         isScrolled
-          ? "bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg border-b border-zinc-200/70 dark:border-zinc-800/70 py-3"
+          ? "bg-white/80 backdrop-blur-lg border-b border-zinc-200/70 py-3"
           : "bg-transparent py-5"
       )}
     >
       <div className="page-container">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-accent-color flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-lg">
               z
             </div>
             <span className="text-2xl lowercase font-bold font-display tracking-tight">
@@ -68,12 +64,12 @@ const Header = () => {
                 to={item.href}
                 className={cn(
                   "relative text-sm font-medium transition-colors duration-200",
-                  "after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2px] after:bg-accent after:origin-left after:scale-x-0 after:transition-transform after:duration-300",
-                  "hover:text-accent hover:after:scale-x-100",
+                  "after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2px] after:bg-green-500 after:origin-left after:scale-x-0 after:transition-transform after:duration-300",
+                  "hover:text-green-500 hover:after:scale-x-100",
                   location.pathname === item.href || 
                   (location.pathname === "/" && item.href.startsWith("/#"))
-                    ? "text-accent after:scale-x-100"
-                    : "text-zinc-800 dark:text-zinc-200"
+                    ? "text-green-500 after:scale-x-100"
+                    : "text-zinc-800"
                 )}
               >
                 {item.name}
@@ -86,7 +82,7 @@ const Header = () => {
             
             <Link
               to="/login"
-              className="px-4 py-2 accent-color text-white rounded-md text-sm font-medium transition-colors"
+              className="px-4 py-2 bg-green-500 text-white rounded-md text-sm font-medium transition-colors"
             >
               Login
             </Link>
@@ -96,7 +92,7 @@ const Header = () => {
           <div className="flex items-center gap-2 md:hidden">
             <DarkModeToggle />
             <button
-              className="p-2 rounded-md text-zinc-800 dark:text-zinc-200"
+              className="p-2 rounded-md text-zinc-800"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -113,7 +109,7 @@ const Header = () => {
       {/* Mobile Navigation */}
       <div
         className={cn(
-          "fixed inset-0 z-40 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-lg pt-24 px-6 flex flex-col transition-transform duration-300 ease-in-out md:hidden",
+          "fixed inset-0 z-40 bg-white/95 backdrop-blur-lg pt-24 px-6 flex flex-col transition-transform duration-300 ease-in-out md:hidden",
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -123,10 +119,10 @@ const Header = () => {
               key={item.name}
               to={item.href}
               className={cn(
-                "text-lg font-medium py-2 border-b border-zinc-100 dark:border-zinc-800 transition-colors duration-200",
+                "text-lg font-medium py-2 border-b border-zinc-100 transition-colors duration-200",
                 location.pathname === item.href
-                  ? "text-accent border-accent"
-                  : "text-zinc-800 dark:text-zinc-200"
+                  ? "text-green-500 border-green-500"
+                  : "text-zinc-800"
               )}
             >
               {item.name}
@@ -135,7 +131,7 @@ const Header = () => {
           
           <Link
             to="/login"
-            className="mt-4 w-full py-3 accent-color text-white rounded-md text-center font-medium transition-colors"
+            className="mt-4 w-full py-3 bg-green-500 text-white rounded-md text-center font-medium transition-colors"
           >
             Login
           </Link>
