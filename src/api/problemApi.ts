@@ -1,3 +1,4 @@
+
 import { Problem, Submission, CompileRequest, CompileResponse } from './types';
 
 // Mock data from the API response
@@ -683,4 +684,18 @@ export const compileAndRun = async (request: CompileRequest): Promise<CompileRes
     if (hasError) {
       setTimeout(() => resolve({
         output: "",
-        error: `Compilation error in ${request.language}:\nSyntax error
+        error: `Compilation error in ${request.language}:\nSyntax error`,
+        success: false
+      }), 1000);
+    } else {
+      // Simulate successful execution
+      const output = `Running ${request.language} code...\n> Program executed successfully!\n> Output:\n${request.code.length % 2 === 0 ? "Even" : "Odd"} number of characters in your code.`;
+      
+      setTimeout(() => resolve({
+        output,
+        success: true,
+        execution_time: Math.floor(Math.random() * 500)
+      }), 1000);
+    }
+  });
+};
