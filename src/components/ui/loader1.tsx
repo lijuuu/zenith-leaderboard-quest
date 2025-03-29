@@ -1,7 +1,6 @@
 
 import React from 'react';
 
-// Replace styled-components with regular inline styles
 const Loader1 = () => {
   return (
     <div style={{
@@ -37,7 +36,7 @@ const Loader1 = () => {
             animationDelay: '-0.5s'
           }}
         />
-        <style jsx>{`
+        <style dangerouslySetInnerHTML={{ __html: `
           @keyframes ripple {
             0% {
               top: 36px;
@@ -54,7 +53,7 @@ const Loader1 = () => {
               opacity: 0;
             }
           }
-        `}</style>
+        `}} />
       </div>
     </div>
   );

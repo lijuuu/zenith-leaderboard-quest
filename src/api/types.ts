@@ -59,7 +59,6 @@ export interface CompileResponse {
   status_message?: string;
 }
 
-// Add missing interfaces referenced in the codebase
 export interface User {
   id: string;
   username: string;
@@ -71,6 +70,23 @@ export interface User {
   isOnline?: boolean;
   avatar?: string;
   name?: string;
+  website?: string;
+  githubProfile?: string;
+  joinedDate?: string;
+  problemsSolved?: number;
+  dayStreak?: number;
+  ranking?: number;
+  isBanned?: boolean;
+  isVerified?: boolean;
+  following?: number;
+  followers?: number;
+  is2FAEnabled?: boolean;
+  globalRank?: number;
+  currentRating?: number;
+  countryCode?: string;
+  country?: string;
+  status?: string;
+  lastActive?: string;
 }
 
 export interface UserProfile {
@@ -98,6 +114,14 @@ export interface UserProfile {
     monthlyContests: number;
     specialEvents: number;
   };
+  activityHeatmap?: any;
+  website?: string;
+  githubProfile?: string;
+  followers?: number;
+  following?: number;
+  isOnline?: boolean;
+  country?: string;
+  countryCode?: string;
 }
 
 export interface Friend {
@@ -107,6 +131,7 @@ export interface Friend {
   profileImage?: string;
   isOnline?: boolean;
   lastActive?: string;
+  status?: string;
 }
 
 export interface Badge {
@@ -115,6 +140,7 @@ export interface Badge {
   description: string;
   rarity: "common" | "uncommon" | "rare" | "epic" | "legendary";
   earnedDate: string;
+  icon?: string;
 }
 
 export interface Challenge {
@@ -130,19 +156,32 @@ export interface Challenge {
     name?: string;
     avatar?: string;
   }[];
+  createdBy?: {
+    id: string;
+    username: string;
+    profileImage?: string;
+  };
+  problems?: string[];
+  problemCount?: number;
+  isActive?: boolean;
+  accessCode?: string;
+  timeLimit?: number;
 }
 
 export interface ChatChannel {
   id: string;
   name: string;
   type: "direct" | "group" | "public";
-  participants: User[];
+  participants?: User[];
   lastMessage?: {
     content: string;
     timestamp: string;
     sender: string;
-  };
-  unreadCount: number;
+  } | string;
+  unreadCount?: number;
+  isOnline?: boolean;
+  description?: string;
+  lastMessageTime?: string;
 }
 
 export interface ChatMessage {
@@ -154,6 +193,7 @@ export interface ChatMessage {
   isCurrentUser?: boolean;
   liked?: boolean;
   likeCount?: number;
+  attachments?: any[];
 }
 
 export interface LeaderboardEntry {
@@ -167,12 +207,24 @@ export interface LeaderboardEntry {
   country?: string;
   countryCode?: string;
   isFriend?: boolean;
+  user?: {
+    id: string;
+    username: string;
+    fullName: string;
+    profileImage: string;
+    country?: string;
+    countryCode?: string;
+  };
+  score?: number;
+  contestsParticipated?: number;
+  streakDays?: number;
 }
 
 export interface AuthResponse {
   token: string;
   user: User;
   expiresIn: number;
+  refreshToken?: string;
 }
 
 export interface LoginCredentials {
@@ -220,4 +272,12 @@ export interface AdminState {
   isAuthenticated: boolean;
   accessToken: string | null;
   error: string | null;
+  loading?: boolean;
+  message?: string;
+  refreshToken?: string;
+  adminID?: string;
+  expiresIn?: number;
+  users?: User[];
+  totalUsers?: number;
+  nextPageToken?: string;
 }
