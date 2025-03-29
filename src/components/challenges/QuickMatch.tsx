@@ -48,7 +48,6 @@ const QuickMatch: React.FC = () => {
   return (
     <div className="min-h-screen bg-zinc-950 text-white pt-16">
       <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-8">Quick Match</h1>
         
         <div className="max-w-md mx-auto bg-zinc-900 rounded-xl shadow-lg overflow-hidden">
           <div className={`p-6 ${status === 'matched' ? 'bg-green-600/20' : status === 'searching' ? 'bg-amber-600/20' : ''}`}>
