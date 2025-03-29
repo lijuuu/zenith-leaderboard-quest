@@ -1,35 +1,31 @@
 import { Problem, Submission, CompileRequest, CompileResponse } from './types';
 
-// Mock data for problems
+// Mock data for problems based on the provided JSON
 const mockProblems: Problem[] = [
   {
-    id: "p1",
+    id: "67d96452d3fe6af39801337b",
     title: "Two Sum",
     slug: "two-sum",
     difficulty: "Easy",
-    tags: ["Array", "Hash Table", "String"],
+    tags: ["Array", "Hash Table", "String", "Linked List"],
     acceptanceRate: 78,
     solved: true,
-    description: "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
+    description: "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to the target.\n\nYou may assume that each input would have **exactly one solution**, and you may not use the same element twice.\n\nYou can return the answer in any order.\n\n## Examples\n\n### Example 1:\n- **Input**: `nums = [2,7,11,15]`, `target = 9`\n- **Output**: `[0,1]`\n- **Explanation**: Because `nums[0] + nums[1] == 9`, we return `[0, 1]`\n\n### Example 2:\n- **Input**: `nums = [3,2,4]`, `target = 6`\n- **Output**: `[1,2]`\n\n## Constraints\n- `2 <= nums.length <= 10⁴`\n- `-10⁹ <= nums[i] <= 10⁹`\n- `-10⁹ <= target <= 10⁹`\n- Only one valid answer exists\n\n## Follow-up\nCan you come up with an algorithm that is less than `O(n²)` time complexity?",
     examples: [
       {
-        input: "nums = [2,7,11,15], target = 9",
+        input: "{ \"nums\": [2,7,11,15], \"target\": 9 }",
         output: "[0,1]",
         explanation: "Because nums[0] + nums[1] == 9, we return [0, 1]."
       },
       {
-        input: "nums = [3,2,4], target = 6",
-        output: "[1,2]"
-      },
-      {
-        input: "nums = [3,3], target = 6",
+        input: "{   \"nums\": [2, 7, 11, 15],   \"target\": 9 }",
         output: "[0,1]"
       }
     ],
     constraints: [
-      "2 <= nums.length <= 10^4",
-      "-10^9 <= nums[i] <= 10^9",
-      "-10^9 <= target <= 10^9",
+      "2 <= nums.length <= 10⁴",
+      "-10⁹ <= nums[i] <= 10⁹",
+      "-10⁹ <= target <= 10⁹",
       "Only one valid answer exists."
     ],
     hints: [
@@ -38,234 +34,52 @@ const mockProblems: Problem[] = [
     ]
   },
   {
-    id: "p2",
+    id: "67b96452d3fe6af39801337d",
     title: "Reverse a String",
     slug: "reverse-string",
     difficulty: "Easy",
     tags: ["String", "Array"],
     acceptanceRate: 82,
     solved: false,
-    description: "Write a function that reverses a string. The input string is given as an array of characters s.\n\nYou must do this by modifying the input array in-place with O(1) extra memory.",
+    description: "Write a function that reverses a given string. You must return the string with its characters in reverse order.\n\n## Examples\n\n### Example 1:\n- **Input**: `\"hello\"`\n- **Output**: `\"olleh\"`\n- **Explanation**: The string \"hello\" is reversed to \"olleh\".\n\n### Example 2:\n- **Input**: `\"world\"`\n- **Output**: `\"dlrow\"`\n\n## Constraints\n- `1 <= s.length <= 10⁴`\n- `s` consists of printable ASCII characters.",
     examples: [
       {
-        input: 's = ["h","e","l","l","o"]',
-        output: '["o","l","l","e","h"]'
+        input: "\"hello\"",
+        output: "\"olleh\"",
+        explanation: "The string \"hello\" is reversed to \"olleh\"."
       },
       {
-        input: 's = ["H","a","n","n","a","h"]',
-        output: '["h","a","n","n","a","H"]'
+        input: "\"world\"",
+        output: "\"dlrow\""
       }
     ],
     constraints: [
-      "1 <= s.length <= 10^5",
-      "s[i] is a printable ascii character."
+      "1 <= s.length <= 10⁴",
+      "s consists of printable ASCII characters."
     ]
   },
   {
-    id: "p3",
+    id: "67e1a5b2c9f8d3e4a201b48f",
     title: "Add Two Numbers",
     slug: "add-two-numbers",
-    difficulty: "Medium",
-    tags: ["Linked List", "Math", "Recursion"],
-    acceptanceRate: 68,
-    solved: true,
-    description: "You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.\n\nYou may assume the two numbers do not contain any leading zero, except the number 0 itself.",
-    examples: [
-      {
-        input: "l1 = [2,4,3], l2 = [5,6,4]",
-        output: "[7,0,8]",
-        explanation: "342 + 465 = 807."
-      },
-      {
-        input: "l1 = [0], l2 = [0]",
-        output: "[0]"
-      },
-      {
-        input: "l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]",
-        output: "[8,9,9,9,0,0,0,1]"
-      }
-    ],
-    constraints: [
-      "The number of nodes in each linked list is in the range [1, 100].",
-      "0 <= Node.val <= 9",
-      "It is guaranteed that the list represents a number that does not have leading zeros."
-    ]
-  },
-  {
-    id: "p4",
-    title: "Longest Palindromic Substring",
-    slug: "longest-palindromic-substring",
-    difficulty: "Medium",
-    tags: ["String", "Dynamic Programming"],
-    acceptanceRate: 56,
-    solved: false,
-    description: "Given a string s, return the longest palindromic substring in s.",
-    examples: [
-      {
-        input: 's = "babad"',
-        output: '"bab"',
-        explanation: '"aba" is also a valid answer.'
-      },
-      {
-        input: 's = "cbbd"',
-        output: '"bb"'
-      }
-    ],
-    constraints: [
-      "1 <= s.length <= 1000",
-      "s consist of only digits and English letters."
-    ]
-  },
-  {
-    id: "p5",
-    title: "Valid Parentheses",
-    slug: "valid-parentheses",
     difficulty: "Easy",
-    tags: ["Stack", "String"],
-    acceptanceRate: 74,
+    tags: ["Math", "Basic"],
+    acceptanceRate: 68,
     solved: false,
-    description: "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.\n\nAn input string is valid if:\n\n1. Open brackets must be closed by the same type of brackets.\n2. Open brackets must be closed in the correct order.\n3. Every close bracket has a corresponding open bracket of the same type.",
+    description: "Write a function that takes two integers and returns their sum.\n\n## Examples\n\n### Example 1:\n- **Input**: `a = 3, b = 5`\n- **Output**: `8`\n- **Explanation**: `3 + 5 = 8`\n\n### Example 2:\n- **Input**: `a = -2, b = 7`\n- **Output**: `5`\n\n## Constraints\n- `-10⁹ <= a, b <= 10⁹`",
     examples: [
       {
-        input: 's = "()"',
-        output: "true"
+        input: "{\"a\": 3, \"b\": 5}",
+        output: "8",
+        explanation: "3 + 5 = 8"
       },
       {
-        input: 's = "()[]{}"',
-        output: "true"
-      },
-      {
-        input: 's = "(]"',
-        output: "false"
+        input: "{\"a\": -2, \"b\": 7}",
+        output: "5"
       }
     ],
     constraints: [
-      "1 <= s.length <= 10^4",
-      "s consists of parentheses only '()[]{}'."
-    ]
-  },
-  {
-    id: "p6",
-    title: "Merge Two Sorted Lists",
-    slug: "merge-two-sorted-lists",
-    difficulty: "Medium",
-    tags: ["Linked List", "Recursion"],
-    acceptanceRate: 71,
-    solved: false,
-    description: "You are given the heads of two sorted linked lists list1 and list2.\n\nMerge the two lists in a one sorted list. The list should be made by splicing together the nodes of the first two lists.\n\nReturn the head of the merged linked list.",
-    examples: [
-      {
-        input: "list1 = [1,2,4], list2 = [1,3,4]",
-        output: "[1,1,2,3,4,4]"
-      },
-      {
-        input: "list1 = [], list2 = []",
-        output: "[]"
-      },
-      {
-        input: "list1 = [], list2 = [0]",
-        output: "[0]"
-      }
-    ],
-    constraints: [
-      "The number of nodes in both lists is in the range [0, 50].",
-      "-100 <= Node.val <= 100",
-      "Both list1 and list2 are sorted in non-decreasing order."
-    ]
-  },
-  {
-    id: "p7",
-    title: "Longest Substring Without Repeating Characters",
-    slug: "longest-substring-without-repeating-characters",
-    difficulty: "Medium",
-    tags: ["Hash Table", "String", "Sliding Window"],
-    acceptanceRate: 64,
-    solved: false,
-    description: "Given a string s, find the length of the longest substring without repeating characters.",
-    examples: [
-      {
-        input: 's = "abcabcbb"',
-        output: "3",
-        explanation: "The answer is 'abc', with the length of 3."
-      },
-      {
-        input: 's = "bbbbb"',
-        output: "1",
-        explanation: "The answer is 'b', with the length of 1."
-      },
-      {
-        input: 's = "pwwkew"',
-        output: "3",
-        explanation: "The answer is 'wke', with the length of 3. Notice that the answer must be a substring, 'pwke' is a subsequence and not a substring."
-      }
-    ],
-    constraints: [
-      "0 <= s.length <= 5 * 10^4",
-      "s consists of English letters, digits, symbols and spaces."
-    ]
-  },
-  {
-    id: "p8",
-    title: "Median of Two Sorted Arrays",
-    slug: "median-of-two-sorted-arrays",
-    difficulty: "Hard",
-    tags: ["Array", "Binary Search", "Divide and Conquer"],
-    acceptanceRate: 35,
-    solved: false,
-    description: "Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.\n\nThe overall run time complexity should be O(log (m+n)).",
-    examples: [
-      {
-        input: "nums1 = [1,3], nums2 = [2]",
-        output: "2.00000",
-        explanation: "merged array = [1,2,3] and median is 2."
-      },
-      {
-        input: "nums1 = [1,2], nums2 = [3,4]",
-        output: "2.50000",
-        explanation: "merged array = [1,2,3,4] and median is (2 + 3) / 2 = 2.5."
-      }
-    ],
-    constraints: [
-      "nums1.length == m",
-      "nums2.length == n",
-      "0 <= m <= 1000",
-      "0 <= n <= 1000",
-      "1 <= m + n <= 2000",
-      "-10^6 <= nums1[i], nums2[i] <= 10^6"
-    ]
-  },
-  {
-    id: "p9",
-    title: "Regular Expression Matching",
-    slug: "regular-expression-matching",
-    difficulty: "Hard",
-    tags: ["String", "Dynamic Programming", "Recursion"],
-    acceptanceRate: 28,
-    solved: false,
-    description: "Given an input string s and a pattern p, implement regular expression matching with support for '.' and '*' where:\n\n'.' Matches any single character.\n'*' Matches zero or more of the preceding element.\nThe matching should cover the entire input string (not partial).",
-    examples: [
-      {
-        input: 's = "aa", p = "a"',
-        output: "false",
-        explanation: '"a" does not match the entire string "aa".'
-      },
-      {
-        input: 's = "aa", p = "a*"',
-        output: "true",
-        explanation: '"a*" means zero or more of the preceding element, "a". Therefore, by repeating "a" once, it becomes "aa".'
-      },
-      {
-        input: 's = "ab", p = ".*"',
-        output: "true",
-        explanation: '".*" means "zero or more (*) of any character (.)".'
-      }
-    ],
-    constraints: [
-      "1 <= s.length <= 20",
-      "1 <= p.length <= 30",
-      "s contains only lowercase English letters.",
-      "p contains only lowercase English letters, '.', and '*'.",
-      "It is guaranteed for each appearance of the character '*', there will be a previous valid character to match."
+      "-10⁹ <= a, b <= 10⁹"
     ]
   }
 ];
@@ -341,9 +155,8 @@ export const getProblems = async (filters?: { difficulty?: string; tags?: string
 
 export const getProblem = async (idOrSlug: string): Promise<Problem | null> => {
   return new Promise(resolve => {
-    const problem = mockProblems.find(p => 
-      p.id === idOrSlug || p.slug === idOrSlug
-    ) || null;
+    // For any problem id/slug, return the Two Sum problem when no data from server
+    const problem = mockProblems[0];
     
     setTimeout(() => resolve(problem), 500);
   });
@@ -437,34 +250,28 @@ export const runTestCases = async (problemId: string, code: string, language: st
 
 // Add these new functions for the problem execution
 export const fetchProblemByIdAPI = async (problemId: string) => {
-  // Get problem from the existing mock data for development
-  const problem = await getProblem(problemId);
+  // Always return the Two Sum problem data for ZenXPlayground
+  const twoSumProblem = mockProblems[0];
   
-  if (!problem) {
-    throw new Error('Problem not found');
-  }
-
   // Map the mock data to the expected format
   return {
-    problem_id: problem.id,
-    title: problem.title,
-    description: problem.description,
-    tags: problem.tags,
+    problem_id: twoSumProblem.id,
+    title: twoSumProblem.title,
+    description: twoSumProblem.description,
+    tags: twoSumProblem.tags,
     testcase_run: {
-      run: problem.examples.map(example => ({
+      run: twoSumProblem.examples.map(example => ({
         input: example.input,
         expected: example.output
       }))
     },
-    difficulty: problem.difficulty,
-    supported_languages: ['javascript', 'python', 'java', 'cpp', 'go'],
+    difficulty: twoSumProblem.difficulty === "Easy" ? "E" : twoSumProblem.difficulty === "Medium" ? "M" : "H",
+    supported_languages: ['javascript', 'python', 'go'],
     validated: true,
     placeholder_maps: {
-      javascript: 'function solution(nums, target) {\n  // Write your solution here\n}',
-      python: 'def solution(nums, target):\n  # Write your solution here\n  pass',
-      java: 'class Solution {\n  public int[] solution(int[] nums, int target) {\n    // Write your solution here\n    return new int[0];\n  }\n}',
-      cpp: '#include <vector>\n\nclass Solution {\npublic:\n  std::vector<int> solution(std::vector<int>& nums, int target) {\n    // Write your solution here\n    return {};\n  }\n};',
-      go: 'package main\n\nfunc solution(nums []int, target int) []int {\n  // Write your solution here\n  return []int{}\n}'
+      javascript: 'function twoSum(nums, target) {\n    // Type your code\n    return [];\n}',
+      python: 'def two_sum(nums, target):\n    // Type your code\n    return []',
+      go: 'func twoSum(nums []int, target int) []int {\n\t//Type your code\n\treturn []int{}\n}'
     }
   };
 };
@@ -475,8 +282,6 @@ export const executeCode = async (
   code: string,
   isRunTestcase: boolean
 ) => {
-  // For now, we'll simulate the API call with a mocked response
-  // In production, this would be a real API call
   return new Promise((resolve) => {
     setTimeout(() => {
       // Create a simulated success response (70% chance)
