@@ -88,6 +88,7 @@ import {
   Search,
   X,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface Message {
   id: string;
@@ -1028,5 +1029,4 @@ const Chat: React.FC = () => {
                       <DropdownMenuItem>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="ghost" className="w-full justify-start">
-                              Leave Group
+                            <Button variant
