@@ -24,6 +24,7 @@ import VerifyEmail from "./pages/Auth/VerifyEmail";
 import MainNavbar from "@/components/MainNavbar";
 import QuickMatch from "./components/challenges/QuickMatch";
 import AdminDashboard from "./pages-admin/AdminDashboard";
+import SmoothScroll from "./components/SmoothScroll/SmoothScroll";
 
 // Create the query client instance
 const queryClient = new QueryClient({
@@ -48,37 +49,40 @@ const AppContent = () => {
   }, [location.pathname]);
   
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
-      <div>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/problems" element={<Problems />} />
-          <Route path="/problems/:id" element={<ProblemDetail />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/profile/:userId" element={<Profile />} />
-          <Route path="/challenges" element={<Challenges />} />
-          <Route path="/quick-match" element={<QuickMatch />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/compiler" element={<Compiler />} />
-          
-          {/* Auth Routes */}
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
+    <SmoothScroll>
+      <div className="min-h-screen bg-zinc-950 text-white">
+        <MainNavbar />
+        <div>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/problems" element={<Problems />} />
+            <Route path="/problems/:id" element={<ProblemDetail />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/:userId" element={<Profile />} />
+            <Route path="/challenges" element={<Challenges />} />
+            <Route path="/quick-match" element={<QuickMatch />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/compiler" element={<Compiler />} />
+            
+            {/* Auth Routes */}
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
 
-          {/*Admin Dashboard*/}
-          <Route path="/admin/dashboard" element={<AdminDashboard />}></Route>
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            {/*Admin Dashboard*/}
+            <Route path="/admin/dashboard" element={<AdminDashboard />}></Route>
+            
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+        <Toaster />
+        <Sonner />
       </div>
-      <Toaster />
-      <Sonner />
-    </div>
+    </SmoothScroll>
   );
 };
 
