@@ -1,3 +1,4 @@
+
 import { User, UserProfile, Friend, Badge, AuthResponse, LoginCredentials, RegisterData } from './types';
 
 // Mock data for development
