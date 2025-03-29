@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAccentColor } from "@/contexts/AccentColorContext";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import NotificationsPopover from "@/components/NotificationsPopover";
@@ -42,6 +43,7 @@ interface NavItem {
 
 const AppNavigation = () => {
   const { theme, setTheme } = useTheme();
+  const { accentColor } = useAccentColor();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -92,10 +94,10 @@ const AppNavigation = () => {
         {/* Logo and desktop navigation */}
         <div className="flex items-center">
           <Link to="/" className="flex items-center gap-2 mr-6">
-            <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-accent-color flex items-center justify-center">
               <span className="font-bold text-xl text-white">z</span>
             </div>
-            <span className="text-xl font-bold text-green-500">zenx</span>
+            <span className="text-xl font-bold text-accent">zenx</span>
           </Link>
 
           {/* Desktop navigation */}
@@ -108,7 +110,7 @@ const AppNavigation = () => {
                     "flex items-center gap-2 text-sm font-medium",
                     isActive(item.path)
                       ? item.highlight
-                        ? "bg-green-500 text-white hover:bg-green-600"
+                        ? "bg-accent-color text-white hover:bg-accent-color/90"
                         : "bg-zinc-800 text-white hover:bg-zinc-700"
                       : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
                   )}
@@ -160,10 +162,10 @@ const AppNavigation = () => {
                 <div className="flex flex-col h-full">
                   <div className="flex items-center px-4 h-16 border-b border-zinc-800">
                     <Link to="/" className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-accent-color flex items-center justify-center">
                         <span className="font-bold text-xl text-white">z</span>
                       </div>
-                      <span className="text-xl font-bold text-green-500">zenx</span>
+                      <span className="text-xl font-bold text-accent">zenx</span>
                     </Link>
                     <Button 
                       variant="ghost" 
@@ -184,7 +186,7 @@ const AppNavigation = () => {
                               "w-full justify-start flex items-center gap-3 text-sm font-medium",
                               isActive(item.path)
                                 ? item.highlight
-                                  ? "bg-green-500 text-white hover:bg-green-600"
+                                  ? "bg-accent-color text-white hover:bg-accent-color/90"
                                   : "bg-zinc-800 text-white hover:bg-zinc-700"
                                 : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
                             )}

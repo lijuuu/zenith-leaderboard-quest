@@ -4,11 +4,15 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import DarkModeToggle from "./DarkModeToggle";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useAccentColor } from "@/contexts/AccentColorContext";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { theme } = useTheme();
+  const { accentColor } = useAccentColor();
 
   const navigationItems = [
     { name: "Home", href: "/" },
@@ -48,7 +52,7 @@ const Header = () => {
       <div className="page-container">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-zinc-900 dark:bg-zinc-700 flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-10 h-10 rounded-full bg-accent-color flex items-center justify-center text-white font-bold text-lg">
               z
             </div>
             <span className="text-2xl lowercase font-bold font-display tracking-tight">
@@ -64,11 +68,11 @@ const Header = () => {
                 to={item.href}
                 className={cn(
                   "relative text-sm font-medium transition-colors duration-200",
-                  "after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2px] after:bg-green-500 after:origin-left after:scale-x-0 after:transition-transform after:duration-300",
-                  "hover:text-green-500 hover:after:scale-x-100",
+                  "after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-[2px] after:bg-accent after:origin-left after:scale-x-0 after:transition-transform after:duration-300",
+                  "hover:text-accent hover:after:scale-x-100",
                   location.pathname === item.href || 
                   (location.pathname === "/" && item.href.startsWith("/#"))
-                    ? "text-green-500 after:scale-x-100"
+                    ? "text-accent after:scale-x-100"
                     : "text-zinc-800 dark:text-zinc-200"
                 )}
               >
@@ -82,7 +86,7 @@ const Header = () => {
             
             <Link
               to="/login"
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-white rounded-md text-sm font-medium transition-colors"
+              className="px-4 py-2 accent-color text-white rounded-md text-sm font-medium transition-colors"
             >
               Login
             </Link>
@@ -121,7 +125,7 @@ const Header = () => {
               className={cn(
                 "text-lg font-medium py-2 border-b border-zinc-100 dark:border-zinc-800 transition-colors duration-200",
                 location.pathname === item.href
-                  ? "text-green-500 border-green-500"
+                  ? "text-accent border-accent"
                   : "text-zinc-800 dark:text-zinc-200"
               )}
             >
@@ -131,7 +135,7 @@ const Header = () => {
           
           <Link
             to="/login"
-            className="mt-4 w-full py-3 bg-zinc-800 hover:bg-zinc-900 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-white rounded-md text-center font-medium transition-colors"
+            className="mt-4 w-full py-3 accent-color text-white rounded-md text-center font-medium transition-colors"
           >
             Login
           </Link>

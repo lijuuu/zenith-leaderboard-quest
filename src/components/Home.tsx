@@ -9,11 +9,13 @@ import { GitCompare, Sword, Trophy, Code, Flame, ArrowRight, Users, Github, Zap,
 import Navbar from './Navbar';
 import Footer from './Footer';
 import ChatBattleNotification from './chat/ChatBattleNotification';
+import { useAccentColor } from '@/contexts/AccentColorContext';
 
 const Home = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showAnimation, setShowAnimation] = useState(false);
+  const { accentColor } = useAccentColor();
   
   const handleQuickMatch = () => {
     navigate('/quick-match');
@@ -86,7 +88,7 @@ const Home = () => {
                 <Button 
                   onClick={handleQuickMatch}
                   size="lg" 
-                  className="relative group bg-green-600 hover:bg-green-700 text-white py-6 px-8 rounded-xl font-medium flex items-center justify-center gap-2 shadow-lg shadow-green-600/20 hover:shadow-green-600/30 transition-all"
+                  className="relative group accent-color py-6 px-8 rounded-xl font-medium flex items-center justify-center gap-2 shadow-lg shadow-green-600/20 hover:shadow-green-600/30 transition-all"
                 >
                   <Flame className="h-5 w-5 group-hover:animate-pulse" />
                   <span>Quick Match</span>
@@ -123,7 +125,7 @@ const Home = () => {
                 </Badge>
               </div>
               <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">
-                Exciting 1v1 <span className="text-green-600 dark:text-green-500 relative">
+                Exciting 1v1 <span className="text-accent relative">
                   Code Battles
                   <span className="absolute bottom-0 left-0 w-full h-1 bg-green-500/30 rounded-full"></span>
                 </span>
@@ -151,7 +153,7 @@ const Home = () => {
                 Features
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                Everything you need to <span className="text-green-600 dark:text-green-500">excel</span>
+                Everything you need to <span className="text-accent">excel</span>
               </h2>
               <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
                 Our platform provides all the tools necessary for tracking, analyzing, and improving your coding skills.
@@ -163,7 +165,7 @@ const Home = () => {
                 <CardHeader>
                   <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <Code className="h-6 w-6 text-green-600 dark:text-green-500 relative z-10" />
+                    <Code className="h-6 w-6 text-accent relative z-10" />
                   </div>
                   <CardTitle>Real-world Problems</CardTitle>
                   <CardDescription>
@@ -176,7 +178,7 @@ const Home = () => {
                 <CardHeader>
                   <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <GitCompare className="h-6 w-6 text-green-600 dark:text-green-500 relative z-10" />
+                    <GitCompare className="h-6 w-6 text-accent relative z-10" />
                   </div>
                   <CardTitle>Live Competition</CardTitle>
                   <CardDescription>
@@ -189,7 +191,7 @@ const Home = () => {
                 <CardHeader>
                   <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <Trophy className="h-6 w-6 text-green-600 dark:text-green-500 relative z-10" />
+                    <Trophy className="h-6 w-6 text-accent relative z-10" />
                   </div>
                   <CardTitle>Leaderboard</CardTitle>
                   <CardDescription>
@@ -202,7 +204,7 @@ const Home = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 bg-gradient-to-r from-green-600 to-emerald-500 text-white relative overflow-hidden">
+        <section className="py-16 bg-accent-color text-white relative overflow-hidden">
           {/* Diagonal pattern overlay */}
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNTkuOTEgMEgwdjU5LjkxaDU5LjkxVjB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iNTkuOTEgNTkuOTFMMCAwdjU5LjkxaDU5LjkxWiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] opacity-30" />
           
@@ -259,7 +261,7 @@ const Home = () => {
                 <CardHeader>
                   <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 relative group">
                     <div className="absolute inset-0 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 bg-gradient-to-br from-green-400 to-emerald-600"></div>
-                    <Users className="h-6 w-6 text-green-600 dark:text-green-500 relative z-10 group-hover:text-white transition-colors duration-300" />
+                    <Users className="h-6 w-6 text-accent relative z-10 group-hover:text-white transition-colors duration-300" />
                   </div>
                   <CardTitle>10,000+</CardTitle>
                   <CardDescription>
@@ -272,7 +274,7 @@ const Home = () => {
                 <CardHeader>
                   <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 relative group">
                     <div className="absolute inset-0 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 bg-gradient-to-br from-green-400 to-emerald-600"></div>
-                    <Code className="h-6 w-6 text-green-600 dark:text-green-500 relative z-10 group-hover:text-white transition-colors duration-300" />
+                    <Code className="h-6 w-6 text-accent relative z-10 group-hover:text-white transition-colors duration-300" />
                   </div>
                   <CardTitle>500+</CardTitle>
                   <CardDescription>
@@ -285,7 +287,7 @@ const Home = () => {
                 <CardHeader>
                   <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4 relative group">
                     <div className="absolute inset-0 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 bg-gradient-to-br from-green-400 to-emerald-600"></div>
-                    <Github className="h-6 w-6 text-green-600 dark:text-green-500 relative z-10 group-hover:text-white transition-colors duration-300" />
+                    <Github className="h-6 w-6 text-accent relative z-10 group-hover:text-white transition-colors duration-300" />
                   </div>
                   <CardTitle>Open Source</CardTitle>
                   <CardDescription>

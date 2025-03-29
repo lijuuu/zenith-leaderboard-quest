@@ -5,6 +5,7 @@ import { Home, User, Code, Terminal, Zap, Award, MessageSquare, Settings, LogOut
 import { cn } from "@/lib/utils";
 import DarkModeToggle from "./DarkModeToggle";
 import { useAccentColor } from "@/contexts/AccentColorContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface NavItem {
   name: string;
@@ -17,6 +18,7 @@ const Navbar = ({ isAuthenticated = true }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { accentColor } = useAccentColor();
+  const { theme } = useTheme();
 
   const navItems: NavItem[] = [
     { name: "Home", path: "/", icon: <Home className="w-4 h-4" /> },

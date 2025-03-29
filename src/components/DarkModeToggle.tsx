@@ -2,9 +2,11 @@
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAccentColor } from "@/contexts/AccentColorContext";
 
 const DarkModeToggle = () => {
   const { theme, setTheme } = useTheme();
+  const { accentColor } = useAccentColor();
 
   return (
     <Button

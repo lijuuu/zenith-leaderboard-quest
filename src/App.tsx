@@ -3,11 +3,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AccentColorProvider } from "@/contexts/AccentColorContext";
 import { Provider } from "react-redux";
 import { store } from "@/store";
+import { useEffect } from "react";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Leaderboard from "./pages/Leaderboard";
@@ -36,6 +37,46 @@ const queryClient = new QueryClient({
   },
 });
 
+const AppContent = () => {
+  const location = useLocation();
+  
+  useEffect(() => {
+    // Scroll to top when route changes
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+  
+  return (
+    <div className="min-h-screen bg-zinc-950 text-white">
+      <div>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/problems" element={<Problems />} />
+          <Route path="/problems/:id" element={<ProblemDetail />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:userId" element={<Profile />} />
+          <Route path="/challenges" element={<Challenges />} />
+          <Route path="/quick-match" element={<QuickMatch />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/compiler" element={<Compiler />} />
+          
+          {/* Auth Routes */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+      <Toaster />
+      <Sonner />
+    </div>
+  );
+};
+
 const App = () => {
   return (
     <Provider store={store}>
@@ -43,34 +84,7 @@ const App = () => {
         <ThemeProvider defaultTheme="dark" storageKey="zenx-theme">
           <AccentColorProvider defaultColor="green" storageKey="zenx-accent-color">
             <TooltipProvider>
-              <div className="min-h-screen bg-zinc-950 text-white">
-                <div>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/leaderboard" element={<Leaderboard />} />
-                    <Route path="/problems" element={<Problems />} />
-                    <Route path="/problems/:id" element={<ProblemDetail />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/profile/:userId" element={<Profile />} />
-                    <Route path="/challenges" element={<Challenges />} />
-                    <Route path="/quick-match" element={<QuickMatch />} />
-                    <Route path="/chat" element={<Chat />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/compiler" element={<Compiler />} />
-                    
-                    {/* Auth Routes */}
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
-                    <Route path="/verify-email" element={<VerifyEmail />} />
-                    
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </div>
-                <Toaster />
-                <Sonner />
-              </div>
+              <AppContent />
             </TooltipProvider>
           </AccentColorProvider>
         </ThemeProvider>

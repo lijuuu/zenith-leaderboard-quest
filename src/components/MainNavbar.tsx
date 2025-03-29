@@ -20,6 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import DarkModeToggle from "./DarkModeToggle";
 import { useAccentColor } from "@/contexts/AccentColorContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -44,6 +45,7 @@ const MainNavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { accentColor } = useAccentColor();
+  const { theme } = useTheme();
   const isMobile = useIsMobile();
   
   const navItems: NavItem[] = [
@@ -95,7 +97,7 @@ const MainNavbar = () => {
       <div className="page-container h-full flex items-center justify-between z-10">
         <div className="flex items-center">
           <Link to="/" className="flex items-center gap-2 mr-8">
-            <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-10 h-10 rounded-full bg-accent-color flex items-center justify-center text-white font-bold text-lg">
               z
             </div>
             <span className="text-2xl lowercase font-bold font-display tracking-tight text-white">
@@ -118,9 +120,8 @@ const MainNavbar = () => {
                     isActiveRoute 
                       ? "bg-zinc-800 text-white" 
                       : "text-zinc-400 hover:text-white hover:bg-zinc-800/50",
-                    item.isHighlighted && !isActiveRoute && "bg-green-500/10 text-green-400 hover:bg-green-500/20 hover:text-green-300",
-                    item.isHighlighted && isActiveRoute && "bg-green-500 text-white hover:bg-green-600",
-                    isMobile && "justify-start w-full"
+                    item.isHighlighted && !isActiveRoute && "bg-accent-5 text-accent hover:bg-accent-10 hover:text-accent",
+                    item.isHighlighted && isActiveRoute && "bg-accent-color text-white hover:bg-accent-color/90"
                   )}
                 >
                   <Link to={item.path} className="flex items-center gap-2">
@@ -140,7 +141,7 @@ const MainNavbar = () => {
           
           <Button variant="ghost" size="icon" aria-label="Notifications" className="text-zinc-400 hover:text-white relative">
             <Bell className="h-5 w-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full"></span>
+            <span className="absolute top-1 right-1 w-2 h-2 bg-accent-color rounded-full"></span>
           </Button>
           
           <DarkModeToggle />
@@ -224,8 +225,8 @@ const MainNavbar = () => {
                   isActiveRoute 
                     ? "bg-zinc-800 text-white" 
                     : "text-zinc-400 hover:text-white hover:bg-zinc-800/50",
-                  item.isHighlighted && !isActiveRoute && "bg-green-500/10 text-green-400 hover:bg-green-500/20 hover:text-green-300",
-                  item.isHighlighted && isActiveRoute && "bg-green-500 text-white hover:bg-green-600"
+                  item.isHighlighted && !isActiveRoute && "bg-accent-5 text-accent hover:bg-accent-10 hover:text-accent",
+                  item.isHighlighted && isActiveRoute && "bg-accent-color text-white hover:bg-accent-color/90"
                 )}
               >
                 <Link to={item.path} className="flex items-center gap-3">
