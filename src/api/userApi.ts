@@ -145,22 +145,41 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
   return new Promise(resolve => {
     const user = mockUsers.find(u => u.id === userId) || mockUsers[0];
     
-    // Map the user object to match the UserProfile type expected by the application
-    const profile: UserProfile = {
-      userID: user.id,
+    // Create a profile that matches both User and extended UserProfile properties
+    const profile = {
+      // Original User properties
+      id: user.id,
+      username: user.username,
+      fullName: user.fullName,
+      email: user.email,
+      profileImage: user.profileImage || '',
+      bio: user.bio || '',
+      website: user.website || '',
+      githubProfile: user.githubProfile || '',
+      location: user.location || '',
+      joinedDate: user.joinedDate,
+      problemsSolved: user.problemsSolved,
+      dayStreak: user.dayStreak,
+      ranking: user.ranking,
+      isBanned: user.isBanned,
+      isVerified: user.isVerified,
+      following: user.following || 0,
+      followers: user.followers || 0,
+      is2FAEnabled: user.is2FAEnabled || false,
+      
+      // Additional UserProfile properties
+      userID: user.id, // Map to overlapping fields
       userName: user.username,
       firstName: user.fullName.split(' ')[0],
       lastName: user.fullName.split(' ')[1] || '',
       avatarURL: user.profileImage || '',
-      email: user.email,
-      role: 'user', // Mock role
-      country: user.location || '',
-      isBanned: user.isBanned,
-      isVerified: user.isVerified,
-      primaryLanguageID: 'en', // Mock language
+      role: 'user',
+      country: user.location?.split(', ')[1] || '',
+      countryCode: 'US',
+      primaryLanguageID: 'en',
       muteNotifications: false,
       socials: {
-        github: user.githubProfile,
+        github: user.githubProfile || '',
         twitter: '',
         linkedin: ''
       },
@@ -178,12 +197,13 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
       badges: mockBadges,
       activityHeatmap: generateHeatmapData(),
       currentStreak: user.dayStreak,
-      longestStreak: user.dayStreak * 2, // Example calculation
+      longestStreak: user.dayStreak * 2,
       currentRating: user.ranking,
       globalRank: user.ranking
     };
     
-    setTimeout(() => resolve(profile), 600);
+    // Cast to UserProfile type to satisfy TypeScript
+    setTimeout(() => resolve(profile as UserProfile), 600);
   });
 };
 
