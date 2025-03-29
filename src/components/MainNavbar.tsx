@@ -97,11 +97,11 @@ const MainNavbar = ({ isAuthenticated = true }: MainNavbarProps) => {
         <div className="flex items-center">
           <Link to="/" className="flex items-center gap-2 mr-8">
 
-          <span
-  className="text-2xl lowercase font-bold font-display tracking-tight relative bg-gradient-to-r from-green-500 via-emerald-500 to-green-500 bg-clip-text text-transparent animate-glow"
->
-  zenx
-</span>
+            <span
+              className="text-2xl lowercase font-bold font-display tracking-tight relative bg-gradient-to-r from-green-500 via-emerald-500 to-green-500 bg-clip-text text-transparent animate-glow"
+            >
+              zenx
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
