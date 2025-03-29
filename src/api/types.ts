@@ -1,4 +1,3 @@
-
 // User related types
 export interface User {
   id: string;
@@ -267,7 +266,7 @@ export interface CompileResponse {
 // adminTypes.ts
 
 // Types based on Go backend models
-export interface UserProfile {
+export interface AdminUserProfile {
   userID: string;
   userName: string;
   firstName: string;
@@ -310,7 +309,7 @@ export interface GenericResponse<T> {
 
 // State interface for the admin slice
 export interface AdminState {
-  users: UserProfile[];
+  users: AdminUserProfile[];
   totalUsers: number;
   nextPageToken: string;
   banHistories: { [userID: string]: BanHistory[] };
@@ -338,8 +337,7 @@ export interface LoginResponse {
 }
 
 export interface UsersResponse {
-  users: UserProfile[];
+  users: AdminUserProfile[];
   totalCount: number;
   nextPageToken: string;
 }
-
