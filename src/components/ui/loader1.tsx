@@ -1,7 +1,8 @@
+
 import React from 'react';
 import styled from 'styled-components';
 
-const themeColors = [ "#1D7D6A", "#164F45", "#3CE7B2"];
+const themeColors = ["#1D7D6A", "#164F45", "#3CE7B2"];
 
 const Loader1 = ({ className }: { className?: string }) => {
   return (
@@ -106,7 +107,7 @@ const StyledWrapper = styled.div`
 .boxes .box > div:nth-child(1) {
   --top: 0;
   --left: 0;
-  --background: ${themeColors[3]};
+  --background: ${themeColors[0]};
 }
 
 .boxes .box > div:nth-child(2) {
