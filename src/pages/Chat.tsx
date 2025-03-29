@@ -1,3 +1,4 @@
+
 // src/pages/Chat.tsx
 import React, {
   useState,
@@ -1029,4 +1030,196 @@ const Chat: React.FC = () => {
                       <DropdownMenuItem>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant
+                            <Button variant="ghost" className="w-full justify-start">
+                              <Trash2 className="mr-2 h-4 w-4 text-red-500" />
+                              Leave Group
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Leave Group Channel
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to leave this group
+                                channel? You will need an invitation to rejoin.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={handleLeaveGroup}
+                                className="bg-red-500 hover:bg-red-600"
+                                disabled={isLeavingGroup}
+                              >
+                                {isLeavingGroup ? (
+                                  <>
+                                    Leaving...
+                                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                  </>
+                                ) : (
+                                  "Leave Group"
+                                )}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </DropdownMenuItem>
+                    )}
+                    {isUserTheCreator && (
+                      <DropdownMenuItem>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" className="w-full justify-start">
+                              <Trash2 className="mr-2 h-4 w-4 text-red-500" />
+                              Delete Group
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Delete Group Channel
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete this group
+                                channel? This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={handleDeleteGroup}
+                                className="bg-red-500 hover:bg-red-600"
+                                disabled={isDeletingGroup}
+                              >
+                                {isDeletingGroup ? (
+                                  <>
+                                    Deleting...
+                                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                  </>
+                                ) : (
+                                  "Delete Group"
+                                )}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </DropdownMenuItem>
+                    )}
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full p-4">
+            {messages.length === 0 ? (
+              <div className="flex h-full items-center justify-center">
+                <div className="text-center">
+                  <p className="text-zinc-400">No messages yet.</p>
+                  <p className="text-zinc-500 text-sm">
+                    Start a conversation by sending a message.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4 pb-4">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex items-start gap-2 ${
+                      message.user.uid === user?.uid
+                        ? "flex-row-reverse"
+                        : "flex-row"
+                    }`}
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={message.user.photoURL || ""} />
+                      <AvatarFallback className="bg-zinc-700">
+                        {message.user.displayName
+                          ?.charAt(0)
+                          .toUpperCase() || "?"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div
+                      className={`flex flex-col ${
+                        message.user.uid === user?.uid
+                          ? "items-end"
+                          : "items-start"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">
+                          {message.user.displayName}
+                        </span>
+                        <span className="text-xs text-zinc-400">
+                          {message.createdAt?.toDate
+                            ? format(
+                                message.createdAt.toDate(),
+                                "h:mm a, MMM d"
+                              )
+                            : "Just now"}
+                        </span>
+                      </div>
+                      <div
+                        className={`mt-1 rounded-lg px-3 py-2 ${
+                          message.user.uid === user?.uid
+                            ? "bg-green-500/20 text-white"
+                            : "bg-zinc-800"
+                        }`}
+                      >
+                        <p>{message.text}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
+          </ScrollArea>
+        </div>
+        <div className="border-t border-zinc-800 p-4">
+          <div className="flex items-center gap-2">
+            <Input
+              type="text"
+              placeholder={
+                isGroupChat
+                  ? "Send a message to the group..."
+                  : "Send a message..."
+              }
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  if (isGroupChat) {
+                    handleSendGroupMessage();
+                  } else {
+                    handleSendDirectMessage();
+                  }
+                }
+              }}
+              disabled={!currentChannel && !currentGroupChannel}
+              className="flex-1"
+            />
+            <Button
+              onClick={
+                isGroupChat ? handleSendGroupMessage : handleSendDirectMessage
+              }
+              disabled={
+                !newMessage.trim() ||
+                (!currentChannel && !currentGroupChannel)
+              }
+            >
+              Send
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default Chat;
