@@ -18,7 +18,7 @@ interface Problem {
   description: string;
   tags: string[];
   difficulty: string;
-  testcase_run: { run: { input: string; expected: string; id?: string }[] };
+  testcase_run: { run: { input: string; expected: string }[] };
   supported_languages: string[];
   validated: boolean;
   placeholder_maps: { [key: string]: string };
@@ -58,46 +58,23 @@ const fetchProblems = async () => {
   try {
     // For production/deployed app
     const res = await axios.get(`${BASE_URL}/metadata/list`, { params: { page: 1, page_size: 100 } });
-    console.log("API Response:", res.data);
+    const problemList = res.data.payload?.problems || [];
     
-    // Check if the response has the expected format from our mock data
-    if (res.data && res.data.success && res.data.payload && Array.isArray(res.data.payload.problems)) {
-      console.log("Using API response format data");
-      const problemList = res.data.payload.problems;
-      
-      const mappedProblems: Problem[] = problemList.map((item: any) => ({
-        problem_id: item.problem_id || '',
-        title: item.title || 'Untitled',
-        description: item.description || '',
-        tags: item.tags || [],
-        difficulty: item.difficulty || '',
-        testcase_run: item.testcase_run || { run: [] },
-        supported_languages: item.supported_languages || [],
-        validated: item.validated || false,
-        placeholder_maps: item.placeholder_maps || {},
-      }));
-      
-      return mappedProblems;
-    } else {
-      // Original response format from existing API
-      const problemList = res.data.payload?.problems || [];
-      
-      if (!Array.isArray(problemList)) throw new Error("Expected an array of problems");
-      
-      const mappedProblems: Problem[] = problemList.map((item: any) => ({
-        problem_id: item.problem_id || '',
-        title: item.title || 'Untitled',
-        description: item.description || '',
-        tags: item.tags || [],
-        difficulty: item.difficulty || '',
-        testcase_run: item.testcase_run || { run: [] },
-        supported_languages: item.supported_languages || [],
-        validated: item.validated || false,
-        placeholder_maps: item.placeholder_maps || {},
-      }));
-      
-      return mappedProblems;
-    }
+    if (!Array.isArray(problemList)) throw new Error("Expected an array of problems");
+    
+    const mappedProblems: Problem[] = problemList.map((item: any) => ({
+      problem_id: item.problem_id || '',
+      title: item.title || 'Untitled',
+      description: item.description || '',
+      tags: item.tags || [],
+      difficulty: item.difficulty || '',
+      testcase_run: item.testcase_run || { run: [] },
+      supported_languages: item.supported_languages || [],
+      validated: item.validated || false,
+      placeholder_maps: item.placeholder_maps || {},
+    }));
+    
+    return mappedProblems;
   } catch (error) {
     console.error("Error fetching problems:", error);
     // In case of error, fallback to the mock data from problemApi.ts

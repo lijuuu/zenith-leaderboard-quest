@@ -1,109 +1,30 @@
 
-export interface Problem {
-  id: string;
-  title: string;
-  slug: string;
-  difficulty: "Easy" | "Medium" | "Hard";
-  tags: string[];
-  acceptanceRate: number;
-  solved: boolean;
-  description: string;
-  examples: {
-    input: string;
-    output: string;
-    explanation?: string;
-  }[];
-  constraints: string[];
-  hints?: string[];
-  testcase_run?: {
-    run: {
-      id: string;
-      input: string;
-      expected: string;
-    }[];
-  };
-  supported_languages?: string[];
-  placeholder_maps?: { [key: string]: string };
-}
-
-export interface Submission {
-  id: string;
-  problemId: string;
-  problemTitle: string;
-  userId: string;
-  language: string;
-  code: string;
-  status: string;
-  runtime?: string;
-  memory?: string;
-  timestamp: string;
-  testCases: {
-    passed: number;
-    total: number;
-  };
-  difficulty?: string;
-  problem?: Problem;
-  submittedAt?: string;
-}
-
-export interface CompileRequest {
-  language: string;
-  code: string;
-}
-
-export interface CompileResponse {
-  output?: string;
-  error?: string;
-  success?: boolean;
-  execution_time?: number;
-  status_message?: string;
-}
-
+// User related types
 export interface User {
   id: string;
   username: string;
   fullName: string;
   email: string;
   profileImage?: string;
-  location?: string;
   bio?: string;
-  isOnline?: boolean;
-  avatar?: string;
-  name?: string;
   website?: string;
   githubProfile?: string;
-  joinedDate?: string;
-  problemsSolved?: number;
-  dayStreak?: number;
-  ranking?: number;
-  isBanned?: boolean;
-  isVerified?: boolean;
-  following?: number;
-  followers?: number;
-  is2FAEnabled?: boolean;
-  globalRank?: number;
-  currentRating?: number;
-  countryCode?: string;
-  country?: string;
-  status?: string;
-  lastActive?: string;
-}
-
-export interface UserProfile {
-  id: string;
-  username: string;
-  fullName: string;
-  email: string;
-  profileImage?: string;
   location?: string;
-  bio?: string;
-  joinedDate?: string;
+  joinedDate: string;
   problemsSolved: number;
   dayStreak: number;
   ranking: number;
-  globalRank?: number;
-  currentRating?: number;
-  badges?: Badge[];
+  isBanned: boolean;
+  isVerified: boolean;
+  following?: number;
+  followers?: number;
+  is2FAEnabled?: boolean;
+  isOnline?: boolean;
+  country?: string;
+  countryCode?: string;
+}
+
+export interface UserProfile extends User {
   stats: {
     easy: { solved: number; total: number };
     medium: { solved: number; total: number };
@@ -114,122 +35,180 @@ export interface UserProfile {
     monthlyContests: number;
     specialEvents: number;
   };
-  activityHeatmap?: any;
-  website?: string;
-  githubProfile?: string;
-  followers?: number;
-  following?: number;
-  isOnline?: boolean;
-  country?: string;
-  countryCode?: string;
+  badges: Badge[];
+  activityHeatmap: HeatmapData;
+  currentStreak?: number;
+  longestStreak?: number;
+  currentRating?: number;
+  globalRank?: number;
 }
 
 export interface Friend {
   id: string;
   username: string;
-  fullName?: string;
+  fullName: string;
   profileImage?: string;
-  isOnline?: boolean;
+  status: 'online' | 'offline' | 'in-match' | 'coding';
   lastActive?: string;
-  status?: string;
+  isOnline?: boolean;
 }
 
 export interface Badge {
   id: string;
   name: string;
   description: string;
-  rarity: "common" | "uncommon" | "rare" | "epic" | "legendary";
+  icon: string;
   earnedDate: string;
-  icon?: string;
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 }
 
+export interface HeatmapData {
+  startDate: string;
+  data: { date: string; count: number; present: boolean }[];
+}
+
+// Problem related types
+export interface Problem {
+  id: string;
+  title: string;
+  slug: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  tags: string[];
+  acceptanceRate: number;
+  solved?: boolean;
+  description: string;
+  examples: ProblemExample[];
+  constraints: string[];
+  hints?: string[];
+  similarProblems?: { id: string; title: string; difficulty: string }[];
+  solutions?: Solution[];
+}
+
+export interface ProblemExample {
+  input: string;
+  output: string;
+  explanation?: string;
+}
+
+export interface Solution {
+  id: string;
+  authorId: string;
+  authorName: string;
+  language: string;
+  code: string;
+  runtime: string;
+  memory: string;
+  createdAt: string;
+  upvotes: number;
+  downvotes: number;
+  comments: Comment[];
+}
+
+export interface Comment {
+  id: string;
+  authorId: string;
+  authorName: string;
+  authorImage?: string;
+  content: string;
+  createdAt: string;
+  upvotes: number;
+  downvotes: number;
+  replies?: Comment[];
+}
+
+// Challenge related types
 export interface Challenge {
   id: string;
   title: string;
-  description?: string; // Making description optional
-  difficulty: "Easy" | "Medium" | "Hard";
-  isPrivate: boolean;
-  participants?: number;
-  createdAt: string;
-  participantUsers?: {
-    id?: string;
-    name?: string;
-    avatar?: string;
-  }[];
-  createdBy?: {
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  createdBy: {
     id: string;
     username: string;
     profileImage?: string;
   };
+  participants: number;
+  participantUsers?: {
+    id?: string;
+    avatar?: string;
+    name?: string;
+  }[];
+  problemCount: number;
+  createdAt: string;
+  isActive: boolean;
   problems?: string[];
-  problemCount?: number;
-  isActive?: boolean;
+  description?: string;
+  date?: string;
+  type?: string;
+  isPrivate?: boolean;
   accessCode?: string;
   timeLimit?: number;
 }
 
+// Chat related types
 export interface ChatChannel {
   id: string;
   name: string;
-  type: "direct" | "group" | "public";
+  description?: string;
+  type: 'public' | 'private' | 'direct';
   participants?: User[];
-  lastMessage?: {
-    content: string;
-    timestamp: string;
-    sender: string;
-  } | string;
   unreadCount?: number;
   isOnline?: boolean;
-  description?: string;
+  lastMessage?: string;
   lastMessageTime?: string;
 }
 
 export interface ChatMessage {
   id: string;
   channelId: string;
-  sender?: User;
+  sender: {
+    id: string;
+    username: string;
+    profileImage?: string;
+    isOnline?: boolean;
+  };
   content: string;
   timestamp: string;
   isCurrentUser?: boolean;
+  attachments?: {
+    type: 'image' | 'code' | 'link' | 'challenge-invite';
+    content: string;
+    challengeId?: string;
+    challengeTitle?: string;
+    isPrivate?: boolean;
+    accessCode?: string;
+  }[];
   liked?: boolean;
   likeCount?: number;
-  attachments?: any[];
 }
 
+// Leaderboard related types
 export interface LeaderboardEntry {
-  id: string;
-  username: string;
-  fullName?: string;
-  profileImage?: string;
   rank: number;
-  rating: number;
-  problemsSolved: number;
-  country?: string;
-  countryCode?: string;
-  isFriend?: boolean;
-  user?: {
+  user: {
     id: string;
     username: string;
     fullName: string;
-    profileImage: string;
+    profileImage?: string;
     country?: string;
     countryCode?: string;
   };
-  score?: number;
-  contestsParticipated?: number;
-  streakDays?: number;
+  score: number;
+  problemsSolved: number;
+  contestsParticipated: number;
+  streakDays: number;
 }
 
+// Auth related types
 export interface AuthResponse {
   token: string;
+  refreshToken: string;
   user: User;
-  expiresIn: number;
-  refreshToken?: string;
 }
 
 export interface LoginCredentials {
   email: string;
   password: string;
+  code?: string; // For 2FA
 }
 
 export interface RegisterData {
@@ -239,46 +218,128 @@ export interface RegisterData {
   fullName: string;
 }
 
-export interface GenericResponse<T = any> {
+// Submission related types
+export interface Submission {
+  id: string;
+  problemId: string;
+  problemTitle: string;
+  userId: string;
+  language: string;
+  code: string;
+  status: 'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Memory Limit Exceeded' | 'Runtime Error' | 'Compilation Error' | 'Processing';
+  runtime?: string;
+  memory?: string;
+  timestamp: string;
+  submittedAt?: string;
+  testCases?: {
+    passed: number;
+    total: number;
+    results?: {
+      input: string;
+      expectedOutput: string;
+      actualOutput?: string;
+      passed: boolean;
+      error?: string;
+    }[];
+  };
+  difficulty?: string;
+  problem?: {
+    id: string;
+    title: string;
+    difficulty: string;
+  };
+}
+
+// Compiler related types
+export interface CompileRequest {
+  language: string;
+  code: string;
+  input?: string;
+}
+
+export interface CompileResponse {
+  output: string;
+  error?: string;
+  executionTime?: string;
+  memory?: string;
+}
+
+// adminTypes.ts
+
+// Types based on Go backend models
+export interface UserProfile {
+  userID: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  avatarURL: string;
+  email: string;
+  role: string;
+  country: string;
+  isBanned: boolean;
+  isVerified: boolean;
+  primaryLanguageID: string;
+  muteNotifications: boolean;
+  socials: {
+    github: string;
+    twitter: string;
+    linkedin: string;
+  };
+  createdAt: number;
+}
+
+export interface BanHistory {
+  id: string;
+  userID: string;
+  bannedAt: number;
+  banType: string;
+  banReason: string;
+  banExpiry: number;
+}
+
+export interface GenericResponse<T> {
   success: boolean;
   status: number;
   payload: T;
   error?: {
-    errorType: string;
+    code: number;
     message: string;
+    details?: string;
   };
+}
+
+// State interface for the admin slice
+export interface AdminState {
+  users: UserProfile[];
+  totalUsers: number;
+  nextPageToken: string;
+  banHistories: { [userID: string]: BanHistory[] };
+  loading: boolean;
+  error: string | null;
+  message: string;
+  isAuthenticated: boolean;
+  accessToken: string | null;
+  refreshToken: string | null;
+  adminID: string | null;
+  expiresIn: number | null;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
 }
 
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
-  adminID?: string;
-  message?: string;
+  adminID: string;
+  message: string;
 }
 
 export interface UsersResponse {
-  users: User[];
+  users: UserProfile[];
   totalCount: number;
-  nextPageToken?: string;
+  nextPageToken: string;
 }
 
-export interface AdminState {
-  user: {
-    id: string;
-    username: string;
-    role: string;
-  } | null;
-  isAuthenticated: boolean;
-  accessToken: string | null;
-  error: string | null;
-  loading?: boolean;
-  message?: string;
-  refreshToken?: string;
-  adminID?: string;
-  expiresIn?: number;
-  users?: User[];
-  totalUsers?: number;
-  nextPageToken?: string;
-  banHistories?: any[];
-}

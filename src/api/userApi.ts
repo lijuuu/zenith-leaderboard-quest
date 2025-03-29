@@ -1,3 +1,4 @@
+
 import { User, UserProfile, Friend, Badge, AuthResponse, LoginCredentials, RegisterData } from './types';
 
 // Mock data for development
@@ -147,9 +148,6 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
     
     const profile: UserProfile = {
       ...user,
-      problemsSolved: user.problemsSolved || 0, // Ensure required properties have default values
-      dayStreak: user.dayStreak || 0,
-      ranking: user.ranking || 0,
       stats: {
         easy: { solved: 78, total: 100 },
         medium: { solved: 45, total: 150 },
@@ -175,15 +173,13 @@ export const updateUserProfile = async (profileData: Partial<User>): Promise<Use
   });
 };
 
-// Fix login function to include expiresIn
 export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
   return new Promise((resolve, reject) => {
     if (credentials.email === "john.doe@example.com" && credentials.password === "password") {
       setTimeout(() => resolve({
         token: "mock-jwt-token",
         refreshToken: "mock-refresh-token",
-        user: mockUsers[0],
-        expiresIn: 3600 // Add expiresIn property (1 hour in seconds)
+        user: mockUsers[0]
       }), 800);
     } else {
       setTimeout(() => reject(new Error("Invalid credentials")), 800);
@@ -191,7 +187,6 @@ export const login = async (credentials: LoginCredentials): Promise<AuthResponse
   });
 };
 
-// Fix register function to include expiresIn
 export const register = async (data: RegisterData): Promise<AuthResponse> => {
   return new Promise(resolve => {
     const newUser: User = {
@@ -210,8 +205,7 @@ export const register = async (data: RegisterData): Promise<AuthResponse> => {
     setTimeout(() => resolve({
       token: "mock-jwt-token",
       refreshToken: "mock-refresh-token",
-      user: newUser,
-      expiresIn: 3600 // Add expiresIn property (1 hour in seconds)
+      user: newUser
     }), 1000);
   });
 };

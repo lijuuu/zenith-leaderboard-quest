@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { fetchProblemByIdAPI, executeCode } from '@/api/problemExecutionApi';
+import { fetchProblemByIdAPI, executeCode } from '@/api/problemApi';
 import { ProblemMetadata, TestCase, ExecutionResult, GenericResponse } from '@/api/types/problem-execution';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -29,9 +29,7 @@ export const useProblemDetail = () => {
     
     const fetchProblem = async () => {
       try {
-        console.log("Fetching problem data for ID:", id);
         const problemData = await fetchProblemByIdAPI(id);
-        console.log("Problem data received:", problemData);
         setProblem(problemData);
         
         // Get stored language preference

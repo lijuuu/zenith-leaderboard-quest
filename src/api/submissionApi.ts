@@ -15,10 +15,6 @@ const mockSubmissions: Submission[] = [
     memory: '42MB',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
     difficulty: 'Easy',
-    testCases: {
-      passed: 15,
-      total: 15
-    }
   },
   {
     id: 's2',
@@ -30,10 +26,6 @@ const mockSubmissions: Submission[] = [
     status: 'Wrong Answer',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
     difficulty: 'Easy',
-    testCases: {
-      passed: 10,
-      total: 15
-    }
   },
   {
     id: 's3',
@@ -45,10 +37,6 @@ const mockSubmissions: Submission[] = [
     status: 'Time Limit Exceeded',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
     difficulty: 'Medium',
-    testCases: {
-      passed: 8,
-      total: 12
-    }
   },
   {
     id: 's4',
@@ -62,10 +50,6 @@ const mockSubmissions: Submission[] = [
     memory: '38.7MB',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
     difficulty: 'Easy',
-    testCases: {
-      passed: 10,
-      total: 10
-    }
   },
   {
     id: 's5',
@@ -77,10 +61,6 @@ const mockSubmissions: Submission[] = [
     status: 'Runtime Error',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), // 3 days ago
     difficulty: 'Hard',
-    testCases: {
-      passed: 5,
-      total: 15
-    }
   },
 ];
 
@@ -140,10 +120,6 @@ export const submitSolution = async (
     runtime: randomStatus === 'Accepted' ? `${Math.floor(Math.random() * 200)}ms` : undefined,
     memory: randomStatus === 'Accepted' ? `${Math.floor(Math.random() * 100)}MB` : undefined,
     timestamp: new Date().toISOString(),
-    testCases: {
-      passed: randomStatus === 'Accepted' ? 15 : Math.floor(Math.random() * 14) + 1,
-      total: 15
-    }
   };
   
   return newSubmission;
