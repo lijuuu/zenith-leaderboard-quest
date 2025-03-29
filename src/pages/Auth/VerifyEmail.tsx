@@ -1,154 +1,124 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Mail, CheckCircle2 } from "lucide-react";
-import Footer from "@/components/Footer";
-import MainNavbar from "@/components/MainNavbar";
+
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "sonner";
+import { useAppDispatch, useAppSelector } from "@/hooks/useAppSelector";
+import { verifyEmail } from "@/store/slices/authSlice";
+import { motion } from "framer-motion";
+import Loader1 from "@/components/ui/loader1";
 
 const VerifyEmail = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
-  const [otp, setOtp] = useState("");
-  const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useAppDispatch();
 
-  const handleVerify = async () => {
-    if (otp.length !== 6) {
-      toast({
-        variant: "destructive",
-        title: "Invalid code",
-        description: "Please enter the complete 6-digit code.",
+  const { loading, successMessage, error, isAuthenticated } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    // Extract email and token from URL query parameters
+    const queryParams = new URLSearchParams(location.search);
+    const email = queryParams.get("email");
+    const token = queryParams.get("token");
+    
+    if (!email || !token) {
+      toast.error("Invalid verification link", { 
+        style: { background: "#1D1D1D", color: "#FFFFFF" } 
       });
+      setTimeout(() => navigate("/login"), 2000);
       return;
     }
 
-    try {
-      setIsLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast({
-        title: "Email verified",
-        description: "Your email has been successfully verified.",
-      });
-      setIsVerified(true);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Verification failed",
-        description: "Invalid verification code. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    // Dispatch verifyEmail thunk with email and token
+    dispatch(verifyEmail({ email, token }) as any);
+  }, [dispatch, location.search, navigate]);
 
-  const handleResendCode = async () => {
-    try {
-      setIsLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast({
-        title: "Code resent",
-        description: "A new verification code has been sent to your email.",
+  useEffect(() => {
+    if (successMessage && !loading) {
+      toast.success(successMessage, { 
+        style: { background: "#1D1D1D", color: "#3CE7B2" },
+        duration: 2000 
       });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Failed to resend code",
-        description: "An error occurred. Please try again later.",
-      });
-    } finally {
-      setIsLoading(false);
+      setTimeout(() => navigate("/login"), 2000);
     }
-  };
+    
+    if (error && !loading) {
+      toast.error(error.message || "Verification failed", { 
+        style: { background: "#1D1D1D", color: "#FFFFFF" },
+        duration: 3000 
+      });
+    }
+  }, [successMessage, error, loading, navigate, isAuthenticated]);
+
+  if (!location.search.includes("email=") || !location.search.includes("token=")) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#121212] px-4 text-center">
+        <h1 className="text-3xl font-bold text-white mb-4 font-coinbase-display">
+          Invalid Verification Link
+        </h1>
+        <p className="text-gray-400 mb-6 font-coinbase-sans max-w-md">
+          The verification link appears to be missing required parameters.
+          Please check your email for a valid verification link.
+        </p>
+        <button
+          onClick={() => navigate("/login")}
+          className="px-6 py-2 bg-[#3CE7B2] text-[#121212] rounded-md hover:bg-[#27A98B] transition-colors duration-200 font-coinbase-sans"
+        >
+          Back to Login
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="animate-page-in min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-300/20 via-white to-white dark:from-zinc-800/20 dark:via-zinc-900 dark:to-zinc-900 foggy-grain">
-      <MainNavbar isAuthenticated={false} />
-
-      <main className="flex-grow pt-24 pb-16">
-        <div className="page-container">
-          <div className="max-w-md mx-auto">
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl font-bold font-display tracking-tight mb-2">
-                Verify Your Email
-              </h1>
-              <p className="text-muted-foreground">
-                We've sent a verification code to your email
-              </p>
-            </div>
-
-            <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg rounded-xl border border-zinc-200/50 dark:border-zinc-800/50 p-6 shadow-sm">
-              {isVerified ? (
-                <div className="text-center py-4">
-                  <div className="mb-4 flex justify-center">
-                    <CheckCircle2 className="h-12 w-12 text-accent-color" />
-                  </div>
-                  <h2 className="text-xl font-medium mb-2">Email Verified</h2>
-                  <p className="text-muted-foreground mb-4">
-                    Your email has been successfully verified.
-                  </p>
-                  <Button className="accent-color mt-2" asChild>
-                    <Link to="/">Continue to Homepage</Link>
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <div className="flex justify-center mb-2">
-                    <Mail className="h-10 w-10 text-accent-color" />
-                  </div>
-
-                  <div className="text-center mb-4">
-                    <p className="text-sm text-muted-foreground">
-                      Enter the 6-digit code sent to your email address
-                    </p>
-                  </div>
-
-                  <div className="flex justify-center">
-                    <InputOTP
-                      maxLength={6}
-                      value={otp}
-                      onChange={(value) => setOtp(value)}
-                    >
-                      <InputOTPGroup>
-                        <InputOTPSlot index={0} />
-                        <InputOTPSlot index={1} />
-                        <InputOTPSlot index={2} />
-                        <InputOTPSlot index={3} />
-                        <InputOTPSlot index={4} />
-                        <InputOTPSlot index={5} />
-                      </InputOTPGroup>
-                    </InputOTP>
-                  </div>
-
-                  <Button
-                    onClick={handleVerify}
-                    className="w-full accent-color"
-                    disabled={isLoading || otp.length !== 6}
-                  >
-                    {isLoading ? "Verifying..." : "Verify Email"}
-                  </Button>
-
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
-                      Didn't receive a code?{" "}
-                      <button
-                        type="button"
-                        onClick={handleResendCode}
-                        className="font-medium text-foreground hover:underline"
-                        disabled={isLoading}
-                      >
-                        Resend code
-                      </button>
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#121212] px-4 text-center">
+      {loading ? (
+        <div className="space-y-6">
+          <Loader1 className="w-16 h-16 mx-auto text-[#3CE7B2] mr-10" />
+          <h1 className="text-3xl font-bold text-white mb-2 font-coinbase-display">
+            Verifying Your Email
+          </h1>
+          <p className="text-gray-400 font-coinbase-sans max-w-md">
+            Please wait while we verify your email address...
+          </p>
         </div>
-      </main>
-
-      <Footer />
+      ) : error ? (
+        <div className="space-y-4">
+          <h1 className="text-3xl font-bold text-white mb-2 font-coinbase-display">
+            Verification Failed
+          </h1>
+          <p className="text-gray-400 mb-6 font-coinbase-sans max-w-md">
+            {error.message || "We couldn't verify your email. The link may be expired or invalid."}
+          </p>
+          <button
+            onClick={() => navigate("/login")}
+            className="px-6 py-2 bg-[#3CE7B2] text-[#121212] rounded-md hover:bg-[#27A98B] transition-colors duration-200 font-coinbase-sans"
+          >
+            Back to Login
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <motion.div
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 0.8, repeat: Infinity, repeatType: "reverse" }}
+            className="text-[#3CE7B2] text-7xl mb-6"
+          >
+            ✓
+          </motion.div>
+          <h1 className="text-3xl font-bold text-white mb-2 font-coinbase-display">
+            Email Verified!
+          </h1>
+          <p className="text-gray-400 mb-6 font-coinbase-sans max-w-md">
+            Your email has been successfully verified. You'll be redirected to the login page shortly.
+          </p>
+          <button
+            onClick={() => navigate("/login")}
+            className="px-6 py-2 bg-[#3CE7B2] text-[#121212] rounded-md hover:bg-[#27A98B] transition-colors duration-200 font-coinbase-sans"
+          >
+            Login Now
+          </button>
+        </div>
+      )}
     </div>
   );
 };

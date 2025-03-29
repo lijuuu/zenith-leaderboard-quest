@@ -1,4 +1,3 @@
-
 import { User, UserProfile, Friend, Badge, AuthResponse, LoginCredentials, RegisterData } from './types';
 
 // Mock data for development
@@ -146,8 +145,45 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
   return new Promise(resolve => {
     const user = mockUsers.find(u => u.id === userId) || mockUsers[0];
     
-    const profile: UserProfile = {
-      ...user,
+    // Create a profile that matches both User and extended UserProfile properties
+    const profile = {
+      // Original User properties
+      id: user.id,
+      username: user.username,
+      fullName: user.fullName,
+      email: user.email,
+      profileImage: user.profileImage || '',
+      bio: user.bio || '',
+      website: user.website || '',
+      githubProfile: user.githubProfile || '',
+      location: user.location || '',
+      joinedDate: user.joinedDate,
+      problemsSolved: user.problemsSolved,
+      dayStreak: user.dayStreak,
+      ranking: user.ranking,
+      isBanned: user.isBanned,
+      isVerified: user.isVerified,
+      following: user.following || 0,
+      followers: user.followers || 0,
+      is2FAEnabled: user.is2FAEnabled || false,
+      
+      // Additional UserProfile properties
+      userID: user.id, // Map to overlapping fields
+      userName: user.username,
+      firstName: user.fullName.split(' ')[0],
+      lastName: user.fullName.split(' ')[1] || '',
+      avatarURL: user.profileImage || '',
+      role: 'user',
+      country: user.location?.split(', ')[1] || '',
+      countryCode: 'US',
+      primaryLanguageID: 'en',
+      muteNotifications: false,
+      socials: {
+        github: user.githubProfile || '',
+        twitter: '',
+        linkedin: ''
+      },
+      createdAt: new Date(user.joinedDate).getTime(),
       stats: {
         easy: { solved: 78, total: 100 },
         medium: { solved: 45, total: 150 },
@@ -159,10 +195,15 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
         specialEvents: 2
       },
       badges: mockBadges,
-      activityHeatmap: generateHeatmapData()
+      activityHeatmap: generateHeatmapData(),
+      currentStreak: user.dayStreak,
+      longestStreak: user.dayStreak * 2,
+      currentRating: user.ranking,
+      globalRank: user.ranking
     };
     
-    setTimeout(() => resolve(profile), 600);
+    // Cast to UserProfile type to satisfy TypeScript
+    setTimeout(() => resolve(profile as UserProfile), 600);
   });
 };
 
