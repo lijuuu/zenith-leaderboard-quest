@@ -1,5 +1,4 @@
-
-import { ChatChannel, ChatMessage } from './types';
+import { ChatChannel, ChatMessage, User } from './types';
 
 // Mock data for chat channels
 const mockChannels: ChatChannel[] = [
@@ -94,7 +93,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
       sender: {
         id: "4",
         username: "Alice",
-        profileImage: "https://i.pravatar.cc/300?img=5"
+        profileImage: "https://i.pravatar.cc/300?img=5",
+        fullName: "Alice Johnson", // Add required User fields
+        email: "alice@example.com"
       },
       content: "Hey, anyone working on the Two Sum problem?",
       timestamp: "2023-04-02T12:47:00Z"
@@ -105,7 +106,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
       sender: {
         id: "5",
         username: "Bob",
-        profileImage: "https://i.pravatar.cc/300?img=8"
+        profileImage: "https://i.pravatar.cc/300?img=8",
+        fullName: "Bob Smith", // Add required User fields
+        email: "bob@example.com"
       },
       content: "Yeah, I solved it using a hash map. What approach are you using?",
       timestamp: "2023-04-02T12:52:00Z"
@@ -116,7 +119,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
       sender: {
         id: "1",
         username: "Me",
-        profileImage: "https://i.pravatar.cc/300?img=1"
+        profileImage: "https://i.pravatar.cc/300?img=1",
+        fullName: "John Doe",
+        email: "john.doe@example.com"
       },
       content: "I'm struggling with the time complexity. My brute force approach is O(n²) but I think there's a more efficient way.",
       timestamp: "2023-04-02T12:57:00Z",
@@ -128,7 +133,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
       sender: {
         id: "4",
         username: "Alice",
-        profileImage: "https://i.pravatar.cc/300?img=5"
+        profileImage: "https://i.pravatar.cc/300?img=5",
+        fullName: "Alice Johnson", // Add required User fields
+        email: "alice@example.com"
       },
       content: "Try using a hash map to store the elements you've seen. It can reduce time complexity to O(n).",
       timestamp: "2023-04-02T13:02:00Z"
@@ -139,7 +146,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
       sender: {
         id: "5",
         username: "Bob",
-        profileImage: "https://i.pravatar.cc/300?img=8"
+        profileImage: "https://i.pravatar.cc/300?img=8",
+        fullName: "Bob Smith", // Add required User fields
+        email: "bob@example.com"
       },
       content: "Exactly. As you iterate through the array, check if the complement (target - current element) exists in the hash map. If it does, you've found your pair.",
       timestamp: "2023-04-02T13:07:00Z"
@@ -153,7 +162,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
         id: "4",
         username: "Sophie",
         profileImage: "https://i.pravatar.cc/300?img=9",
-        isOnline: true
+        isOnline: true,
+        fullName: "Sophie Williams",
+        email: "sophie@example.com"
       },
       content: "Hey! How's your practice going?",
       timestamp: "2023-04-02T14:45:00Z"
@@ -164,7 +175,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
       sender: {
         id: "1",
         username: "Me",
-        profileImage: "https://i.pravatar.cc/300?img=1"
+        profileImage: "https://i.pravatar.cc/300?img=1",
+        fullName: "John Doe",
+        email: "john.doe@example.com"
       },
       content: "Pretty good! Working on dynamic programming problems this week.",
       timestamp: "2023-04-02T14:48:00Z",
@@ -177,7 +190,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
         id: "4",
         username: "Sophie",
         profileImage: "https://i.pravatar.cc/300?img=9",
-        isOnline: true
+        isOnline: true,
+        fullName: "Sophie Williams",
+        email: "sophie@example.com"
       },
       content: "Nice! I'm creating a new challenge focused on graph algorithms.",
       timestamp: "2023-04-02T14:52:00Z"
@@ -189,7 +204,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
         id: "4",
         username: "Sophie",
         profileImage: "https://i.pravatar.cc/300?img=9",
-        isOnline: true
+        isOnline: true,
+        fullName: "Sophie Williams",
+        email: "sophie@example.com"
       },
       content: "I'm creating a new challenge, want to join?",
       timestamp: "2023-04-02T15:30:00Z",
@@ -212,7 +229,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
         id: "5",
         username: "Taylor",
         profileImage: "https://i.pravatar.cc/300?img=5",
-        isOnline: false
+        isOnline: false,
+        fullName: "Taylor Smith",
+        email: "taylor@example.com"
       },
       content: "Hi there! Would you be interested in a 1v1 coding challenge?",
       timestamp: "2023-04-03T09:30:00Z"
@@ -223,7 +242,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
       sender: {
         id: "1",
         username: "Me",
-        profileImage: "https://i.pravatar.cc/300?img=1"
+        profileImage: "https://i.pravatar.cc/300?img=1",
+        fullName: "John Doe",
+        email: "john.doe@example.com"
       },
       content: "Absolutely! What kind of problems are you thinking?",
       timestamp: "2023-04-03T09:33:00Z",
@@ -236,7 +257,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
         id: "5",
         username: "Taylor",
         profileImage: "https://i.pravatar.cc/300?img=5",
-        isOnline: false
+        isOnline: false,
+        fullName: "Taylor Smith",
+        email: "taylor@example.com"
       },
       content: "I was thinking hard difficulty, focused on dynamic programming and backtracking.",
       timestamp: "2023-04-03T09:38:00Z"
@@ -248,7 +271,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
         id: "5",
         username: "Taylor",
         profileImage: "https://i.pravatar.cc/300?img=5",
-        isOnline: false
+        isOnline: false,
+        fullName: "Taylor Smith",
+        email: "taylor@example.com"
       },
       content: "Check out this private challenge I created",
       timestamp: "2023-04-03T09:45:00Z",
@@ -272,7 +297,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
         id: "3",
         username: "Mike",
         profileImage: "https://i.pravatar.cc/300?img=3",
-        isOnline: true
+        isOnline: true,
+        fullName: "Mike Chen",
+        email: "mike@example.com"
       },
       content: "Hey! Are you preparing for the upcoming weekly contest?",
       timestamp: "2023-04-03T10:45:00Z"
@@ -283,7 +310,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
       sender: {
         id: "1",
         username: "Me",
-        profileImage: "https://i.pravatar.cc/300?img=1"
+        profileImage: "https://i.pravatar.cc/300?img=1",
+        fullName: "John Doe",
+        email: "john.doe@example.com"
       },
       content: "Yes! Looking forward to it. How about you?",
       timestamp: "2023-04-03T10:50:00Z",
@@ -296,7 +325,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
         id: "3",
         username: "Mike",
         profileImage: "https://i.pravatar.cc/300?img=3",
-        isOnline: true
+        isOnline: true,
+        fullName: "Mike Chen",
+        email: "mike@example.com"
       },
       content: "Same here. We should practice together before the contest.",
       timestamp: "2023-04-03T10:55:00Z"
@@ -308,7 +339,9 @@ const mockMessages: Record<string, ChatMessage[]> = {
         id: "3",
         username: "Mike",
         profileImage: "https://i.pravatar.cc/300?img=3",
-        isOnline: true
+        isOnline: true,
+        fullName: "Mike Chen",
+        email: "mike@example.com"
       },
       content: "Let's practice for the upcoming contest",
       timestamp: "2023-04-03T11:20:00Z"
@@ -350,7 +383,9 @@ export const sendMessage = async (channelId: string, content: string, attachment
       sender: {
         id: "1",
         username: "Me",
-        profileImage: "https://i.pravatar.cc/300?img=1"
+        profileImage: "https://i.pravatar.cc/300?img=1",
+        fullName: "John Doe", // Add required User fields
+        email: "john.doe@example.com"
       },
       content,
       timestamp: new Date().toISOString(),
@@ -370,7 +405,9 @@ export const sendChallengeInvite = async (channelId: string, challenge: { id: st
       sender: {
         id: "1",
         username: "Me",
-        profileImage: "https://i.pravatar.cc/300?img=1"
+        profileImage: "https://i.pravatar.cc/300?img=1",
+        fullName: "John Doe",
+        email: "john.doe@example.com"
       },
       content: challenge.isPrivate 
         ? `Join my private challenge: ${challenge.title}` 

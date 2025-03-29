@@ -146,7 +146,7 @@ export interface Badge {
 export interface Challenge {
   id: string;
   title: string;
-  description: string;
+  description?: string; // Making description optional
   difficulty: "Easy" | "Medium" | "Hard";
   isPrivate: boolean;
   participants?: number;
@@ -280,4 +280,5 @@ export interface AdminState {
   users?: User[];
   totalUsers?: number;
   nextPageToken?: string;
+  banHistories?: any[];
 }
