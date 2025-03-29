@@ -35,15 +35,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Log environment variables to console in development mode
-if (import.meta.env.DEV) {
-  console.log('Environment:', import.meta.env.VITE_ENVIRONMENT);
-  console.log('API URLs configured correctly:', {
-    engineURL: import.meta.env.VITE_XENGINELOCALENGINEURL || 'Not set',
-    xcodeURL: import.meta.env.VITE_XCODEMICROSERVICELOCALURL || 'Not set',
-  });
-}
-
 const AppContent = () => {
   const location = useLocation();
   
