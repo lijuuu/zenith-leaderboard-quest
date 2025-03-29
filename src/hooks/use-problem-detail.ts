@@ -29,7 +29,9 @@ export const useProblemDetail = () => {
     
     const fetchProblem = async () => {
       try {
+        console.log("Fetching problem data for ID:", id);
         const problemData = await fetchProblemByIdAPI(id);
+        console.log("Problem data received:", problemData);
         setProblem(problemData);
         
         // Get stored language preference

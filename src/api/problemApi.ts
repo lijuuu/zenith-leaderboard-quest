@@ -1,6 +1,169 @@
 import { Problem, Submission, CompileRequest, CompileResponse } from './types';
 
-// Mock data for problems
+// Mock data from the API response
+const apiMockProblems = {
+  "success": true,
+  "status": 200,
+  "payload": {
+    "page": 1,
+    "page_size": 100,
+    "problems": [
+      {
+        "problem_id": "67d96452d3fe6af39801337b",
+        "title": "Two Sum",
+        "description": "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to the target.\n\nYou may assume that each input would have **exactly one solution**, and you may not use the same element twice.\n\nYou can return the answer in any order.\n\n## Examples\n\n### Example 1:\n- **Input**: `nums = [2,7,11,15]`, `target = 9`\n- **Output**: `[0,1]`\n- **Explanation**: Because `nums[0] + nums[1] == 9`, we return `[0, 1]`\n\n### Example 2:\n- **Input**: `nums = [3,2,4]`, `target = 6`\n- **Output**: `[1,2]`\n\n## Constraints\n- `2 <= nums.length <= 10⁴`\n- `-10⁹ <= nums[i] <= 10⁹`\n- `-10⁹ <= target <= 10⁹`\n- Only one valid answer exists\n\n## Follow-up\nCan you come up with an algorithm that is less than `O(n²)` time complexity?",
+        "tags": [
+          "Array",
+          "Hash Table",
+          "String",
+          "Linked List"
+        ],
+        "testcase_run": {
+          "run": [
+            {
+              "id": "67e16a5a48ec539e82f1622c",
+              "input": "{ \"nums\": [2,7,11,15], \"target\": 9 }",
+              "expected": "[0,1]"
+            },
+            {
+              "id": "67e216734e8f4ccb4fda6635",
+              "input": "{   \"nums\": [2, 7, 11, 15],   \"target\": 9 }",
+              "expected": "[0,1]"
+            }
+          ]
+        },
+        "difficulty": "E",
+        "supported_languages": [
+          "go",
+          "python",
+          "javascript"
+        ],
+        "validated": true,
+        "placeholder_maps": {
+          "go": "func twoSum(nums []int, target int) []int {\n\t//Type your code\n\treturn []int{}\n}",
+          "javascript": "function twoSum(nums, target) {\n    // Type your code\n    return [];\n}",
+          "python": "def two_sum(nums, target):\n    # Type your code\n    return []"
+          }
+      },
+      {
+        "problem_id": "67b96452d3fe6af39801337d",
+        "title": "Reverse a String",
+        "description": "Write a function that reverses a given string. You must return the string with its characters in reverse order.\n\n## Examples\n\n### Example 1:\n- **Input**: `\"hello\"`\n- **Output**: `\"olleh\"`\n- **Explanation**: The string \"hello\" is reversed to \"olleh\".\n\n### Example 2:\n- **Input**: `\"world\"`\n- **Output**: `\"dlrow\"`\n\n## Constraints\n- `1 <= s.length <= 10⁴`\n- `s` consists of printable ASCII characters.",
+        "tags": [
+          "String",
+          "Array"
+        ],
+        "testcase_run": {
+          "run": [
+            {
+              "id": "67e16a5a48ec539e82f16232",
+              "input": "\"hello\"",
+              "expected": "\"olleh\""
+            },
+            {
+              "id": "67e16a5a48ec539e82f16233",
+              "input": "\"world\"",
+              "expected": "\"dlrow\""
+            }
+          ]
+        },
+        "difficulty": "E",
+        "supported_languages": [
+          "go",
+          "python",
+          "javascript"
+        ],
+        "validated": true,
+        "placeholder_maps": {
+          "go": "func reverseString(s string) string {\n\t// Type your code\n\treturn \"\"\n}",
+          "javascript": "function reverseString(s) {\n    // Type your code\n    return \"\";\n}",
+          "python": "def reverse_string(s):\n    # Type your code\n    return \"\""
+        }
+      },
+      {
+        "problem_id": "67e1a5b2c9f8d3e4a201b48f",
+        "title": "Add Two Numbers",
+        "description": "Write a function that takes two integers and returns their sum.\n\n## Examples\n\n### Example 1:\n- **Input**: `a = 3, b = 5`\n- **Output**: `8`\n- **Explanation**: `3 + 5 = 8`\n\n### Example 2:\n- **Input**: `a = -2, b = 7`\n- **Output**: `5`\n\n## Constraints\n- `-10⁹ <= a, b <= 10⁹`",
+        "tags": [
+          "Math",
+          "Basic"
+        ],
+        "testcase_run": {
+          "run": [
+            {
+              "id": "67e16a5a48ec539e82f16238",
+              "input": "{\"a\": 3, \"b\": 5}",
+              "expected": "8"
+            },
+            {
+              "id": "67e16a5a48ec539e82f16239",
+              "input": "{\"a\": -2, \"b\": 7}",
+              "expected": "5"
+            }
+          ]
+        },
+        "difficulty": "E",
+        "supported_languages": [
+          "go",
+          "python",
+          "javascript"
+        ],
+        "validated": true,
+        "placeholder_maps": {
+          "go": "func addTwoNumbers(a int, b int) int {\n\t// Type your code\n\treturn 0\n}",
+          "javascript": "function addTwoNumbers(a, b) {\n    // Type your code\n    return 0;\n}",
+          "python": "def add_two_numbers(a, b):\n    # Type your code\n    return 0"
+        }
+      }
+    ],
+    "total_count": 3
+  }
+};
+
+// Mock data for the Two Sum problem detail
+const apiMockProblemDetail = {
+  "success": true,
+  "status": 200,
+  "payload": {
+    "problem_id": "67d96452d3fe6af39801337b",
+    "title": "Two Sum",
+    "description": "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to the target.\n\nYou may assume that each input would have **exactly one solution**, and you may not use the same element twice.\n\nYou can return the answer in any order.\n\n## Examples\n\n### Example 1:\n- **Input**: `nums = [2,7,11,15]`, `target = 9`\n- **Output**: `[0,1]`\n- **Explanation**: Because `nums[0] + nums[1] == 9`, we return `[0, 1]`\n\n### Example 2:\n- **Input**: `nums = [3,2,4]`, `target = 6`\n- **Output**: `[1,2]`\n\n## Constraints\n- `2 <= nums.length <= 10⁴`\n- `-10⁹ <= nums[i] <= 10⁹`\n- `-10⁹ <= target <= 10⁹`\n- Only one valid answer exists\n\n## Follow-up\nCan you come up with an algorithm that is less than `O(n²)` time complexity?",
+    "tags": [
+      "Array",
+      "Hash Table",
+      "String",
+      "Linked List"
+    ],
+    "testcase_run": {
+      "run": [
+        {
+          "id": "67e16a5a48ec539e82f1622c",
+          "input": "{ \"nums\": [2,7,11,15], \"target\": 9 }",
+          "expected": "[0,1]"
+        },
+        {
+          "id": "67e216734e8f4ccb4fda6635",
+          "input": "{   \"nums\": [2, 7, 11, 15],   \"target\": 9 }",
+          "expected": "[0,1]"
+        }
+      ]
+    },
+    "difficulty": "E",
+    "supported_languages": [
+      "go",
+      "python",
+      "javascript"
+    ],
+    "validated": true,
+    "placeholder_maps": {
+      "go": "func twoSum(nums []int, target int) []int {\n\t//Type your code\n\treturn []int{}\n}",
+      "javascript": "function twoSum(nums, target) {\n    // Type your code\n    return [];\n}",
+      "python": "def two_sum(nums, target):\n    # Type your code\n    return []"
+    }
+  }
+};
+
+// Original mock data for problems
 const mockProblems: Problem[] = [
   {
     id: "p1",
@@ -270,6 +433,189 @@ const mockProblems: Problem[] = [
   }
 ];
 
+// API functions
+export const getProblems = async (filters?: { difficulty?: string; tags?: string[]; solved?: boolean; search?: string }): Promise<Problem[]> => {
+  return new Promise(resolve => {
+    try {
+      // Try to use the API mock data first
+      if (apiMockProblems && apiMockProblems.success) {
+        console.log("Using API mock data for problems list");
+        
+        // Map the API format to our internal format
+        const mappedProblems = apiMockProblems.payload.problems.map(p => ({
+          id: p.problem_id,
+          title: p.title,
+          slug: p.title.toLowerCase().replace(/\s+/g, '-'),
+          difficulty: mapDifficulty(p.difficulty),
+          tags: p.tags,
+          acceptanceRate: Math.floor(Math.random() * 30) + 60, // Random between 60-90%
+          solved: Math.random() > 0.5, // Randomly set as solved or not
+          description: p.description,
+          examples: p.testcase_run.run.map(ex => ({
+            input: ex.input,
+            output: ex.expected,
+            explanation: "" // Not provided in the API data
+          })),
+          constraints: p.description.includes("## Constraints") 
+            ? p.description.split("## Constraints")[1].split(/\n##|\n\n/)[0].split("\n").filter(line => line.trim().startsWith("-")).map(line => line.trim())
+            : []
+        }));
+        
+        // Apply any filters
+        let filteredProblems = [...mappedProblems];
+        
+        if (filters) {
+          if (filters.difficulty) {
+            filteredProblems = filteredProblems.filter(p => p.difficulty === filters.difficulty);
+          }
+          
+          if (filters.tags && filters.tags.length > 0) {
+            filteredProblems = filteredProblems.filter(p => 
+              filters.tags!.some(tag => p.tags.includes(tag))
+            );
+          }
+          
+          if (filters.solved !== undefined) {
+            filteredProblems = filteredProblems.filter(p => p.solved === filters.solved);
+          }
+          
+          if (filters.search) {
+            const searchLower = filters.search.toLowerCase();
+            filteredProblems = filteredProblems.filter(p => 
+              p.title.toLowerCase().includes(searchLower) || 
+              p.description.toLowerCase().includes(searchLower)
+            );
+          }
+        }
+        
+        setTimeout(() => resolve(filteredProblems), 600);
+        return;
+      }
+    } catch (error) {
+      console.error("Error processing API mock data:", error);
+      // Fall back to the original mock data if anything goes wrong
+    }
+    
+    // Fall back to original implementation with existing mock data
+    let filteredProblems = [...mockProblems];
+    
+    if (filters) {
+      if (filters.difficulty) {
+        filteredProblems = filteredProblems.filter(p => p.difficulty === filters.difficulty);
+      }
+      
+      if (filters.tags && filters.tags.length > 0) {
+        filteredProblems = filteredProblems.filter(p =>
+          filters.tags!.some(tag => p.tags.includes(tag))
+        );
+      }
+      
+      if (filters.solved !== undefined) {
+        filteredProblems = filteredProblems.filter(p => p.solved === filters.solved);
+      }
+      
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        filteredProblems = filteredProblems.filter(p =>
+          p.title.toLowerCase().includes(searchLower) ||
+          p.description.toLowerCase().includes(searchLower)
+        );
+      }
+    }
+    
+    setTimeout(() => resolve(filteredProblems), 600);
+  });
+};
+
+export const getProblem = async (idOrSlug: string): Promise<Problem | null> => {
+  return new Promise(resolve => {
+    try {
+      // Check if we're looking for the Two Sum problem specifically
+      if (idOrSlug === "67d96452d3fe6af39801337b" || idOrSlug === "two-sum" || idOrSlug === "p1") {
+        console.log("Using API mock data for Two Sum problem detail");
+        
+        // Format the API response to match our internal format
+        const apiProblem = apiMockProblemDetail.payload;
+        const problem: Problem = {
+          id: apiProblem.problem_id,
+          title: apiProblem.title,
+          slug: apiProblem.title.toLowerCase().replace(/\s+/g, '-'),
+          difficulty: mapDifficulty(apiProblem.difficulty),
+          tags: apiProblem.tags,
+          acceptanceRate: Math.floor(Math.random() * 30) + 60, // Random between 60-90%
+          solved: Math.random() > 0.5, // Randomly set as solved or not
+          description: apiProblem.description,
+          examples: apiProblem.testcase_run.run.map(ex => ({
+            input: ex.input,
+            output: ex.expected,
+            explanation: "" // Not provided in the API data
+          })),
+          constraints: apiProblem.description.includes("## Constraints") 
+            ? apiProblem.description.split("## Constraints")[1].split(/\n##|\n\n/)[0].split("\n").filter(line => line.trim().startsWith("-")).map(line => line.trim())
+            : []
+        };
+        
+        setTimeout(() => resolve(problem), 500);
+        return;
+      }
+      
+      // For other problems, check the problems list
+      for (const apiProblem of apiMockProblems.payload.problems) {
+        if (apiProblem.problem_id === idOrSlug || 
+            apiProblem.title.toLowerCase().replace(/\s+/g, '-') === idOrSlug) {
+          
+          console.log(`Using API mock data for problem: ${apiProblem.title}`);
+          
+          const problem: Problem = {
+            id: apiProblem.problem_id,
+            title: apiProblem.title,
+            slug: apiProblem.title.toLowerCase().replace(/\s+/g, '-'),
+            difficulty: mapDifficulty(apiProblem.difficulty),
+            tags: apiProblem.tags,
+            acceptanceRate: Math.floor(Math.random() * 30) + 60, // Random between 60-90%
+            solved: Math.random() > 0.5, // Randomly set as solved or not
+            description: apiProblem.description,
+            examples: apiProblem.testcase_run.run.map(ex => ({
+              input: ex.input,
+              output: ex.expected,
+              explanation: "" // Not provided in the API data
+            })),
+            constraints: apiProblem.description.includes("## Constraints") 
+              ? apiProblem.description.split("## Constraints")[1].split(/\n##|\n\n/)[0].split("\n").filter(line => line.trim().startsWith("-")).map(line => line.trim())
+              : []
+          };
+          
+          setTimeout(() => resolve(problem), 500);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Error processing API mock data for problem detail:", error);
+      // Fall back to the original implementation if anything goes wrong
+    }
+    
+    // Fall back to the original implementation
+    const problem = mockProblems.find(p => 
+      p.id === idOrSlug || p.slug === idOrSlug
+    ) || null;
+    
+    setTimeout(() => resolve(problem), 500);
+  });
+};
+
+// Helper function to map difficulty codes to strings
+const mapDifficulty = (difficulty: string): "Easy" | "Medium" | "Hard" => {
+  const difficultyMap: Record<string, "Easy" | "Medium" | "Hard"> = {
+    "1": "Easy",
+    "2": "Medium",
+    "3": "Hard",
+    "E": "Easy",
+    "M": "Medium",
+    "H": "Hard",
+  };
+  return difficultyMap[difficulty] || "Medium";
+};
+
 // Mock submissions
 const mockSubmissions: Submission[] = [
   {
@@ -306,61 +652,6 @@ const mockSubmissions: Submission[] = [
   }
 ];
 
-// API functions
-export const getProblems = async (filters?: { difficulty?: string; tags?: string[]; solved?: boolean; search?: string }): Promise<Problem[]> => {
-  return new Promise(resolve => {
-    let filteredProblems = [...mockProblems];
-    
-    if (filters) {
-      if (filters.difficulty) {
-        filteredProblems = filteredProblems.filter(p => p.difficulty === filters.difficulty);
-      }
-      
-      if (filters.tags && filters.tags.length > 0) {
-        filteredProblems = filteredProblems.filter(p => 
-          filters.tags!.some(tag => p.tags.includes(tag))
-        );
-      }
-      
-      if (filters.solved !== undefined) {
-        filteredProblems = filteredProblems.filter(p => p.solved === filters.solved);
-      }
-      
-      if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
-        filteredProblems = filteredProblems.filter(p => 
-          p.title.toLowerCase().includes(searchLower) || 
-          p.description.toLowerCase().includes(searchLower)
-        );
-      }
-    }
-    
-    setTimeout(() => resolve(filteredProblems), 600);
-  });
-};
-
-export const getProblem = async (idOrSlug: string): Promise<Problem | null> => {
-  return new Promise(resolve => {
-    const problem = mockProblems.find(p => 
-      p.id === idOrSlug || p.slug === idOrSlug
-    ) || null;
-    
-    setTimeout(() => resolve(problem), 500);
-  });
-};
-
-export const getSubmissions = async (problemId?: string): Promise<Submission[]> => {
-  return new Promise(resolve => {
-    let filteredSubmissions = [...mockSubmissions];
-    
-    if (problemId) {
-      filteredSubmissions = filteredSubmissions.filter(s => s.problemId === problemId);
-    }
-    
-    setTimeout(() => resolve(filteredSubmissions), 500);
-  });
-};
-
 export const submitSolution = async (submission: Omit<Submission, 'id' | 'timestamp' | 'status' | 'runtime' | 'memory' | 'testCases'>): Promise<Submission> => {
   return new Promise(resolve => {
     // Simulate backend validation and testing
@@ -392,145 +683,4 @@ export const compileAndRun = async (request: CompileRequest): Promise<CompileRes
     if (hasError) {
       setTimeout(() => resolve({
         output: "",
-        error: `Compilation error in ${request.language}:\nSyntax error at line ${Math.floor(Math.random() * 10) + 1}`,
-      }), 1000);
-    } else {
-      setTimeout(() => resolve({
-        output: request.input 
-          ? `Input: ${request.input}\nOutput: Result for the given input`
-          : "Code compiled and ran successfully!",
-        executionTime: `${Math.floor(Math.random() * 100)} ms`,
-        memory: `${Math.floor(Math.random() * 10 + 5)} MB`
-      }), 1000);
-    }
-  });
-};
-
-export const runTestCases = async (problemId: string, code: string, language: string): Promise<{ passed: boolean; results: any[] }> => {
-  return new Promise(resolve => {
-    const problem = mockProblems.find(p => p.id === problemId);
-    
-    if (!problem) {
-      setTimeout(() => resolve({ passed: false, results: [] }), 800);
-      return;
-    }
-    
-    const results = problem.examples.map(example => {
-      const passed = Math.random() > 0.3; // 70% chance of success
-      
-      return {
-        input: example.input,
-        expectedOutput: example.output,
-        actualOutput: passed ? example.output : "Different output",
-        passed
-      };
-    });
-    
-    const allPassed = results.every(r => r.passed);
-    
-    setTimeout(() => resolve({ 
-      passed: allPassed,
-      results
-    }), 1500);
-  });
-};
-
-// Add these new functions for the problem execution
-export const fetchProblemByIdAPI = async (problemId: string) => {
-  // Get problem from the existing mock data for development
-  const problem = await getProblem(problemId);
-  
-  if (!problem) {
-    throw new Error('Problem not found');
-  }
-
-  // Map the mock data to the expected format
-  return {
-    problem_id: problem.id,
-    title: problem.title,
-    description: problem.description,
-    tags: problem.tags,
-    testcase_run: {
-      run: problem.examples.map(example => ({
-        input: example.input,
-        expected: example.output
-      }))
-    },
-    difficulty: problem.difficulty,
-    supported_languages: ['javascript', 'python', 'java', 'cpp', 'go'],
-    validated: true,
-    placeholder_maps: {
-      javascript: 'function solution(nums, target) {\n  // Write your solution here\n}',
-      python: 'def solution(nums, target):\n  # Write your solution here\n  pass',
-      java: 'class Solution {\n  public int[] solution(int[] nums, int target) {\n    // Write your solution here\n    return new int[0];\n  }\n}',
-      cpp: '#include <vector>\n\nclass Solution {\npublic:\n  std::vector<int> solution(std::vector<int>& nums, int target) {\n    // Write your solution here\n    return {};\n  }\n};',
-      go: 'package main\n\nfunc solution(nums []int, target int) []int {\n  // Write your solution here\n  return []int{}\n}'
-    }
-  };
-};
-
-export const executeCode = async (
-  problemId: string,
-  language: string,
-  code: string,
-  isRunTestcase: boolean
-) => {
-  // For now, we'll simulate the API call with a mocked response
-  // In production, this would be a real API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Create a simulated success response (70% chance)
-      const success = Math.random() > 0.3;
-      
-      if (success) {
-        const passedCount = Math.floor(Math.random() * 4); // 0-3 passed tests
-        const totalCount = 3; // Mock 3 test cases
-        
-        resolve({
-          success: true,
-          status: 200,
-          payload: {
-            problem_id: problemId,
-            language,
-            is_run_testcase: isRunTestcase,
-            rawoutput: {
-              totalTestCases: totalCount,
-              passedTestCases: passedCount,
-              failedTestCases: totalCount - passedCount,
-              overallPass: passedCount === totalCount,
-              failedTestCase: passedCount < totalCount ? {
-                testCaseIndex: passedCount,
-                input: { nums: [2, 7, 11, 15], target: 9 },
-                expected: [0, 1],
-                received: [1, 0],
-                passed: false
-              } : undefined
-            }
-          }
-        });
-      } else {
-        // Simulate error response
-        resolve({
-          success: false,
-          status: 400,
-          payload: {
-            problem_id: problemId,
-            language,
-            is_run_testcase: isRunTestcase,
-            rawoutput: {
-              totalTestCases: 0,
-              passedTestCases: 0,
-              failedTestCases: 0,
-              overallPass: false,
-              syntaxError: "Unexpected token in line 3"
-            }
-          },
-          error: {
-            errorType: "SyntaxError",
-            message: "Unexpected token in line 3"
-          }
-        });
-      }
-    }, 1500);
-  });
-};
+        error: `Compilation error in ${request.language}:\nSyntax error
