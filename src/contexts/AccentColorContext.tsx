@@ -9,3 +9,5 @@ interface AccentColorContextType {
 const AccentColorContext = createContext<AccentColorContextType>({ accentColor: 'green' });
 
 export const useAccentColor = () => useContext(AccentColorContext);
+
+export default AccentColorContext;

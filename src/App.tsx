@@ -41,6 +41,9 @@ const AppContent = () => {
   useEffect(() => {
     // Scroll to top when route changes
     window.scrollTo(0, 0);
+    
+    // Add dark class to document by default
+    document.documentElement.classList.add('dark');
   }, [location.pathname]);
   
   return (

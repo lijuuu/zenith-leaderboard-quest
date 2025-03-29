@@ -176,21 +176,9 @@ const CompilerLayout = () => {
             </Button>
           )}
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
-                <Settings className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-background border-border/50">
-              <DropdownMenuItem className="hover:bg-muted">
-                Light Mode
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-muted">
-                Dark Mode
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
+            <Settings className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 

@@ -18,7 +18,6 @@ import {
   LayoutDashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import DarkModeToggle from "./DarkModeToggle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -139,8 +138,6 @@ const MainNavbar = () => {
             <Bell className="h-5 w-5" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full"></span>
           </Button>
-          
-          <DarkModeToggle />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

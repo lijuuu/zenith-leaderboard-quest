@@ -1,11 +1,10 @@
 
 import React from "react";
-import { User, Lock, Bell, Moon } from "lucide-react";
+import { User, Lock, Bell } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileSettingsTab from "./ProfileSettingsTab";
 import AccountSettingsTab from "./AccountSettingsTab";
 import NotificationsSettingsTab from "./NotificationsSettingsTab";
-import AppearanceSettingsTab from "./AppearanceSettingsTab";
 import { User as UserType } from "@/api/types";
 
 interface SettingsTabsProps {
@@ -38,13 +37,6 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({ user }) => {
             <Bell className="h-4 w-4 mr-2" />
             Notifications
           </TabsTrigger>
-          <TabsTrigger 
-            value="appearance" 
-            className="py-2 px-4 data-[state=active]:border-b-2 data-[state=active]:border-green-500 data-[state=active]:text-green-400 rounded-none bg-transparent text-zinc-400"
-          >
-            <Moon className="h-4 w-4 mr-2" />
-            Appearance
-          </TabsTrigger>
         </TabsList>
       </div>
       
@@ -58,10 +50,6 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({ user }) => {
       
       <TabsContent value="notifications">
         <NotificationsSettingsTab />
-      </TabsContent>
-      
-      <TabsContent value="appearance">
-        <AppearanceSettingsTab />
       </TabsContent>
     </Tabs>
   );
