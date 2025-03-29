@@ -20,6 +20,7 @@ import Compiler from "./pages/Compiler";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
+import Login from "./pages/Auth/Login";
 import MainNavbar from "@/components/MainNavbar";
 import QuickMatch from "./components/challenges/QuickMatch";
 import AdminDashboard from "./pages-admin/AdminDashboard";
@@ -63,6 +64,7 @@ const AppContent = () => {
           <Route path="/compiler" element={<Compiler />} />
           
           {/* Auth Routes */}
+          <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
